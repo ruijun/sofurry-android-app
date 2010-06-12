@@ -8,9 +8,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Intent;
 import android.util.Log;
 
-public class ListStories extends AbstractContentList {
+public class ListStories extends AbstractContentList<String> {
 
 	@Override
 	protected Map<String, String> getFetchParameters() {
@@ -24,11 +25,11 @@ public class ListStories extends AbstractContentList {
 		return kvPairs;
 	}
 
-	protected int parseResponse(String httpResult, ArrayList<String> list)
-			throws JSONException {
+	@Override
+	protected int parseResponse(java.lang.String httpResult, ArrayList<String> list) throws JSONException {
 		int numResults;
-		Log.i("Stories.parseResponse", "response: "+httpResult);
-		
+		Log.i("Stories.parseResponse", "response: " + httpResult);
+
 		JSONObject jsonParser = new JSONObject(httpResult);
 		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
 		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
@@ -39,6 +40,15 @@ public class ListStories extends AbstractContentList {
 		return numResults;
 	}
 
+	@Override
+	protected void setSelectedIndex(int selectedIndex) {
+		int pageID = 1;
+		Intent i = new Intent( this, ViewStoryActivity.class ) ;
+		i.putExtra("pageID", pageID) ;
+		i.putExtra("useAuthentication", useAuthentication()) ;
+		startActivity(i) ;
+	}
+	
 	@Override
 	protected boolean useAuthentication() {
 		return false;

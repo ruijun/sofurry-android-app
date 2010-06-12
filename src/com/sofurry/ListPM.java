@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-public class ListPM extends AbstractContentList {
+public class ListPM extends AbstractContentList<String> {
 
 	@Override
 	protected Map<String, String> getFetchParameters() {
@@ -41,6 +41,11 @@ public class ListPM extends AbstractContentList {
 			list.add(fromUserName+": "+subject);
 		}
 		return numResults;
+	}
+
+	@Override
+	protected void setSelectedIndex(int selectedIndex) {
+		
 	}
 
 	@Override

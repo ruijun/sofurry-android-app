@@ -1,7 +1,6 @@
 package com.sofurry;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,44 +10,56 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.webkit.WebView;
 
-public abstract class AbstractContentList<T> extends ListActivity implements Runnable {
-
+public class ViewStoryActivity extends Activity implements Runnable {
+	
 	private String requestUrl;
 	private Map<String, String> requestParameters;
 	private Map<String, String> originalRequestParameters;
 	private ProgressDialog pd;
-	private int numResults;
-	private ArrayList<T> resultList;
 	private String errorMessage;
+	private int pageID;
+	private boolean useAuthentication;
+	private WebView webview;
+	private Submission displaySubmission;
 
-	// Get parameters and initiate data fetch thread
-	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	    super.onCreate(savedInstanceState);	
+	    webview = new WebView(this);
+	    setContentView(webview);
+	    Bundle extras = getIntent().getExtras() ;
+	    if( extras != null ){
+	        pageID = extras.getInt( "pageID" ) ;
+	        useAuthentication = extras.getBoolean("useAuthentication");
+			requestUrl = AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
+			requestParameters = getFetchParameters(pageID);
+			if (useAuthentication) {
+				// Save request parameters in case we have to re-send the request
+				originalRequestParameters = new HashMap<String, String>(requestParameters);
+				// add authentication parameters to the request
+				requestParameters = Authentication.addAuthParametersToQuery(requestParameters);
+			}
+			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
+			errorMessage = null;
+			Thread thread = new Thread(this);
+			thread.start();
+	    }
+	}
 
-		requestUrl = getFetchUrl();
-		requestParameters = getFetchParameters();
-		if (useAuthentication()) {
-			// Save request parameters in case we have to re-send the request
-			originalRequestParameters = new HashMap<String, String>(requestParameters);
-			// add authentication parameters to the request
-			requestParameters = Authentication.addAuthParametersToQuery(requestParameters);
-		}
-		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
-		errorMessage = null;
-		Thread thread = new Thread(this);
-		thread.start();
+	protected Map<String, String> getFetchParameters(int pageID) {
+		Map<String, String> kvPairs = new HashMap<String, String>();
+
+		kvPairs.put("f", "getpagecontent");
+		kvPairs.put("pid", ""+pageID);
+		return kvPairs;
 	}
 
 	// Asynchronous http request and result parsing
@@ -56,10 +67,8 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 		try {
 			HttpResponse response = HttpRequest.doPost(requestUrl, requestParameters);
 			String httpResult = EntityUtils.toString(response.getEntity());
-			numResults = 0;
-			resultList = new ArrayList<T>();
 			try {
-				if (useAuthentication() && Authentication.parseResponse(httpResult) == false) {
+				if (useAuthentication && Authentication.parseResponse(httpResult) == false) {
 					// Retry request with new otp sequence if it failed for the first time
 					requestParameters = Authentication.addAuthParametersToQuery(originalRequestParameters);
 					response = HttpRequest.doPost(requestUrl, requestParameters);
@@ -67,7 +76,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 				}
 				errorMessage = parseErrorMessage(httpResult);
 				if (errorMessage == null) {
-					numResults = parseResponse(httpResult, resultList);
+					displaySubmission = parseResponse(httpResult);
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -94,8 +103,13 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 			}
 		}
 	};
-
-	// Goes back to the main menu
+	
+	private void updateView() {
+		//TODO: Take story text and update web view
+		webview.loadData("Test data", "text/html", "utf-8");
+	}
+	
+	// Goes back to the story list
 	private void closeList() {
 		Bundle bundle = new Bundle();
 		if (errorMessage != null) {
@@ -107,21 +121,18 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 		finish();
 	}
 
-	// Sets the resulting list on the screen
-	private void updateView() {
-		setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, (String[]) resultList
-				.toArray(new String[numResults])));
-		getListView().setTextFilterEnabled(true);
-		  // bind a selection listener to the view
-		  getListView().setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-		    public void onItemSelected(AdapterView parentView, View childView, int position, long id) {
-		      setSelectedIndex(position);
-		    }
-		    public void onNothingSelected(AdapterView parentView) {
-		      setSelectedIndex(-1);
-		    }
-		  });
+	protected Submission parseResponse(java.lang.String httpResult) throws JSONException {
+		Submission submission = new Submission();
+		Log.i("ViewStoryActivity.parseResponse", "response: " + httpResult);
 
+		JSONObject jsonParser = new JSONObject(httpResult);
+//		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
+//		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
+//		numResults = items.length();
+//		for (int i = 0; i < numResults; i++) {
+//			list.add(items.getJSONObject(i).getString("name"));
+//		}
+		return submission;
 	}
 
 	protected String parseErrorMessage(String httpResult) {
@@ -143,17 +154,5 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 		return null;
 
 	}
-
-	protected abstract int parseResponse(String httpResult, ArrayList<T> list) throws JSONException;
-
-	protected String getFetchUrl() {
-		return AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
-	}
-
-	protected abstract void setSelectedIndex(int selectedIndex);
-	
-	protected abstract Map<String, String> getFetchParameters();
-
-	protected abstract boolean useAuthentication();
 
 }
