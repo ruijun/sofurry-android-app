@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:gravity="center_horizontal" android:layout_height="wrap_content" android:layout_weight="0.2">
+		<TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Username"></TextView>
+	</LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.5">
+		<EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/UsernameField"></EditText>
+	</LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.2">
+		<TextView android:id="@+id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Password"></TextView>
+	</LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.5">
+		<EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/PasswordField"></EditText>
+	</LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_weight="1" android:layout_height="wrap_content">
+		
+	</LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.4">
+		<Button android:text="Cancel" android:id="@+id/AccountCancelButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="0.5"></Button>
+		<Button android:text="OK" android:id="@+id/AccountOkButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="0.5"></Button>
+</LinearLayout>
+</LinearLayout>

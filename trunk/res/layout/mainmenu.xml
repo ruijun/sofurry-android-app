@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+	android:orientation="horizontal"
+    android:gravity="center_horizontal"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:layout_weight="1">
+	
+    <Button
+        android:id="@+id/pms"
+	    android:gravity="center_horizontal"
+        android:layout_width="95px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:text="PMs" />
+
+    <Button
+        android:id="@+id/chat"
+	    android:gravity="center_horizontal"
+        android:layout_width="95px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:text="Chat" />
+    <Button
+        android:id="@+id/logbook"
+	    android:gravity="center_horizontal"
+        android:layout_width="95px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:text="Logbook" />
+		
+    </LinearLayout>
+	
+    <LinearLayout
+	android:orientation="horizontal"
+    android:gravity="center_horizontal"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:layout_weight="1">
+	
+    <Button
+        android:id="@+id/stories"
+	    android:gravity="center_horizontal"
+        android:layout_width="95px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:text="Stories" />
+    <Button
+        android:id="@+id/art"
+	    android:gravity="center_horizontal"
+        android:layout_width="95px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:text="Art" />
+    <Button
+        android:id="@+id/music"
+	    android:gravity="center_horizontal"
+        android:layout_width="95px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:text="Music" />
+        
+    </LinearLayout>
+
+    <LinearLayout
+	android:orientation="horizontal"
+    android:gravity="center_horizontal"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:layout_weight="1">
+	
+    <Button
+        android:id="@+id/journals"
+	    android:gravity="center_horizontal"
+        android:layout_width="95px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:text="Journals" />
+    <Button
+        android:id="@+id/featured"
+	    android:gravity="center_horizontal"
+        android:layout_width="95px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:text="Featured" />
+    <Button
+        android:id="@+id/watchlist"
+	    android:gravity="center_horizontal"
+        android:layout_width="95px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:text="Watchlist" />
+        
+    </LinearLayout>        
+</LinearLayout>
