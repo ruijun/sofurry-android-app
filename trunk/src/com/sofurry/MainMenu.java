@@ -81,19 +81,22 @@ public class MainMenu extends Activity {
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		Bundle extras = intent.getExtras();
-		if (extras != null) {
-			// General error handling
-			String errorMessage = extras.getString("errorMessage");
-			if (errorMessage != null) {
-				new AlertDialog.Builder(MainMenu.this).setMessage(errorMessage).show();
-			}
-
-			switch (requestCode) {
-			case AppConstants.ACTIVITY_STORIESLIST:
-				break;
-			case AppConstants.ACTIVITY_PMLIST:
-				break;
+		if (intent != null)
+		{
+			Bundle extras = intent.getExtras();
+			if (extras != null) {
+			// 	General error handling
+				String errorMessage = extras.getString("errorMessage");
+				if (errorMessage != null) {
+					new AlertDialog.Builder(MainMenu.this).setMessage(errorMessage).show();
+				}
+				
+				switch (requestCode) {
+				case AppConstants.ACTIVITY_STORIESLIST:
+					break;
+				case AppConstants.ACTIVITY_PMLIST:
+					break;
+				}
 			}
 		}
 	}

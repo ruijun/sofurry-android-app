@@ -17,6 +17,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".ViewStoryActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEWSTORYACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ListPM">
             <intent-filter>
                 <action android:name="android.intent.action.LISTPM" />

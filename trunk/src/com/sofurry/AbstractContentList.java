@@ -113,12 +113,9 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 				.toArray(new String[numResults])));
 		getListView().setTextFilterEnabled(true);
 		  // bind a selection listener to the view
-		  getListView().setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-		    public void onItemSelected(AdapterView parentView, View childView, int position, long id) {
+		  getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		    public void onItemClick(AdapterView parentView, View childView, int position, long id) {
 		      setSelectedIndex(position);
-		    }
-		    public void onNothingSelected(AdapterView parentView) {
-		      setSelectedIndex(-1);
 		    }
 		  });
 

@@ -7,6 +7,7 @@ public class Submission {
 	private SUBMISSION_TYPE type;
 	private int id;
 	private String name;
+	private String content;
 	private String tags;
 	private String authorName;
 	private String authorID;
@@ -46,6 +47,12 @@ public class Submission {
 	}
 	public void setAuthorID(String authorID) {
 		this.authorID = authorID;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
 	}
 	
 }
