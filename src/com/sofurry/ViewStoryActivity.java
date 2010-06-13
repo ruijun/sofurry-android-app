@@ -105,8 +105,7 @@ public class ViewStoryActivity extends Activity implements Runnable {
 	};
 	
 	private void updateView() {
-		//TODO: Take story text and update web view
-		webview.loadData("Test data", "text/html", "utf-8");
+		webview.loadData(displaySubmission.getContent(), "text/html", "utf-8");
 	}
 	
 	// Goes back to the story list
@@ -126,12 +125,8 @@ public class ViewStoryActivity extends Activity implements Runnable {
 		Log.i("ViewStoryActivity.parseResponse", "response: " + httpResult);
 
 		JSONObject jsonParser = new JSONObject(httpResult);
-//		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
-//		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
-//		numResults = items.length();
-//		for (int i = 0; i < numResults; i++) {
-//			list.add(items.getJSONObject(i).getString("name"));
-//		}
+		String content = jsonParser.getString("content");
+		submission.setContent(content);
 		return submission;
 	}
 

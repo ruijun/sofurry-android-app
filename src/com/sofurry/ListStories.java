@@ -13,6 +13,8 @@ import android.util.Log;
 
 public class ListStories extends AbstractContentList<String> {
 
+	private ArrayList<String> pageIDs;
+	
 	@Override
 	protected Map<String, String> getFetchParameters() {
 		Map<String, String> kvPairs = new HashMap<String, String>();
@@ -29,20 +31,23 @@ public class ListStories extends AbstractContentList<String> {
 	protected int parseResponse(java.lang.String httpResult, ArrayList<String> list) throws JSONException {
 		int numResults;
 		Log.i("Stories.parseResponse", "response: " + httpResult);
-
+		pageIDs = new ArrayList<String>();
+		
 		JSONObject jsonParser = new JSONObject(httpResult);
 		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
 		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
 		numResults = items.length();
 		for (int i = 0; i < numResults; i++) {
 			list.add(items.getJSONObject(i).getString("name"));
+			pageIDs.add(items.getJSONObject(i).getString("pid"));
 		}
 		return numResults;
 	}
 
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {
-		int pageID = 1;
+		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
+		Log.i("ListStories", "Viewing story ID: "+pageID);
 		Intent i = new Intent( this, ViewStoryActivity.class ) ;
 		i.putExtra("pageID", pageID) ;
 		i.putExtra("useAuthentication", useAuthentication()) ;
