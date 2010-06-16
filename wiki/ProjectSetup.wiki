@@ -20,17 +20,31 @@ Below that you can see a link that says "googlecode.com password". Click it, and
 
 Start Eclipse, right click in the package explorer and select "Import". A window will appear, in which you should select "SVN" and "Project from SVN":
 
+<img src="http://hoxdna.org/svn/01.png">
+
 Click on "Create new repository location":
+
+<img src="http://hoxdna.org/svn/02.png">
 
 Enter the SVN path, username and password as follows. Do check "remember password", and note that the username does not contain "@gmail.com":
 
+<img src="http://hoxdna.org/svn/03.png">
+
 If you get a certicate warning, select "Trust Always":
+
+<img src="http://hoxdna.org/svn/04.png">
 
 On the next window append "/trunk" to the end so it looks like this. You will want to have "Head Revision" selected as shown.
 
+<img src="http://hoxdna.org/svn/05.png">
+
 On the next window, select "Check out as project configured using New Project Wizard"
 
+<img src="http://hoxdna.org/svn/06.png">
+
 On the next dialog enter the following: "SoFurry Android App" as project name, select "Create new project in workspace", select "Android 1.5" as target, Application name is "SoFurry Mobile", and package name is "com.sofurry". Uncheck "Create Activity"!
+
+<img src="http://hoxdna.org/svn/07.png">
 
 When asked to create a test project don't do anything but just press "Finish".
 
@@ -41,4 +55,3 @@ Right click on "SoFurry Android App" in the package explorer, and select "Team" 
 
 
 To run, select "Run" from the menu bar, then "Run Configurations..." and create a run configuration for this android application. You may need to set up an emulator device (also within this window) or connect your phone to the USB cable. 
-
