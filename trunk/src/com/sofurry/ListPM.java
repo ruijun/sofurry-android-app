@@ -1,6 +1,7 @@
 package com.sofurry;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,9 +9,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.ListAdapter;
 
-public class ListPM extends AbstractContentList<String> {
+import com.sofurry.list.PrivateMessageAdapter;
+import com.sofurry.model.PrivateMessage;
+
+public class ListPM extends AbstractContentList<PrivateMessage> {
 
 	@Override
 	protected Map<String, String> getFetchParameters() {
@@ -22,7 +28,7 @@ public class ListPM extends AbstractContentList<String> {
 	}
 
 	@Override
-	protected int parseResponse(String httpResult, ArrayList<String> list)
+	protected int parseResponse(String httpResult, ArrayList<PrivateMessage> list)
 			throws JSONException {
 		int numResults;
 		String result;
@@ -38,7 +44,14 @@ public class ListPM extends AbstractContentList<String> {
 			String date = jsonItem.getString("date");
 			String subject = jsonItem.getString("subject");
 			String status = jsonItem.getString("status");
-			list.add(fromUserName+": "+subject);
+			PrivateMessage m = new PrivateMessage();
+			m.setFromUser(fromUserName);
+			m.setId(Integer.parseInt(id));
+			m.setDate(date);
+			m.setSubject(subject);
+			m.setStatus(status);
+			
+			list.add(m);
 		}
 		return numResults;
 	}
@@ -51,6 +64,11 @@ public class ListPM extends AbstractContentList<String> {
 	@Override
 	protected boolean useAuthentication() {
 		return true;
+	}
+
+	@Override 
+	protected ListAdapter getAdapter(Context context) {
+		return new PrivateMessageAdapter(context, R.layout.listitemtwolineicon, resultList);
 	}
 
 }

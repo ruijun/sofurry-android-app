@@ -13,14 +13,16 @@ import org.json.JSONObject;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 
 public abstract class AbstractContentList<T> extends ListActivity implements Runnable {
 
@@ -28,8 +30,8 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 	private Map<String, String> requestParameters;
 	private Map<String, String> originalRequestParameters;
 	private ProgressDialog pd;
-	private int numResults;
-	private ArrayList<T> resultList;
+	protected int numResults;
+	protected ArrayList<T> resultList;
 	private String errorMessage;
 
 	// Get parameters and initiate data fetch thread
@@ -109,8 +111,9 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 
 	// Sets the resulting list on the screen
 	private void updateView() {
-		setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, (String[]) resultList
-				.toArray(new String[numResults])));
+//		setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, (String[]) resultList
+//				.toArray(new String[numResults])));
+		setListAdapter(getAdapter(this));
 		getListView().setTextFilterEnabled(true);
 		  // bind a selection listener to the view
 		  getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -153,4 +156,6 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 
 	protected abstract boolean useAuthentication();
 
+	protected abstract ListAdapter getAdapter(Context context);
+	
 }

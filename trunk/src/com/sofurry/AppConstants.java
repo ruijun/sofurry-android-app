@@ -12,7 +12,7 @@ public class AppConstants {
 	
 
 	public static final String PREFS_NAME = "SoFurryPreferences";
-	public static final String SITE_URL = "http://www.sofurry.com";
+	public static final String SITE_URL = "http://chat.sofurry.com";
 //	public static final String SITE_URL = "http://10.0.2.2";
 	public static final String SITE_REQUEST_SCRIPT = "/ajaxfetch.php";
 

@@ -8,10 +8,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.ListAdapter;
 
-public class ListStories extends AbstractContentList<String> {
+import com.sofurry.list.SubmissionAdapter;
+import com.sofurry.model.Submission;
+
+public class ListStories extends AbstractContentList<Submission> {
 
 	private ArrayList<String> pageIDs;
 	
@@ -28,7 +33,7 @@ public class ListStories extends AbstractContentList<String> {
 	}
 
 	@Override
-	protected int parseResponse(java.lang.String httpResult, ArrayList<String> list) throws JSONException {
+	protected int parseResponse(java.lang.String httpResult, ArrayList<Submission> list) throws JSONException {
 		int numResults;
 		Log.i("Stories.parseResponse", "response: " + httpResult);
 		pageIDs = new ArrayList<String>();
@@ -38,7 +43,11 @@ public class ListStories extends AbstractContentList<String> {
 		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
 		numResults = items.length();
 		for (int i = 0; i < numResults; i++) {
-			list.add(items.getJSONObject(i).getString("name"));
+			Submission s = new Submission();
+			s.setName(items.getJSONObject(i).getString("name"));
+			s.setId(Integer.parseInt(items.getJSONObject(i).getString("pid")));
+			s.setTags(items.getJSONObject(i).getString("keywords"));
+			list.add(s);
 			pageIDs.add(items.getJSONObject(i).getString("pid"));
 		}
 		return numResults;
@@ -57,6 +66,11 @@ public class ListStories extends AbstractContentList<String> {
 	@Override
 	protected boolean useAuthentication() {
 		return false;
+	}
+	
+	@Override 
+	protected ListAdapter getAdapter(Context context) {
+		return new SubmissionAdapter(context, R.layout.listitemtwolineicon, resultList);
 	}
 
 }
