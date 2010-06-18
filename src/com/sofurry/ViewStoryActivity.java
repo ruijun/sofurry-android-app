@@ -10,6 +10,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.sofurry.model.Submission;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
