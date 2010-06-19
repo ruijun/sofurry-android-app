@@ -71,8 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dip"
         android:text="Forums"
-        android:drawableTop="@drawable/menuforums" 
-        android:enabled="false"/>
+        android:drawableTop="@drawable/menuforums"/>
 
     <Button
         android:id="@+id/logbook"
@@ -81,8 +80,7 @@
         android:layout_marginTop="20dip"
         android:layout_height="wrap_content"
         android:text="Notes"
-        android:drawableTop="@drawable/menumessages"
-        android:enabled="false"/>
+        android:drawableTop="@drawable/menumessages"/>
 
     <Button
         android:id="@+id/pms"
@@ -105,11 +103,10 @@
 	
     <Button
         android:id="@+id/settings"
-	    android:gravity="center_horizontal"
-        android:layout_width="95px"
+	    android:layout_width="95px"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dip"
-        android:text="Settings" />
+        android:text="Settings" android:gravity="center"/>
         
     </LinearLayout>        
 </LinearLayout>

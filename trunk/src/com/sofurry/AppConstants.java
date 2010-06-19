@@ -5,6 +5,8 @@ public class AppConstants {
 	//Activity enumerations
 	public static final int ACTIVITY_STORIESLIST = 0;
 	public static final int ACTIVITY_PMLIST = 1;
+	public static final int ACTIVITY_SETTINGS = 2;
+	public static final int ACTIVITY_JOURNALSLIST = 3;
 
 	//Ajax message types
 	public static final int AJAXTYPE_APIERROR = 5;

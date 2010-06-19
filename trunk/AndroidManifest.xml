@@ -11,9 +11,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ListStories">
+        <activity android:name=".list.ListStories">
             <intent-filter>
                 <action android:name="android.intent.action.LISTSTORIES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".list.ListJournals">
+            <intent-filter>
+                <action android:name="android.intent.action.LISTJOURNALS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -23,7 +29,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ListPM">
+        <activity android:name=".list.ListPM">
             <intent-filter>
                 <action android:name="android.intent.action.LISTPM" />
                 <category android:name="android.intent.category.DEFAULT" />

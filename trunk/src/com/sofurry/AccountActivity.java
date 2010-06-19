@@ -1,6 +1,9 @@
 package com.sofurry;
 
+import com.sofurry.util.Authentication;
+
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
@@ -53,8 +56,11 @@ public class AccountActivity extends Activity {
 	
 	private void closeActivity() {
 		Log.i("closeActivity","closing...");
-        setResult(RESULT_OK);
-        finish();
+		Bundle bundle = new Bundle();
+		Intent mIntent = new Intent();
+		mIntent.putExtras(bundle);
+		setResult(RESULT_OK, mIntent);
+		finish();
 	}
 
 }

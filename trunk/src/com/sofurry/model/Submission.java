@@ -11,6 +11,8 @@ public class Submission {
 	private String tags;
 	private String authorName;
 	private String authorID;
+	private String contentLevel;
+	private String date;
 	
 	public SUBMISSION_TYPE getType() {
 		return type;
@@ -54,5 +56,18 @@ public class Submission {
 	public void setContent(String content) {
 		this.content = content;
 	}
+	public String getContentLevel() {
+		return contentLevel;
+	}
+	public void setContentLevel(String contentLevel) {
+		this.contentLevel = contentLevel;
+	}
+	public String getDate() {
+		return date;
+	}
+	public void setDate(String date) {
+		this.date = date;
+	}
+
 	
 }

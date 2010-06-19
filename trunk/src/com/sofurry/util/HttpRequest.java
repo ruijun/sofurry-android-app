@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.util;
 
 import java.io.IOException;
 import java.util.ArrayList;

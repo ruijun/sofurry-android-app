@@ -13,6 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.sofurry.util.Authentication;
+import com.sofurry.util.HttpRequest;
+
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
