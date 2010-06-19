@@ -2,6 +2,7 @@ package com.sofurry.list;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -10,6 +11,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ListAdapter;
 
@@ -17,6 +19,8 @@ import com.sofurry.AbstractContentList;
 import com.sofurry.R;
 import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
+import com.sofurry.util.ContentDownloader;
+import com.sofurry.util.IconStorage;
 
 public class ListStories extends AbstractContentList<Submission> {
 
@@ -53,9 +57,17 @@ public class ListStories extends AbstractContentList<Submission> {
 			s.setAuthorID(items.getJSONObject(i).getString("authorId"));
 			s.setContentLevel(items.getJSONObject(i).getString("contentLevel"));
 			s.setTags(items.getJSONObject(i).getString("keywords"));
+			s.setThumbnailUrl(items.getJSONObject(i).getString("thumb"));
+			Bitmap thumb = IconStorage.loadUserIcon(Integer.parseInt(s.getAuthorID()));
+			if (thumb != null)
+				s.setThumbnail(thumb);
+			
 			list.add(s);
 			pageIDs.add(""+s.getId());
 		}
+		//Start downloading the thumbnails
+		Thread thumnailLoaderThread = new ThumbnailDownloadThread(true);
+		thumnailLoaderThread.start();
 		return numResults;
 	}
 
@@ -78,5 +90,6 @@ public class ListStories extends AbstractContentList<Submission> {
 	protected ListAdapter getAdapter(Context context) {
 		return new SubmissionAdapter(context, R.layout.listitemtwolineicon, resultList);
 	}
+
 
 }

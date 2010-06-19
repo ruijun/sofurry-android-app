@@ -3,14 +3,17 @@ package com.sofurry.list;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sofurry.R;
 import com.sofurry.model.Submission;
+import com.sofurry.util.IconStorage;
 
 public class SubmissionAdapter extends ArrayAdapter<Submission> {
 
@@ -32,12 +35,20 @@ public class SubmissionAdapter extends ArrayAdapter<Submission> {
 		}
 		Submission s = items.get(position);
 		if (s != null) {
+			ImageView iconview = (ImageView) v.findViewById(R.id.icon);
 			TextView titletext = (TextView) v.findViewById(R.id.toptext);
 			TextView centertext = (TextView) v.findViewById(R.id.centertext);
 			TextView bottomtext = (TextView) v.findViewById(R.id.bottomtext);
 			if (titletext != null) {
 				titletext.setText(s.getName());
 			}
+			
+			Bitmap icon = s.getThumbnail();
+			if (icon != null) {
+				iconview.setImageBitmap(icon);
+				iconview.setPadding(0, 0, 0, 0);
+			}
+			
 			if (centertext != null) {
 				StringBuilder sb = new StringBuilder();
 				if (s.getDate() != null && !s.getDate().equalsIgnoreCase("null")) {

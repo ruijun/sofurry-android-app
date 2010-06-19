@@ -3,6 +3,7 @@ package com.sofurry;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
@@ -11,21 +12,24 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.sofurry.util.Authentication;
-import com.sofurry.util.HttpRequest;
-
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
+
+import com.sofurry.model.Submission;
+import com.sofurry.util.Authentication;
+import com.sofurry.util.ContentDownloader;
+import com.sofurry.util.HttpRequest;
+import com.sofurry.util.IconStorage;
 
 public abstract class AbstractContentList<T> extends ListActivity implements Runnable {
 
@@ -36,6 +40,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 	protected int numResults;
 	protected ArrayList<T> resultList;
 	private String errorMessage;
+	protected final Handler updateHandler = new Handler();
 
 	// Get parameters and initiate data fetch thread
 	@Override
@@ -114,16 +119,15 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 
 	// Sets the resulting list on the screen
 	private void updateView() {
-//		setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, (String[]) resultList
-//				.toArray(new String[numResults])));
+		Log.i("SF AbstractContentList", "updateView called");
 		setListAdapter(getAdapter(this));
 		getListView().setTextFilterEnabled(true);
-		  // bind a selection listener to the view
-		  getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-		    public void onItemClick(AdapterView parentView, View childView, int position, long id) {
-		      setSelectedIndex(position);
-		    }
-		  });
+		// bind a selection listener to the view
+		getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			public void onItemClick(AdapterView parentView, View childView, int position, long id) {
+				setSelectedIndex(position);
+			}
+		});
 
 	}
 
@@ -154,11 +158,58 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 	}
 
 	protected abstract void setSelectedIndex(int selectedIndex);
-	
+
 	protected abstract Map<String, String> getFetchParameters();
 
 	protected abstract boolean useAuthentication();
 
 	protected abstract ListAdapter getAdapter(Context context);
-	
+
+	// Create runnable for updating list
+	protected final Runnable updateListRunnable = new Runnable() {
+		public void run() {
+			updateContentList();
+		}
+	};
+
+	protected void updateContentList() {
+		updateView();
+	}
+
+	// TODO: This only works for art/stories/music/journals right now, NOT PMs
+	public class ThumbnailDownloadThread extends Thread {
+		boolean runIt = true;
+		boolean saveUserAvatar = false;
+
+		// Set saveUserAvatar to true to save the returned thumbnail as the submission's user avatar
+		public ThumbnailDownloadThread(boolean saveUserAvatar) {
+			this.saveUserAvatar = saveUserAvatar;
+		}
+
+		public void stopThread() {
+			runIt = false;
+		}
+
+		public void run() {
+			Iterator i = resultList.iterator();
+			while (runIt && i.hasNext()) {
+				Submission s = (Submission) i.next();
+				if (s.getThumbnail() == null) {
+					Log.i("SF ThumbDownloader", "Downloading thumb for pid " + s.getId() + " from "
+							+ s.getThumbnailUrl());
+					Bitmap thumbnail = ContentDownloader.downloadBitmap(s.getThumbnailUrl());
+					s.setThumbnail(thumbnail);
+					Log.i("SF ThumbDownloader", "Storing image");
+					if (saveUserAvatar)
+						IconStorage.saveUserIcon(Integer.parseInt(s.getAuthorID()), thumbnail);
+					else
+						IconStorage.saveSubmissionIcon(s.getId(), thumbnail);
+
+					Log.i("SF ThumbDownloader", "Updating listview");
+					updateHandler.post(updateListRunnable);
+				}
+			}
+		}
+	}
+
 }

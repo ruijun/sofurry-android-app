@@ -1,5 +1,7 @@
 package com.sofurry.model;
 
+import android.graphics.Bitmap;
+
 public class Submission {
 
 	public enum SUBMISSION_TYPE {ARTWORK, STORY, JOURNAL, MUSIC};
@@ -13,6 +15,8 @@ public class Submission {
 	private String authorID;
 	private String contentLevel;
 	private String date;
+	private String thumbnailUrl;
+	private Bitmap thumbnail;
 	
 	public SUBMISSION_TYPE getType() {
 		return type;
@@ -68,6 +72,19 @@ public class Submission {
 	public void setDate(String date) {
 		this.date = date;
 	}
+	public String getThumbnailUrl() {
+		return thumbnailUrl;
+	}
+	public void setThumbnailUrl(String thumbnailUrl) {
+		this.thumbnailUrl = thumbnailUrl;
+	}
+	public Bitmap getThumbnail() {
+		return thumbnail;
+	}
+	public void setThumbnail(Bitmap thumbnail) {
+		this.thumbnail = thumbnail;
+	}
+	
 
 	
 }

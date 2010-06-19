@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import android.os.Environment;
 
@@ -12,10 +13,16 @@ public class FileStorage {
 	private static boolean mExternalStorageAvailable = false;
 	private static boolean mExternalStorageWriteable = false;
 
-	public static FileOutputStream getFileOutputStream(String filename) throws FileNotFoundException {
+	public static FileOutputStream getFileOutputStream(String filename) throws IOException {
 		checkExternalMedia();
+		if (!mExternalStorageWriteable)
+			return null;
+		
+		File d = new File(Environment.getExternalStorageDirectory()+"/Android/data/com.sofurry/files/");
+		d.mkdirs();
+				
 		File f = new File(Environment.getExternalStorageDirectory()+"/Android/data/com.sofurry/files/"+filename);
-		if (f.canWrite()) {
+		if (f.createNewFile() && f.canWrite()) {
 			return new FileOutputStream(f);
 		}
 		return null;
@@ -23,6 +30,9 @@ public class FileStorage {
 	
 	public static FileInputStream getFileInputStream(String filename) throws FileNotFoundException {
 		checkExternalMedia();
+		if (!mExternalStorageAvailable)
+			return null;
+		
 		File f = new File(Environment.getExternalStorageDirectory()+"/Android/data/com.sofurry/files/"+filename);
 		if (f.canRead()) {
 			return new FileInputStream(f);
