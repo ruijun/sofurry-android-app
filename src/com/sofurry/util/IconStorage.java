@@ -11,19 +11,19 @@ import android.util.Log;
 public class IconStorage {
 
 	
-	public Bitmap loadSubmissionIcon(int id) {
+	public static Bitmap loadSubmissionIcon(int id) {
 		return loadIcon("thumb"+id);
 	}
 
-	public void saveSubmissionIcon(int id, Bitmap icon) {
+	public static void saveSubmissionIcon(int id, Bitmap icon) {
 		saveIcon("thumb"+id, icon);
 	}
 
-	public Bitmap loadUserIcon(int uid) {
+	public static Bitmap loadUserIcon(int uid) {
 		return loadIcon("avatar"+uid);
 	}
 
-	public void saveUserIcon(int uid, Bitmap icon) {
+	public static void saveUserIcon(int uid, Bitmap icon) {
 		saveIcon("avatar"+uid, icon);
 	}
 	
@@ -35,6 +35,8 @@ public class IconStorage {
 			is = FileStorage.getFileInputStream(filename);
 			if (is != null && is.available() > 0) {
 				bitmap = BitmapFactory.decodeStream(is);
+			} else {
+				Log.w("soFurryApp", "Can't load from external storage");
 			}
 		} catch (Exception e) {
 			Log.e("soFurryApp", "error in loadIcon", e);
@@ -49,6 +51,8 @@ public class IconStorage {
 			os = FileStorage.getFileOutputStream(filename );
 			if (os != null) {
 				icon.compress(CompressFormat.JPEG, 80, os);
+			} else {
+				Log.w("soFurryApp", "Can't save to external storage");
 			}
 		} catch (Exception e) {
 			Log.e("soFurryApp", "error in saveIcon", e);
