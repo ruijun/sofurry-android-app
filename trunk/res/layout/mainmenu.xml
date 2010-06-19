@@ -12,27 +12,38 @@
 	android:layout_weight="1">
 	
     <Button
-        android:id="@+id/pms"
+        android:id="@+id/stories"
 	    android:gravity="center_horizontal"
-        android:layout_width="95px"
+        android:layout_width="75px"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="PMs" />
+        android:layout_marginTop="20dip"
+        android:text="Stories" 
+        android:drawableTop="@drawable/menustories"/>
+    <Button
+        android:id="@+id/art"
+	    android:gravity="center_horizontal"
+        android:layout_width="75px"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip"
+        android:text="Art" 
+        android:drawableTop="@drawable/menuart"/>
+    <Button
+        android:id="@+id/music"
+	    android:gravity="center_horizontal"
+        android:layout_width="75px"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip"
+        android:text="Music" 
+        android:drawableTop="@drawable/menumusic"/>
 
     <Button
-        android:id="@+id/chat"
+        android:id="@+id/journals"
 	    android:gravity="center_horizontal"
-        android:layout_width="95px"
+        android:layout_width="75px"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="Chat" />
-    <Button
-        android:id="@+id/logbook"
-	    android:gravity="center_horizontal"
-        android:layout_width="95px"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="Logbook" />
+        android:layout_marginTop="20dip"
+        android:text="Journals" 
+        android:drawableTop="@drawable/menujournals"/>
 		
     </LinearLayout>
 	
@@ -43,27 +54,45 @@
 	android:layout_height="fill_parent"
 	android:layout_weight="1">
 	
+
     <Button
-        android:id="@+id/stories"
+        android:id="@+id/chat"
 	    android:gravity="center_horizontal"
-        android:layout_width="95px"
+        android:layout_width="75px"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="Stories" />
+        android:layout_marginTop="20dip"
+        android:text="Chat"
+        android:drawableTop="@drawable/menuchat"/>
+
     <Button
-        android:id="@+id/art"
+        android:id="@+id/forums"
 	    android:gravity="center_horizontal"
-        android:layout_width="95px"
+        android:layout_width="75px"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="Art" />
+        android:layout_marginTop="20dip"
+        android:text="Forums"
+        android:drawableTop="@drawable/menuforums" 
+        android:enabled="false"/>
+
     <Button
-        android:id="@+id/music"
+        android:id="@+id/logbook"
 	    android:gravity="center_horizontal"
-        android:layout_width="95px"
+        android:layout_width="75px"
+        android:layout_marginTop="20dip"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="Music" />
+        android:text="Notes"
+        android:drawableTop="@drawable/menumessages"
+        android:enabled="false"/>
+
+    <Button
+        android:id="@+id/pms"
+	    android:gravity="center_horizontal"
+        android:layout_width="75px"
+        android:layout_marginTop="20dip"
+        android:layout_height="wrap_content"
+        android:text="PMs"
+        android:drawableTop="@drawable/menumessages"/>
+
         
     </LinearLayout>
 
@@ -75,26 +104,12 @@
 	android:layout_weight="1">
 	
     <Button
-        android:id="@+id/journals"
+        android:id="@+id/settings"
 	    android:gravity="center_horizontal"
         android:layout_width="95px"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="Journals" />
-    <Button
-        android:id="@+id/featured"
-	    android:gravity="center_horizontal"
-        android:layout_width="95px"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="Featured" />
-    <Button
-        android:id="@+id/watchlist"
-	    android:gravity="center_horizontal"
-        android:layout_width="95px"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="Watchlist" />
+        android:layout_marginTop="20dip"
+        android:text="Settings" />
         
     </LinearLayout>        
 </LinearLayout>

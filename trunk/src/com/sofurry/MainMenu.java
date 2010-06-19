@@ -16,8 +16,7 @@ public class MainMenu extends Activity {
 	Button buttonArt;
 	Button buttonMusic;
 	Button buttonJournals;
-	Button buttonFeatured;
-	Button buttonWatchlist;
+	Button buttonSettings;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -30,18 +29,11 @@ public class MainMenu extends Activity {
 		buttonArt = (Button) findViewById(R.id.art);
 		buttonMusic = (Button) findViewById(R.id.music);
 		buttonJournals = (Button) findViewById(R.id.journals);
-		buttonFeatured = (Button) findViewById(R.id.featured);
-		buttonWatchlist = (Button) findViewById(R.id.watchlist);
+		buttonSettings = (Button) findViewById(R.id.settings);
 
 		buttonStories.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
 				launchStoriesList();
-			}
-		});
-
-		buttonArt.setOnClickListener(new Button.OnClickListener() {
-			public void onClick(View arg0) {
-				launchAccountActivity();
 			}
 		});
 
@@ -54,6 +46,12 @@ public class MainMenu extends Activity {
 		buttonChat.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
 				launchChat();
+			}
+		});
+
+		buttonSettings.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View arg0) {
+				launchAccountActivity();
 			}
 		});
 
