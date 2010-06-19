@@ -11,6 +11,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sofurry.model.Submission;
+import com.sofurry.util.Authentication;
+import com.sofurry.util.HttpRequest;
 
 import android.app.Activity;
 import android.app.ProgressDialog;

@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.util;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.sofurry.AppConstants;
 
 import android.app.Activity;
 import android.content.SharedPreferences;

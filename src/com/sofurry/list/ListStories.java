@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.list;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,9 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.ListAdapter;
 
-import com.sofurry.list.SubmissionAdapter;
+import com.sofurry.AbstractContentList;
+import com.sofurry.R;
+import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
 
 public class ListStories extends AbstractContentList<Submission> {
@@ -28,7 +30,7 @@ public class ListStories extends AbstractContentList<Submission> {
 		kvPairs.put("viewSource", "0");
 		kvPairs.put("contentType", "0");
 		kvPairs.put("entriesPerPage", "30");
-		kvPairs.put("page", "10");
+		kvPairs.put("page", "0");
 		return kvPairs;
 	}
 
@@ -46,9 +48,13 @@ public class ListStories extends AbstractContentList<Submission> {
 			Submission s = new Submission();
 			s.setName(items.getJSONObject(i).getString("name"));
 			s.setId(Integer.parseInt(items.getJSONObject(i).getString("pid")));
+			s.setDate(items.getJSONObject(i).getString("date"));
+			s.setAuthorName(items.getJSONObject(i).getString("authorName"));
+			s.setAuthorID(items.getJSONObject(i).getString("authorId"));
+			s.setContentLevel(items.getJSONObject(i).getString("contentLevel"));
 			s.setTags(items.getJSONObject(i).getString("keywords"));
 			list.add(s);
-			pageIDs.add(items.getJSONObject(i).getString("pid"));
+			pageIDs.add(""+s.getId());
 		}
 		return numResults;
 	}

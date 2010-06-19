@@ -1,7 +1,6 @@
-package com.sofurry;
+package com.sofurry.list;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +12,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.ListAdapter;
 
-import com.sofurry.list.PrivateMessageAdapter;
+import com.sofurry.AbstractContentList;
+import com.sofurry.R;
 import com.sofurry.model.PrivateMessage;
 
 public class ListPM extends AbstractContentList<PrivateMessage> {

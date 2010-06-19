@@ -4,8 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import com.sofurry.list.ListJournals;
+import com.sofurry.list.ListPM;
+import com.sofurry.list.ListStories;
+import com.sofurry.util.Authentication;
 
 public class MainMenu extends Activity {
 
@@ -17,6 +23,7 @@ public class MainMenu extends Activity {
 	Button buttonMusic;
 	Button buttonJournals;
 	Button buttonSettings;
+	Button buttonForums;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -30,10 +37,23 @@ public class MainMenu extends Activity {
 		buttonMusic = (Button) findViewById(R.id.music);
 		buttonJournals = (Button) findViewById(R.id.journals);
 		buttonSettings = (Button) findViewById(R.id.settings);
+		buttonForums = (Button) findViewById(R.id.forums);
+		
+		buttonForums.setEnabled(false);
+		buttonLogbook.setEnabled(false);
+		buttonMusic.setEnabled(false);
 
+		checkButtonDisabledState();
+		
 		buttonStories.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
 				launchStoriesList();
+			}
+		});
+
+		buttonJournals.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View arg0) {
+				launchJournalsList();
 			}
 		});
 
@@ -57,6 +77,11 @@ public class MainMenu extends Activity {
 
 	}
 
+	private void launchJournalsList() {
+		Intent intent = new Intent(this, ListJournals.class);
+		startActivityForResult(intent, AppConstants.ACTIVITY_JOURNALSLIST);
+	}
+
 	private void launchStoriesList() {
 		Intent intent = new Intent(this, ListStories.class);
 		startActivityForResult(intent, AppConstants.ACTIVITY_STORIESLIST);
@@ -69,7 +94,7 @@ public class MainMenu extends Activity {
 
 	private void launchAccountActivity() {
 		Intent intent = new Intent(this, AccountActivity.class);
-		startActivity(intent);
+		startActivityForResult(intent, AppConstants.ACTIVITY_SETTINGS);
 	}
 
 	private void launchChat() {
@@ -79,11 +104,14 @@ public class MainMenu extends Activity {
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
+		Log.i("SF MainMenu", "onActivityResult");
+		checkButtonDisabledState();
+
 		if (intent != null)
 		{
 			Bundle extras = intent.getExtras();
 			if (extras != null) {
-			// 	General error handling
+				// 	General error handling
 				String errorMessage = extras.getString("errorMessage");
 				if (errorMessage != null) {
 					new AlertDialog.Builder(MainMenu.this).setMessage(errorMessage).show();
@@ -96,6 +124,19 @@ public class MainMenu extends Activity {
 					break;
 				}
 			}
+		}
+	}
+	
+	private void checkButtonDisabledState() {
+		if (Authentication.getUsername() == null || Authentication.getUsername().trim().length() <= 0 ||
+				Authentication.getPassword() == null || Authentication.getPassword().trim().length() <= 0) {
+				buttonPMs.setEnabled(false);
+				buttonChat.setEnabled(false);
+		}
+		else
+		{
+			buttonPMs.setEnabled(true);
+			buttonChat.setEnabled(true);
 		}
 	}
 

@@ -11,6 +11,9 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.sofurry.util.Authentication;
+import com.sofurry.util.HttpRequest;
+
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
