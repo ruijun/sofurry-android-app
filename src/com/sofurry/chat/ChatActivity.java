@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.chat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,35 +13,44 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.sofurry.util.Authentication;
-import com.sofurry.util.HttpRequest;
-
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.sofurry.AppConstants;
+import com.sofurry.R;
+import com.sofurry.util.Authentication;
+import com.sofurry.util.HttpRequest;
+
 public class ChatActivity extends Activity {
+	protected TextView chatView;
 	private int chatSequence = 0;
 	private int roomId = 1;
-	TextView chatView;
-	ChatPollTask chatPollTask;
+	protected ChatPollThread chatPollThread;
 	String requestUrl = AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
 	LinkedList<String> chatBuffer = new LinkedList<String>();
+	protected final Handler updateHandler = new Handler();
+	protected String lastServerResponse = "";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		chatView = new TextView(this);
-		chatView.setSingleLine(false);
-		setContentView(chatView);
-		chatPollTask = new ChatPollTask();
-		chatPollTask.execute(new Integer(this.roomId));
+//		chatView = new TextView(this);
+//		chatView.setSingleLine(false);
+//		setContentView(chatView);
+		setContentView(R.layout.chatlayout);
+		chatView = (TextView) findViewById(R.id.chatview);
+		chatView.setMaxHeight(200);
+
+		
+		chatPollThread = new ChatPollThread(this.roomId);
+		chatPollThread.start();;
 	}
 
 	protected String pollChat(int roomId) {
-		// TODO: Send chat poll request, return result
+		//Send chat poll request, return result
 		Map<String, String> requestParameters = new HashMap<String, String>();
 		requestParameters.put("f", "chatfetch");
 		requestParameters.put("lastid", ""+chatSequence);
@@ -90,7 +99,7 @@ public class ChatActivity extends Activity {
 					chatSequence = Integer.parseInt(id);
 				}
 				chatBuffer.add(fromUserName+": "+message+"\n");
-				if (chatBuffer.size() > 15) {
+				if (chatBuffer.size() > 500) {
 					chatBuffer.removeFirst();
 				}
 			}
@@ -107,24 +116,39 @@ public class ChatActivity extends Activity {
 		}
 	}
 
-	private class ChatPollTask extends AsyncTask<Integer, String, Boolean> {
-		protected Boolean doInBackground(Integer... roomId) {
-			boolean keepRunning = true;
+	// Create runnable for updating list
+	protected final Runnable updateViewRunnable = new Runnable() {
+		public void run() {
+			updateChatView(lastServerResponse);
+		}
+	};
+
+	//This is the main message polling thread. This is necessary because we can't block the UI with our http requests 
+	private class ChatPollThread extends Thread {
+		boolean keepRunning = true;
+		int roomId;
+		
+		// Set saveUserAvatar to true to save the returned thumbnail as the submission's user avatar
+		public ChatPollThread(int roomId) {
+			this.roomId = roomId;
+		}
+
+		public void stopThread() {
+			keepRunning = false;
+		}
+
+		public void run() {
 			while (keepRunning) {
-				String result = pollChat(roomId[0]);
-				publishProgress(result);
+				lastServerResponse = pollChat(roomId);
+				updateHandler.post(updateViewRunnable);
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			return true;
 		}
-		@Override
-		protected void onProgressUpdate(String... data) {
-			updateChatView(data[0]);
-		}
+
 	}
 
 	protected String parseErrorMessage(String httpResult) {
@@ -145,6 +169,13 @@ public class ChatActivity extends Activity {
 
 		return null;
 
+	}
+	
+	@Override
+	public void finish() {
+		super.finish();
+		if (chatPollThread != null)
+			chatPollThread.stopThread();
 	}
 
 }

@@ -65,8 +65,8 @@ public class ListJournals extends AbstractContentList<Submission> {
 			pageIDs.add(items.getJSONObject(i).getString("pid"));
 		}
 		//Start downloading the thumbnails
-		Thread thumnailLoaderThread = new ThumbnailDownloadThread(true);
-		thumnailLoaderThread.start();
+		thumbnailDownloadThread = new ThumbnailDownloadThread(true);
+		thumbnailDownloadThread.start();
 		return numResults;
 	}
 
