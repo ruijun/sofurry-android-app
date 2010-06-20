@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore.Images.Thumbnails;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -41,6 +42,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 	protected ArrayList<T> resultList;
 	private String errorMessage;
 	protected final Handler updateHandler = new Handler();
+	protected ThumbnailDownloadThread thumbnailDownloadThread;
 
 	// Get parameters and initiate data fetch thread
 	@Override
@@ -211,5 +213,12 @@ public abstract class AbstractContentList<T> extends ListActivity implements Run
 			}
 		}
 	}
-
+	
+	@Override
+	public void finish() {
+		super.finish();
+		if (thumbnailDownloadThread != null)
+			thumbnailDownloadThread.stopThread();
+	}
+	
 }

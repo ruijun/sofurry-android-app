@@ -66,8 +66,8 @@ public class ListStories extends AbstractContentList<Submission> {
 			pageIDs.add(""+s.getId());
 		}
 		//Start downloading the thumbnails
-		Thread thumnailLoaderThread = new ThumbnailDownloadThread(true);
-		thumnailLoaderThread.start();
+		thumbnailDownloadThread = new ThumbnailDownloadThread(true);
+		thumbnailDownloadThread.start();
 		return numResults;
 	}
 

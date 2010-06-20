@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.sofurry.chat.ChatActivity;
 import com.sofurry.list.ListJournals;
 import com.sofurry.list.ListPM;
 import com.sofurry.list.ListStories;
