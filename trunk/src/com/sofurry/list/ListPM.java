@@ -13,10 +13,12 @@ import android.util.Log;
 import android.widget.ListAdapter;
 
 import com.sofurry.AbstractContentList;
+import com.sofurry.ContentController;
 import com.sofurry.R;
 import com.sofurry.model.PrivateMessage;
+import com.sofurry.model.Submission;
 
-public class ListPM extends AbstractContentList<PrivateMessage> {
+public class ListPM extends AbstractContentList<PrivateMessage> implements ContentController<PrivateMessage> {
 
 	@Override
 	protected Map<String, String> getFetchParameters() {
@@ -27,13 +29,11 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 		return kvPairs;
 	}
 
-	@Override
-	protected int parseResponse(String httpResult, ArrayList<PrivateMessage> list)
-			throws JSONException {
+	public	 int parseResponse(String httpResult, ArrayList<PrivateMessage> list) throws JSONException {
 		int numResults;
 		String result;
-		Log.i("PM.parseResponse", "response: "+httpResult);
-		
+		Log.i("PM.parseResponse", "response: " + httpResult);
+
 		JSONObject jsonParser = new JSONObject(httpResult);
 		JSONArray items = new JSONArray(jsonParser.getString("items"));
 		numResults = items.length();
@@ -50,7 +50,7 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 			m.setDate(date);
 			m.setSubject(subject);
 			m.setStatus(status);
-			
+
 			list.add(m);
 		}
 		return numResults;
@@ -58,15 +58,14 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {
-		
+
 	}
 
-	@Override
-	protected boolean useAuthentication() {
+	public boolean useAuthentication() {
 		return true;
 	}
 
-	@Override 
+	@Override
 	protected ListAdapter getAdapter(Context context) {
 		return new PrivateMessageAdapter(context, R.layout.listitemtwolineicon, resultList);
 	}

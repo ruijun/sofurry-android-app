@@ -15,13 +15,14 @@ import android.util.Log;
 import android.widget.ListAdapter;
 
 import com.sofurry.AbstractContentList;
+import com.sofurry.ContentController;
 import com.sofurry.R;
+import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
-import com.sofurry.AbstractContentList.ThumbnailDownloadThread;
 import com.sofurry.model.Submission;
 import com.sofurry.util.IconStorage;
 
-public class ListJournals extends AbstractContentList<Submission> {
+public class ListJournals extends AbstractContentList<Submission> implements ContentController<Submission> {
 
 	private ArrayList<String> pageIDs;
 	
@@ -37,8 +38,7 @@ public class ListJournals extends AbstractContentList<Submission> {
 		return kvPairs;
 	}
 
-	@Override
-	protected int parseResponse(java.lang.String httpResult, ArrayList<Submission> list) throws JSONException {
+	public int parseResponse(java.lang.String httpResult, ArrayList<Submission> list) throws JSONException {
 		int numResults;
 		Log.i("Journals.parseResponse", "response: " + httpResult);
 		pageIDs = new ArrayList<String>();
@@ -65,8 +65,8 @@ public class ListJournals extends AbstractContentList<Submission> {
 			pageIDs.add(items.getJSONObject(i).getString("pid"));
 		}
 		//Start downloading the thumbnails
-		thumbnailDownloadThread = new ThumbnailDownloadThread(true);
-		thumbnailDownloadThread.start();
+		thumbnailDownloaderThread = new ThumbnailDownloaderThread(true, handler, list);
+		thumbnailDownloaderThread.start();
 		return numResults;
 	}
 
@@ -80,8 +80,7 @@ public class ListJournals extends AbstractContentList<Submission> {
 		startActivity(i) ;
 	}
 	
-	@Override
-	protected boolean useAuthentication() {
+	public boolean useAuthentication() {
 		return false;
 	}
 	
