@@ -2,7 +2,6 @@ package com.sofurry.list;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -16,13 +15,14 @@ import android.util.Log;
 import android.widget.ListAdapter;
 
 import com.sofurry.AbstractContentList;
+import com.sofurry.ContentController;
 import com.sofurry.R;
+import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
-import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.IconStorage;
 
-public class ListStories extends AbstractContentList<Submission> {
+public class ListStories extends AbstractContentList<Submission> implements ContentController<Submission> {
 
 	private ArrayList<String> pageIDs;
 	
@@ -38,8 +38,7 @@ public class ListStories extends AbstractContentList<Submission> {
 		return kvPairs;
 	}
 
-	@Override
-	protected int parseResponse(java.lang.String httpResult, ArrayList<Submission> list) throws JSONException {
+	public int parseResponse(String httpResult, ArrayList<Submission> list) throws JSONException {
 		int numResults;
 		Log.i("Stories.parseResponse", "response: " + httpResult);
 		pageIDs = new ArrayList<String>();
@@ -66,8 +65,8 @@ public class ListStories extends AbstractContentList<Submission> {
 			pageIDs.add(""+s.getId());
 		}
 		//Start downloading the thumbnails
-		thumbnailDownloadThread = new ThumbnailDownloadThread(true);
-		thumbnailDownloadThread.start();
+		thumbnailDownloaderThread = new ThumbnailDownloaderThread(true, handler, list);
+		thumbnailDownloaderThread.start();
 		return numResults;
 	}
 
@@ -81,8 +80,7 @@ public class ListStories extends AbstractContentList<Submission> {
 		startActivity(i) ;
 	}
 	
-	@Override
-	protected boolean useAuthentication() {
+	public boolean useAuthentication() {
 		return false;
 	}
 	
