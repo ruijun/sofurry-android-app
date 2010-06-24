@@ -59,7 +59,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> implements Co
 			s.setContentLevel(items.getJSONObject(i).getString("contentLevel"));
 			s.setTags(items.getJSONObject(i).getString("keywords"));
 			s.setThumbnailUrl(items.getJSONObject(i).getString("thumb"));
-			Bitmap thumb = IconStorage.loadUserIcon(Integer.parseInt(s.getAuthorID()));
+			Bitmap thumb = IconStorage.loadSubmissionIcon(s.getId());
 			if (thumb != null)
 				s.setThumbnail(thumb);
 
