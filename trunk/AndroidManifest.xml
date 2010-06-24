@@ -29,6 +29,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".PreviewArtActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.PREVIEWARTACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ViewStoryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEWSTORYACTIVITY" />
