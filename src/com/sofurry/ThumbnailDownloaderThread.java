@@ -18,7 +18,7 @@ public class ThumbnailDownloaderThread extends Thread {
 	boolean saveUserAvatar = false;
 	Handler updateHandler;
 	ArrayList<Submission> resultList;
-	
+
 	// Set saveUserAvatar to true to save the returned thumbnail as the submission's user avatar
 	public ThumbnailDownloaderThread(boolean saveUserAvatar, Handler updateHandler, ArrayList<Submission> resultList) {
 		this.saveUserAvatar = saveUserAvatar;
@@ -32,11 +32,11 @@ public class ThumbnailDownloaderThread extends Thread {
 
 	public void run() {
 		Iterator<Submission> i = resultList.iterator();
+		long lastRefresh = 0;
 		while (runIt && i.hasNext()) {
 			Submission s = i.next();
-			if (s != null && s.getId()!=-1 && s.getThumbnail() == null) {
-				Log.i("SF ThumbDownloader", "Downloading thumb for pid " + s.getId() + " from "
-						+ s.getThumbnailUrl());
+			if (s != null && s.getId() != -1 && s.getThumbnail() == null) {
+				Log.i("SF ThumbDownloader", "Downloading thumb for pid " + s.getId() + " from " + s.getThumbnailUrl());
 				Bitmap thumbnail = ContentDownloader.downloadBitmap(s.getThumbnailUrl());
 				s.setThumbnail(thumbnail);
 				Log.i("SF ThumbDownloader", "Storing image");
@@ -45,10 +45,21 @@ public class ThumbnailDownloaderThread extends Thread {
 				else
 					IconStorage.saveSubmissionIcon(s.getId(), thumbnail);
 
-				Log.i("SF ThumbDownloader", "Updating listview");
-		        Message msg = updateHandler.obtainMessage();
-		        msg.obj = null;
-		        updateHandler.sendMessage(msg);			}
+				//Don't refresh more often than once every 4 seconds
+				if (System.currentTimeMillis() - lastRefresh > 4000) {
+					triggerRefresh();
+					lastRefresh = System.currentTimeMillis();
+				}
+
+			}
 		}
+		triggerRefresh();
+	}
+
+	private void triggerRefresh() {
+		Log.i("SF ThumbDownloader", "Updating listview");
+		Message msg = updateHandler.obtainMessage();
+		msg.obj = null;
+		updateHandler.sendMessage(msg);
 	}
 }

@@ -1,8 +1,12 @@
 package com.sofurry.model;
 
+import java.io.Serializable;
+
 import android.graphics.Bitmap;
 
-public class Submission {
+public class Submission implements Serializable {
+
+	private static final long serialVersionUID = -3841250259233075462L;
 
 	public enum SUBMISSION_TYPE {ARTWORK, STORY, JOURNAL, MUSIC};
 	

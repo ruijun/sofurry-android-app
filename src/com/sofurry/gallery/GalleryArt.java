@@ -19,29 +19,32 @@ import com.sofurry.ContentController;
 import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
+import com.sofurry.util.Authentication;
 import com.sofurry.util.IconStorage;
 
 public class GalleryArt extends AbstractContentGallery<Submission> implements ContentController<Submission> {
 
-	private ArrayList<String> pageIDs;
-	
+	private ArrayList<String> pageIDs = new ArrayList<String>();
+
 	@Override
-	protected Map<String, String> getFetchParameters() {
+	protected Map<String, String> getFetchParameters(int page) {
 		Map<String, String> kvPairs = new HashMap<String, String>();
 
 		kvPairs.put("f", "browse");
 		kvPairs.put("viewSource", "0");
 		kvPairs.put("contentType", "1");
-		kvPairs.put("entriesPerPage", "30");
-		kvPairs.put("page", "0");
+		kvPairs.put("entriesPerPage", "20");
+		kvPairs.put("page", "" + page);
 		return kvPairs;
 	}
 
 	public int parseResponse(String httpResult, ArrayList<Submission> list) throws JSONException {
 		int numResults;
 		Log.i("Stories.parseResponse", "response: " + httpResult);
-		pageIDs = new ArrayList<String>();
-		
+
+		if (resultList != null)
+			list.addAll(resultList);
+
 		JSONObject jsonParser = new JSONObject(httpResult);
 		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
 		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
@@ -59,11 +62,12 @@ public class GalleryArt extends AbstractContentGallery<Submission> implements Co
 			Bitmap thumb = IconStorage.loadUserIcon(Integer.parseInt(s.getAuthorID()));
 			if (thumb != null)
 				s.setThumbnail(thumb);
-			
+
 			list.add(s);
-			pageIDs.add(""+s.getId());
+			pageIDs.add("" + s.getId());
 		}
-		//Start downloading the thumbnails
+
+		// Start downloading the thumbnails
 		thumbnailDownloaderThread = new ThumbnailDownloaderThread(false, handler, list);
 		thumbnailDownloaderThread.start();
 		return numResults;
@@ -72,17 +76,18 @@ public class GalleryArt extends AbstractContentGallery<Submission> implements Co
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {
 		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
-		Log.i("GalleryArt", "Viewing art ID: "+pageID);
-		Intent i = new Intent( this, ViewStoryActivity.class ) ;
-		i.putExtra("pageID", pageID) ;
-		startActivity(i) ;
+		Log.i("GalleryArt", "Viewing art ID: " + pageID);
+		Intent i = new Intent(this, ViewStoryActivity.class);
+		i.putExtra("pageID", pageID);
+		i.putExtra("submission", resultList.get(selectedIndex));
+		startActivity(i);
 	}
-	
+
 	public boolean useAuthentication() {
-		return false;
+		return (Authentication.getUsername() != null && Authentication.getUsername().trim().length() > 0);
 	}
-	
-	@Override 
+
+	@Override
 	protected BaseAdapter getAdapter(Context context) {
 		return new SubmissionGalleryAdapter(context, resultList);
 	}

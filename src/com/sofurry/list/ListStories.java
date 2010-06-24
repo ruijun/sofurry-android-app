@@ -20,11 +20,12 @@ import com.sofurry.R;
 import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
+import com.sofurry.util.Authentication;
 import com.sofurry.util.IconStorage;
 
 public class ListStories extends AbstractContentList<Submission> implements ContentController<Submission> {
 
-	private ArrayList<String> pageIDs;
+	private ArrayList<String> pageIDs = new ArrayList<String>();
 
 	@Override
 	protected Map<String, String> getFetchParameters(int page) {
@@ -41,13 +42,9 @@ public class ListStories extends AbstractContentList<Submission> implements Cont
 	public int parseResponse(String httpResult, ArrayList<Submission> list) throws JSONException {
 		int numResults;
 		Log.i("Stories.parseResponse", "response: " + httpResult);
-		pageIDs = new ArrayList<String>();
-		if (currentPage > 0) {
-			Submission prev = new Submission();
-			prev.setName("previous page ("+(currentPage)+")");
-			list.add(prev);
-			pageIDs.add("prev");
-		}
+
+		if (resultList != null)
+			list.addAll(resultList);
 
 		JSONObject jsonParser = new JSONObject(httpResult);
 		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
@@ -71,11 +68,6 @@ public class ListStories extends AbstractContentList<Submission> implements Cont
 			pageIDs.add("" + s.getId());
 		}
 
-		Submission next = new Submission();
-		next.setName("next page ("+(currentPage+2)+")");
-		list.add(next);
-		pageIDs.add("next");
-
 		// Start downloading the thumbnails
 		thumbnailDownloaderThread = new ThumbnailDownloaderThread(true, handler, list);
 		thumbnailDownloaderThread.start();
@@ -84,26 +76,16 @@ public class ListStories extends AbstractContentList<Submission> implements Cont
 
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {
-		if (pageIDs.get(selectedIndex).equalsIgnoreCase("next")) {
-			currentPage++;
-			loadPage(currentPage);
-		} else if (pageIDs.get(selectedIndex).equalsIgnoreCase("prev")) {
-			if (currentPage > 0) {
-				currentPage--;
-				loadPage(currentPage);
-			}
-		} else {
-			int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
-			Log.i("ListStories", "Viewing story ID: " + pageID);
-			Intent i = new Intent(this, ViewStoryActivity.class);
-			i.putExtra("pageID", pageID);
-			i.putExtra("useAuthentication", useAuthentication());
-			startActivity(i);
-		}
+		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
+		Log.i("ListStories", "Viewing story ID: " + pageID);
+		Intent i = new Intent(this, ViewStoryActivity.class);
+		i.putExtra("pageID", pageID);
+		i.putExtra("useAuthentication", useAuthentication());
+		startActivity(i);
 	}
 
 	public boolean useAuthentication() {
-		return false;
+		return (Authentication.getUsername() != null && Authentication.getUsername().trim().length() > 0);
 	}
 
 	@Override
