@@ -34,7 +34,7 @@ public class ThumbnailDownloaderThread extends Thread {
 		Iterator<Submission> i = resultList.iterator();
 		while (runIt && i.hasNext()) {
 			Submission s = i.next();
-			if (s.getThumbnail() == null) {
+			if (s != null && s.getId()!=-1 && s.getThumbnail() == null) {
 				Log.i("SF ThumbDownloader", "Downloading thumb for pid " + s.getId() + " from "
 						+ s.getThumbnailUrl());
 				Bitmap thumbnail = ContentDownloader.downloadBitmap(s.getThumbnailUrl());

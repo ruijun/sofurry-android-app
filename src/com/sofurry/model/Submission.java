@@ -7,7 +7,7 @@ public class Submission {
 	public enum SUBMISSION_TYPE {ARTWORK, STORY, JOURNAL, MUSIC};
 	
 	private SUBMISSION_TYPE type;
-	private int id;
+	private int id = -1;
 	private String name;
 	private String content;
 	private String tags;

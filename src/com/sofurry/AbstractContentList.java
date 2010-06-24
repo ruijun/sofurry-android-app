@@ -30,6 +30,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 	private String errorMessage;
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	protected ContentRequestThread<Submission> listRequestThread;
+	protected int currentPage = 0;
 
 	// Separate handler to let android update the view whenever possible
 	protected Handler handler = new Handler() {
@@ -54,14 +55,23 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		loadPage(currentPage);
+	}
+
+	public void loadPage(int pageNum) {
+		if (thumbnailDownloaderThread != null) {
+			thumbnailDownloaderThread.stopThread();
+			thumbnailDownloaderThread = null;
+		}
 		requestUrl = getFetchUrl();
-		requestParameters = getFetchParameters();
+		requestParameters = getFetchParameters(pageNum);
 		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		errorMessage = null;
 		listRequestThread = new ContentRequestThread(this, handler, requestUrl, requestParameters);
 		listRequestThread.start();
 	}
-
+	
+	
 	// Goes back to the main menu
 	private void closeList() {
 		Bundle bundle = new Bundle();
@@ -114,7 +124,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 
 	protected abstract void setSelectedIndex(int selectedIndex);
 
-	protected abstract Map<String, String> getFetchParameters();
+	protected abstract Map<String, String> getFetchParameters(int page);
 
 	protected abstract ListAdapter getAdapter(Context context);
 
