@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.sofurry.chat.ChatActivity;
+import com.sofurry.gallery.GalleryArt;
 import com.sofurry.list.ListJournals;
 import com.sofurry.list.ListPM;
 import com.sofurry.list.ListStories;
@@ -52,6 +53,12 @@ public class MainMenu extends Activity {
 			}
 		});
 
+		buttonArt.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View arg0) {
+				launchArtGallery();
+			}
+		});
+
 		buttonJournals.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
 				launchJournalsList();
@@ -81,6 +88,11 @@ public class MainMenu extends Activity {
 	private void launchJournalsList() {
 		Intent intent = new Intent(this, ListJournals.class);
 		startActivityForResult(intent, AppConstants.ACTIVITY_JOURNALSLIST);
+	}
+
+	private void launchArtGallery() {
+		Intent intent = new Intent(this, GalleryArt.class);
+		startActivityForResult(intent, AppConstants.ACTIVITY_GALLERYART);
 	}
 
 	private void launchStoriesList() {

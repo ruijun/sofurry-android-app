@@ -13,14 +13,13 @@ import android.widget.TextView;
 
 import com.sofurry.R;
 import com.sofurry.model.Submission;
-import com.sofurry.util.IconStorage;
 
-public class SubmissionAdapter extends ArrayAdapter<Submission> {
+public class SubmissionListAdapter extends ArrayAdapter<Submission> {
 
 	private ArrayList<Submission> items;
 	private Context context;
 
-	public SubmissionAdapter(Context context, int textViewResourceId, ArrayList<Submission> items) {
+	public SubmissionListAdapter(Context context, int textViewResourceId, ArrayList<Submission> items) {
 		super(context, textViewResourceId, items);
 		this.items = items;
 		this.context = context;

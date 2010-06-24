@@ -7,6 +7,8 @@ public class AppConstants {
 	public static final int ACTIVITY_PMLIST = 1;
 	public static final int ACTIVITY_SETTINGS = 2;
 	public static final int ACTIVITY_JOURNALSLIST = 3;
+	public static final int ACTIVITY_GALLERYART = 4;
+	public static final int ACTIVITY_VIEWPM = 5;
 
 	//Ajax message types
 	public static final int AJAXTYPE_APIERROR = 5;

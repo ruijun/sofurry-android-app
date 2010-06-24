@@ -14,32 +14,38 @@ import com.sofurry.model.PrivateMessage;
 
 public class PrivateMessageAdapter extends ArrayAdapter<PrivateMessage> {
 
-        private ArrayList<PrivateMessage> items;
-        private Context context;
+	private ArrayList<PrivateMessage> items;
+	private Context context;
 
-        public PrivateMessageAdapter(Context context, int textViewResourceId, ArrayList<PrivateMessage> items) {
-                super(context, textViewResourceId, items);
-                this.items = items;
-                this.context = context;
-        }
+	public PrivateMessageAdapter(Context context, int textViewResourceId, ArrayList<PrivateMessage> items) {
+		super(context, textViewResourceId, items);
+		this.items = items;
+		this.context = context;
+	}
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-                View v = convertView;
-                if (v == null) {
-                    LayoutInflater vi = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    v = vi.inflate(R.layout.listitemtwolineicon, parent, false);
-                }
-                PrivateMessage m = items.get(position);
-                if (m != null) {
-                        TextView tt = (TextView) v.findViewById(R.id.toptext);
-                        TextView bt = (TextView) v.findViewById(R.id.bottomtext);
-                        if (tt != null) {
-                              tt.setText(m.getSubject());                            }
-                        if(bt != null){
-                              bt.setText("From: "+m.getFromUser());
-                        }
-                }
-                return v;
-        }
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		View v = convertView;
+		if (v == null) {
+			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			v = vi.inflate(R.layout.listitemtwolineicon, parent, false);
+		}
+		PrivateMessage m = items.get(position);
+		if (m != null) {
+			TextView tt = (TextView) v.findViewById(R.id.toptext);
+			TextView bt = (TextView) v.findViewById(R.id.bottomtext);
+			if (tt != null) {
+				tt.setText(m.getSubject());
+			} else {
+				tt.setText("");
+			}
+			if (bt != null && bt.length() > 0) {
+				bt.setText("From: " + m.getFromUser());
+			} else {
+				bt.setText("");
+			}
+			
+		}
+		return v;
+	}
 }

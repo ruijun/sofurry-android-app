@@ -10,7 +10,7 @@
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="0px"
-	android:layout_weight="1">
+	android:layout_weight="1" android:fadingEdge="none">
 
 	<TextView android:id="@+id/chatview" 
 		android:layout_width="fill_parent"
@@ -21,7 +21,7 @@
 	
 	<LinearLayout android:orientation="horizontal"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
+		android:layout_height="wrap_content" android:fadingEdge="none">
 
 		<EditText android:id="@+id/chatentry" 
 			android:layout_width="fill_parent"

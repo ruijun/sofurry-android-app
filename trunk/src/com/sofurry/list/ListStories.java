@@ -25,16 +25,16 @@ import com.sofurry.util.IconStorage;
 public class ListStories extends AbstractContentList<Submission> implements ContentController<Submission> {
 
 	private ArrayList<String> pageIDs;
-	
+
 	@Override
-	protected Map<String, String> getFetchParameters() {
+	protected Map<String, String> getFetchParameters(int page) {
 		Map<String, String> kvPairs = new HashMap<String, String>();
 
 		kvPairs.put("f", "browse");
 		kvPairs.put("viewSource", "0");
 		kvPairs.put("contentType", "0");
 		kvPairs.put("entriesPerPage", "30");
-		kvPairs.put("page", "0");
+		kvPairs.put("page", "" + page);
 		return kvPairs;
 	}
 
@@ -42,7 +42,13 @@ public class ListStories extends AbstractContentList<Submission> implements Cont
 		int numResults;
 		Log.i("Stories.parseResponse", "response: " + httpResult);
 		pageIDs = new ArrayList<String>();
-		
+		if (currentPage > 0) {
+			Submission prev = new Submission();
+			prev.setName("previous page ("+(currentPage)+")");
+			list.add(prev);
+			pageIDs.add("prev");
+		}
+
 		JSONObject jsonParser = new JSONObject(httpResult);
 		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
 		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
@@ -60,11 +66,17 @@ public class ListStories extends AbstractContentList<Submission> implements Cont
 			Bitmap thumb = IconStorage.loadUserIcon(Integer.parseInt(s.getAuthorID()));
 			if (thumb != null)
 				s.setThumbnail(thumb);
-			
+
 			list.add(s);
-			pageIDs.add(""+s.getId());
+			pageIDs.add("" + s.getId());
 		}
-		//Start downloading the thumbnails
+
+		Submission next = new Submission();
+		next.setName("next page ("+(currentPage+2)+")");
+		list.add(next);
+		pageIDs.add("next");
+
+		// Start downloading the thumbnails
 		thumbnailDownloaderThread = new ThumbnailDownloaderThread(true, handler, list);
 		thumbnailDownloaderThread.start();
 		return numResults;
@@ -72,22 +84,31 @@ public class ListStories extends AbstractContentList<Submission> implements Cont
 
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {
-		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
-		Log.i("ListStories", "Viewing story ID: "+pageID);
-		Intent i = new Intent( this, ViewStoryActivity.class ) ;
-		i.putExtra("pageID", pageID) ;
-		i.putExtra("useAuthentication", useAuthentication()) ;
-		startActivity(i) ;
+		if (pageIDs.get(selectedIndex).equalsIgnoreCase("next")) {
+			currentPage++;
+			loadPage(currentPage);
+		} else if (pageIDs.get(selectedIndex).equalsIgnoreCase("prev")) {
+			if (currentPage > 0) {
+				currentPage--;
+				loadPage(currentPage);
+			}
+		} else {
+			int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
+			Log.i("ListStories", "Viewing story ID: " + pageID);
+			Intent i = new Intent(this, ViewStoryActivity.class);
+			i.putExtra("pageID", pageID);
+			i.putExtra("useAuthentication", useAuthentication());
+			startActivity(i);
+		}
 	}
-	
+
 	public boolean useAuthentication() {
 		return false;
 	}
-	
-	@Override 
-	protected ListAdapter getAdapter(Context context) {
-		return new SubmissionAdapter(context, R.layout.listitemtwolineicon, resultList);
-	}
 
+	@Override
+	protected ListAdapter getAdapter(Context context) {
+		return new SubmissionListAdapter(context, R.layout.listitemtwolineicon, resultList);
+	}
 
 }

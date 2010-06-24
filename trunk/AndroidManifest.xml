@@ -17,6 +17,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".gallery.GalleryArt">
+            <intent-filter>
+                <action android:name="android.intent.action.GALLERYART" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".list.ListJournals">
             <intent-filter>
                 <action android:name="android.intent.action.LISTJOURNALS" />
@@ -32,6 +38,12 @@
         <activity android:name=".list.ListPM">
             <intent-filter>
                 <action android:name="android.intent.action.LISTPM" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ViewPMActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEWPM" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

@@ -1,4 +1,4 @@
-package com.sofurry.list;
+package com.sofurry.gallery;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,42 +12,35 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
-import android.widget.ListAdapter;
+import android.widget.BaseAdapter;
 
-import com.sofurry.AbstractContentList;
+import com.sofurry.AbstractContentGallery;
 import com.sofurry.ContentController;
-import com.sofurry.R;
 import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.util.IconStorage;
 
-public class ListJournals extends AbstractContentList<Submission> implements ContentController<Submission> {
+public class GalleryArt extends AbstractContentGallery<Submission> implements ContentController<Submission> {
 
 	private ArrayList<String> pageIDs;
-
+	
 	@Override
-	protected Map<String, String> getFetchParameters(int page) {
+	protected Map<String, String> getFetchParameters() {
 		Map<String, String> kvPairs = new HashMap<String, String>();
 
 		kvPairs.put("f", "browse");
 		kvPairs.put("viewSource", "0");
-		kvPairs.put("contentType", "3");
+		kvPairs.put("contentType", "1");
 		kvPairs.put("entriesPerPage", "30");
-		kvPairs.put("page", "" + page);
+		kvPairs.put("page", "0");
 		return kvPairs;
 	}
 
-	public int parseResponse(java.lang.String httpResult, ArrayList<Submission> list) throws JSONException {
+	public int parseResponse(String httpResult, ArrayList<Submission> list) throws JSONException {
 		int numResults;
-		Log.i("Journals.parseResponse", "response: " + httpResult);
+		Log.i("Stories.parseResponse", "response: " + httpResult);
 		pageIDs = new ArrayList<String>();
-		if (currentPage > 0) {
-			Submission prev = new Submission();
-			prev.setName("previous page ("+(currentPage)+")");
-			list.add(prev);
-			pageIDs.add("prev");
-		}
 		
 		JSONObject jsonParser = new JSONObject(httpResult);
 		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
@@ -66,49 +59,32 @@ public class ListJournals extends AbstractContentList<Submission> implements Con
 			Bitmap thumb = IconStorage.loadUserIcon(Integer.parseInt(s.getAuthorID()));
 			if (thumb != null)
 				s.setThumbnail(thumb);
-
+			
 			list.add(s);
-			pageIDs.add(items.getJSONObject(i).getString("pid"));
+			pageIDs.add(""+s.getId());
 		}
-		
-		Submission next = new Submission();
-		next.setName("next page ("+(currentPage+2)+")");
-		list.add(next);
-		pageIDs.add("next");
-
-		// Start downloading the thumbnails
-		thumbnailDownloaderThread = new ThumbnailDownloaderThread(true, handler, list);
+		//Start downloading the thumbnails
+		thumbnailDownloaderThread = new ThumbnailDownloaderThread(false, handler, list);
 		thumbnailDownloaderThread.start();
 		return numResults;
 	}
 
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {
-		if (pageIDs.get(selectedIndex).equalsIgnoreCase("next")) {
-			currentPage++;
-			loadPage(currentPage);
-		} else if (pageIDs.get(selectedIndex).equalsIgnoreCase("prev")) {
-			if (currentPage > 0) {
-				currentPage--;
-				loadPage(currentPage);
-			}
-		} else {
-			int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
-			Log.i("ListJournals", "Viewing journal ID: " + pageID);
-			Intent i = new Intent(this, ViewStoryActivity.class);
-			i.putExtra("pageID", pageID);
-			i.putExtra("useAuthentication", useAuthentication());
-			startActivity(i);
-		}
+		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
+		Log.i("GalleryArt", "Viewing art ID: "+pageID);
+		Intent i = new Intent( this, ViewStoryActivity.class ) ;
+		i.putExtra("pageID", pageID) ;
+		startActivity(i) ;
 	}
-
+	
 	public boolean useAuthentication() {
 		return false;
 	}
-
-	@Override
-	protected ListAdapter getAdapter(Context context) {
-		return new SubmissionListAdapter(context, R.layout.listitemtwolineicon, resultList);
+	
+	@Override 
+	protected BaseAdapter getAdapter(Context context) {
+		return new SubmissionGalleryAdapter(context, resultList);
 	}
 
 }
