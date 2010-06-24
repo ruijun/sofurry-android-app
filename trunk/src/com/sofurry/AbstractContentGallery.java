@@ -15,9 +15,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.AbsListView.OnScrollListener;
 
 import com.sofurry.model.Submission;
 
@@ -32,6 +34,8 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	protected ContentRequestThread<Submission> listRequestThread;
 	private GridView galleryView;
+	protected int currentPage = 0;
+	protected int lastScrollY = 0;
 
 	// Separate handler to let android update the view whenever possible
 	protected Handler handler = new Handler() {
@@ -57,10 +61,17 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallerylayout);
 		galleryView = (GridView) findViewById(R.id.galleryview);
-
-		requestUrl = getFetchUrl();
-		requestParameters = getFetchParameters();
 		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
+		loadPage(currentPage);
+	}
+	
+	protected void loadPage(int page) {
+		if (thumbnailDownloaderThread != null) {
+			thumbnailDownloaderThread.stopThread();
+			thumbnailDownloaderThread = null;
+		}
+		requestUrl = getFetchUrl();
+		requestParameters = getFetchParameters(page);
 		errorMessage = null;
 		listRequestThread = new ContentRequestThread(this, handler, requestUrl, requestParameters);
 		listRequestThread.start();
@@ -80,7 +91,9 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 
 	// Sets the resulting list on the screen
 	private void updateView() {
-		Log.i("SF AbstractContentList", "updateView called");
+		lastScrollY = galleryView.getFirstVisiblePosition();
+		Log.i("SF AbstractContentList", "updateView called, last scrollpos: "+lastScrollY);
+		listRequestThread = null;
 		BaseAdapter adapter = getAdapter(this);
 		galleryView.setAdapter(adapter);
 		// bind a selection listener to the view
@@ -89,6 +102,24 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 				setSelectedIndex(position);
 			}
 		});
+	    galleryView.setOnScrollListener(new OnScrollListener() {
+	        public void onScroll(final AbsListView view, final int first,
+	                                    final int visible, final int total) {
+	            // detect if last item is visible
+	            if (visible < total && (first + visible == total) && listRequestThread == null) {
+	                Log.d("OnScrollListener - end of list", "fvi: " +
+	                   first + ", vic: " + visible + ", tic: " + total);
+	                currentPage++;
+	        		loadPage(currentPage);
+	            }
+	        }
+
+			public void onScrollStateChanged(AbsListView view, int arg1) {
+			}
+	    }); 
+		Log.i("SF", "Scrolling TO: "+lastScrollY);
+	    galleryView.setSelection(lastScrollY+3);
+
 
 	}
 
@@ -118,7 +149,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 
 	protected abstract void setSelectedIndex(int selectedIndex);
 
-	protected abstract Map<String, String> getFetchParameters();
+	protected abstract Map<String, String> getFetchParameters(int page);
 
 	protected abstract BaseAdapter getAdapter(Context context);
 

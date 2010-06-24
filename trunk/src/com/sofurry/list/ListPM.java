@@ -21,7 +21,7 @@ import com.sofurry.model.PrivateMessage;
 
 public class ListPM extends AbstractContentList<PrivateMessage> implements ContentController<PrivateMessage> {
 
-	private ArrayList<String> pageIDs;
+	private ArrayList<String> pageIDs = new ArrayList<String>();
 
 	@Override
 	protected Map<String, String> getFetchParameters(int page) {
@@ -34,15 +34,10 @@ public class ListPM extends AbstractContentList<PrivateMessage> implements Conte
 
 	public int parseResponse(String httpResult, ArrayList<PrivateMessage> list) throws JSONException {
 		int numResults;
-		String result;
 		Log.i("PM.parseResponse", "response: " + httpResult);
-		pageIDs = new ArrayList<String>();
-		if (currentPage > 0) {
-			PrivateMessage prev = new PrivateMessage();
-			prev.setSubject("previous page ("+(currentPage)+")");
-			list.add(prev);
-			pageIDs.add("prev");
-		}
+
+		if (resultList != null)
+			list.addAll(resultList);
 
 		JSONObject jsonParser = new JSONObject(httpResult);
 		JSONArray items = new JSONArray(jsonParser.getString("items"));
@@ -65,31 +60,16 @@ public class ListPM extends AbstractContentList<PrivateMessage> implements Conte
 			pageIDs.add(id);
 		}
 
-		PrivateMessage next = new PrivateMessage();
-		next.setSubject("next page ("+(currentPage+2)+")");
-		list.add(next);
-		pageIDs.add("next");
-
 		return numResults;
 	}
 
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {
-		if (pageIDs.get(selectedIndex).equalsIgnoreCase("next")) {
-			currentPage++;
-			loadPage(currentPage);
-		} else if (pageIDs.get(selectedIndex).equalsIgnoreCase("prev")) {
-			if (currentPage > 0) {
-				currentPage--;
-				loadPage(currentPage);
-			}
-		} else {
-			int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
-			Log.i("ListPM", "Viewing PM ID: " + pageID);
-			Intent i = new Intent(this, ViewPMActivity.class);
-			i.putExtra("PMID", pageID);
-			startActivity(i);
-		}
+		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
+		Log.i("ListPM", "Viewing PM ID: " + pageID);
+		Intent i = new Intent(this, ViewPMActivity.class);
+		i.putExtra("PMID", pageID);
+		startActivity(i);
 	}
 
 	public boolean useAuthentication() {

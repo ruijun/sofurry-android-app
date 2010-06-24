@@ -15,8 +15,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.AbsListView.OnScrollListener;
 
 import com.sofurry.model.Submission;
 
@@ -31,6 +33,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	protected ContentRequestThread<Submission> listRequestThread;
 	protected int currentPage = 0;
+	protected int lastScrollY = 0;
 
 	// Separate handler to let android update the view whenever possible
 	protected Handler handler = new Handler() {
@@ -54,7 +57,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		loadPage(currentPage);
 	}
 
@@ -65,7 +68,6 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 		}
 		requestUrl = getFetchUrl();
 		requestParameters = getFetchParameters(pageNum);
-		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		errorMessage = null;
 		listRequestThread = new ContentRequestThread(this, handler, requestUrl, requestParameters);
 		listRequestThread.start();
@@ -86,7 +88,9 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 
 	// Sets the resulting list on the screen
 	private void updateView() {
-		Log.i("SF AbstractContentList", "updateView called");
+		lastScrollY = getListView().getFirstVisiblePosition();
+		Log.i("SF AbstractContentList", "updateView called, last scrollpos: "+lastScrollY);
+		listRequestThread = null;
 		setListAdapter(getAdapter(this));
 		getListView().setTextFilterEnabled(true);
 		// bind a selection listener to the view
@@ -95,6 +99,23 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 				setSelectedIndex(position);
 			}
 		});
+	    getListView().setOnScrollListener(new OnScrollListener() {
+	        public void onScroll(final AbsListView view, final int first,
+	                                    final int visible, final int total) {
+	            // detect if last item is visible
+	            if (visible < total && (first + visible == total) && listRequestThread == null) {
+	                Log.d("OnScrollListener - end of list", "fvi: " +
+	                   first + ", vic: " + visible + ", tic: " + total);
+	                currentPage++;
+	        		loadPage(currentPage);
+	            }
+	        }
+
+			public void onScrollStateChanged(AbsListView view, int arg1) {
+			}
+	    }); 
+		Log.i("SF", "Scrolling TO: "+lastScrollY);
+	    getListView().setSelection(lastScrollY);
 
 	}
 

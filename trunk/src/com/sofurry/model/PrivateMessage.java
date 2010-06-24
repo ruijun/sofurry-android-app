@@ -1,8 +1,11 @@
 package com.sofurry.model;
 
-import java.util.Date;
+import java.io.Serializable;
 
-public class PrivateMessage {
+
+public class PrivateMessage implements Serializable {
+
+	private static final long serialVersionUID = -237449121440709783L;
 
 	private int id;
 	private String fromUser;
