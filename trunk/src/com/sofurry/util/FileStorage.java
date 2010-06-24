@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import android.os.Environment;
+import android.util.Log;
 
 public class FileStorage {
 
@@ -15,14 +16,17 @@ public class FileStorage {
 
 	public static FileOutputStream getFileOutputStream(String filename) throws IOException {
 		checkExternalMedia();
-		if (!mExternalStorageWriteable)
+		if (!mExternalStorageWriteable) {
+			Log.i("FileStorage", "External storage not writeable");
 			return null;
+		}
 		
 		File d = new File(Environment.getExternalStorageDirectory()+"/Android/data/com.sofurry/files/");
 		d.mkdirs();
 				
 		File f = new File(Environment.getExternalStorageDirectory()+"/Android/data/com.sofurry/files/"+filename);
 		if (f.createNewFile() && f.canWrite()) {
+			Log.i("FileStorage", "writing file "+filename);
 			return new FileOutputStream(f);
 		}
 		return null;
@@ -30,12 +34,16 @@ public class FileStorage {
 	
 	public static FileInputStream getFileInputStream(String filename) throws FileNotFoundException {
 		checkExternalMedia();
-		if (!mExternalStorageAvailable)
+		if (!mExternalStorageAvailable) {
+			Log.i("FileStorage", "External storage not readable");
 			return null;
+		}
 		
 		File f = new File(Environment.getExternalStorageDirectory()+"/Android/data/com.sofurry/files/"+filename);
 		if (f.canRead()) {
 			return new FileInputStream(f);
+		} else {
+			Log.i("FileStorage", "Can't read file "+filename);
 		}
 		return null;
 	}
