@@ -16,8 +16,8 @@ import android.widget.BaseAdapter;
 
 import com.sofurry.AbstractContentGallery;
 import com.sofurry.ContentController;
+import com.sofurry.PreviewArtActivity;
 import com.sofurry.ThumbnailDownloaderThread;
-import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.IconStorage;
@@ -77,9 +77,12 @@ public class GalleryArt extends AbstractContentGallery<Submission> implements Co
 	protected void setSelectedIndex(int selectedIndex) {
 		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
 		Log.i("GalleryArt", "Viewing art ID: " + pageID);
-		Intent i = new Intent(this, ViewStoryActivity.class);
+		Intent i = new Intent(this, PreviewArtActivity.class);
 		i.putExtra("pageID", pageID);
-		i.putExtra("submission", resultList.get(selectedIndex));
+		i.putExtra("name", resultList.get(selectedIndex).getName());
+		i.putExtra("tags", resultList.get(selectedIndex).getTags());
+		i.putExtra("authorName", resultList.get(selectedIndex).getAuthorName());
+		i.putExtra("authorId", resultList.get(selectedIndex).getAuthorID());
 		startActivity(i);
 	}
 
