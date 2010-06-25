@@ -61,7 +61,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		loadPage(currentPage, viewSource);
+		loadPage(currentPage, viewSource, true);
 	}
 
 	/* Creates the menu items */
@@ -104,12 +104,14 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 		}
 	}
 
-	public void loadPage(int pageNum, int source) {
+	public void loadPage(int pageNum, int source, boolean showLoadingScreen) {
 		if (thumbnailDownloaderThread != null) {
 			thumbnailDownloaderThread.stopThread();
 			thumbnailDownloaderThread = null;
 		}
-		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
+		if (showLoadingScreen)
+			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
+		
 		requestUrl = getFetchUrl();
 		requestParameters = getFetchParameters(pageNum, source);
 		errorMessage = null;
@@ -154,7 +156,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 	                Log.d("OnScrollListener - end of list", "fvi: " +
 	                   first + ", vic: " + visible + ", tic: " + total);
 	                currentPage++;
-	        		loadPage(currentPage, viewSource);
+	        		loadPage(currentPage, viewSource, false);
 	            }
 	        }
 

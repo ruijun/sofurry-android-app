@@ -101,7 +101,7 @@ public class ListStories extends AbstractContentList<Submission> implements Cont
 		lastScrollY = 0;
 		resultList = new ArrayList<Submission>();
 		pageIDs = new ArrayList<String>();
-		loadPage(currentPage, viewSource);
+		loadPage(currentPage, viewSource, true);
 	}
 
 }
