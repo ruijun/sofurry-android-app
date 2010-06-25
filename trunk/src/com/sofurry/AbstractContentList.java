@@ -88,6 +88,9 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 
 	// Sets the resulting list on the screen
 	private void updateView() {
+		if (resultList == null)
+			return;
+
 		lastScrollY = getListView().getFirstVisiblePosition();
 		Log.i("SF AbstractContentList", "updateView called, last scrollpos: "+lastScrollY);
 		listRequestThread = null;

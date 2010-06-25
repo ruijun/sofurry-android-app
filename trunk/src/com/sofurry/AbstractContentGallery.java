@@ -91,6 +91,9 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 
 	// Sets the resulting list on the screen
 	private void updateView() {
+		if (resultList == null)
+			return;
+
 		lastScrollY = galleryView.getFirstVisiblePosition();
 		Log.i("SF AbstractContentList", "updateView called, last scrollpos: "+lastScrollY);
 		listRequestThread = null;
