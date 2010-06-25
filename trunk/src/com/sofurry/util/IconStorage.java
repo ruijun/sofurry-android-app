@@ -11,6 +11,14 @@ import android.util.Log;
 public class IconStorage {
 
 	
+	public static Bitmap loadSubmissionImage(int id) {
+		return loadIcon("image"+id);
+	}
+
+	public static void saveSubmissionImage(int id, Bitmap icon) {
+		saveIcon("image"+id, icon);
+	}
+	
 	public static Bitmap loadSubmissionIcon(int id) {
 		return loadIcon("thumb"+id);
 	}
