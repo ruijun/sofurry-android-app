@@ -101,7 +101,7 @@ public class ListJournals extends AbstractContentList<Submission> implements Con
 		lastScrollY = 0;
 		resultList = new ArrayList<Submission>();
 		pageIDs = new ArrayList<String>();
-		loadPage(currentPage, viewSource);
+		loadPage(currentPage, viewSource, true);
 	}
 
 }

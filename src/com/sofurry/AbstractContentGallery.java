@@ -49,7 +49,8 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 		public void handleMessage(Message msg) {
 			if (msg.obj != null) {
 				resultList = (ArrayList<T>) msg.obj;
-				pd.dismiss();
+				if (pd != null && pd.isShowing())
+					pd.dismiss();
 				updateView();
 				if (errorMessage != null) {
 					closeList();
@@ -66,7 +67,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallerylayout);
 		galleryView = (GridView) findViewById(R.id.galleryview);
-		loadPage(currentPage, viewSource);
+		loadPage(currentPage, viewSource, true);
 	}
 
 	/* Creates the menu items */
@@ -107,12 +108,14 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 		}
 	}
 
-	protected void loadPage(int page, int source) {
+	protected void loadPage(int page, int source, boolean showLoadingScreen) {
 		if (thumbnailDownloaderThread != null) {
 			thumbnailDownloaderThread.stopThread();
 			thumbnailDownloaderThread = null;
 		}
-		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
+		if (showLoadingScreen)
+			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
+		
 		requestUrl = getFetchUrl();
 		requestParameters = getFetchParameters(page, source);
 		errorMessage = null;
@@ -154,7 +157,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 				if (visible < total && (first + visible == total) && listRequestThread == null) {
 					Log.d("OnScrollListener - end of list", "fvi: " + first + ", vic: " + visible + ", tic: " + total);
 					currentPage++;
-					loadPage(currentPage, viewSource);
+					loadPage(currentPage, viewSource, false);
 				}
 			}
 

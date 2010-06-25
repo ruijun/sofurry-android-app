@@ -104,7 +104,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> implements Co
 		lastScrollY = 0;
 		resultList = new ArrayList<Submission>();
 		pageIDs = new ArrayList<String>();
-		loadPage(currentPage, viewSource);
+		loadPage(currentPage, viewSource, true);
 	}
 
 }
