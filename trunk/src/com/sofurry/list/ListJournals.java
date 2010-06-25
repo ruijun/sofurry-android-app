@@ -28,11 +28,11 @@ public class ListJournals extends AbstractContentList<Submission> implements Con
 	private ArrayList<String> pageIDs = new ArrayList<String>();
 
 	@Override
-	protected Map<String, String> getFetchParameters(int page) {
+	protected Map<String, String> getFetchParameters(int page, int source) {
 		Map<String, String> kvPairs = new HashMap<String, String>();
 
 		kvPairs.put("f", "browse");
-		kvPairs.put("viewSource", "0");
+		kvPairs.put("viewSource", ""+source);
 		kvPairs.put("contentType", "3");
 		kvPairs.put("entriesPerPage", "30");
 		kvPairs.put("page", "" + page);
@@ -91,6 +91,17 @@ public class ListJournals extends AbstractContentList<Submission> implements Con
 	@Override
 	protected ListAdapter getAdapter(Context context) {
 		return new SubmissionListAdapter(context, R.layout.listitemtwolineicon, resultList);
+	}
+
+	@Override
+	protected void resetViewSource(int newViewSource) {
+		Log.i("SF", "ResetViewSource: "+newViewSource);
+		viewSource = newViewSource;
+		currentPage = 0;
+		lastScrollY = 0;
+		resultList = new ArrayList<Submission>();
+		pageIDs = new ArrayList<String>();
+		loadPage(currentPage, viewSource);
 	}
 
 }

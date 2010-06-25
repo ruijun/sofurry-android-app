@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.Menu;
 import android.widget.ListAdapter;
 
 import com.sofurry.AbstractContentList;
@@ -24,7 +25,18 @@ public class ListPM extends AbstractContentList<PrivateMessage> implements Conte
 	private ArrayList<String> pageIDs = new ArrayList<String>();
 
 	@Override
-	protected Map<String, String> getFetchParameters(int page) {
+	public boolean onCreateOptionsMenu(Menu menu) {
+		//TODO: PM Menu
+		return false;
+	}
+
+	@Override
+	protected void resetViewSource(int newViewSource) {
+		//This function is blank on purpose, since no view filter change is supported yet
+	}
+
+	@Override
+	protected Map<String, String> getFetchParameters(int page, int source) {
 		Map<String, String> kvPairs = new HashMap<String, String>();
 
 		kvPairs.put("f", "pm");
