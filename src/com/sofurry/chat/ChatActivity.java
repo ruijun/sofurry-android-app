@@ -70,9 +70,13 @@ public class ChatActivity extends Activity {
                 {
             		//Parse server response
             		try {
+            			if (msg.obj == null)
+            				return;
                         CharSequence serverResponse = (CharSequence) msg.obj.toString();
             			JSONObject jsonParser = new JSONObject(serverResponse.toString());
             			JSONArray items = new JSONArray(jsonParser.getString("data"));
+            			if (items == null)
+            				return;
             			int numResults = items.length();
             			for (int i = 0; i < numResults; i++) {
             				JSONObject jsonItem = items.getJSONObject(i);
@@ -95,8 +99,8 @@ public class ChatActivity extends Activity {
 
             			scrollView.scrollTo(0, chatView.getHeight());
 
-            		} catch (JSONException e) {
-            			Log.e("CHAT.parse", e.getMessage());
+            		} catch (Exception e) {
+            			Log.e("SF CHAT", e.getMessage());
             			e.printStackTrace();
             		}
                 }
@@ -158,9 +162,7 @@ public class ChatActivity extends Activity {
 				return httpResult;
 			}
 
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -184,9 +186,11 @@ public class ChatActivity extends Activity {
 		public void run() {
 			while (keepRunning) {
 				String result = pollChat(roomId);
-		        Message msg = chatHandler.obtainMessage();
-		        msg.obj = result;
-		        chatHandler.sendMessage(msg);
+				if (result != null) {
+					Message msg = chatHandler.obtainMessage();
+					msg.obj = result;
+					chatHandler.sendMessage(msg);
+				}
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {
@@ -234,9 +238,7 @@ public class ChatActivity extends Activity {
 							httpResult = EntityUtils.toString(response.getEntity());
 						}
 						String errorMessage = parseErrorMessage(httpResult);
-					} catch (ClientProtocolException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				

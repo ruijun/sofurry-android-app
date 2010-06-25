@@ -83,6 +83,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> implements Co
 		i.putExtra("tags", resultList.get(selectedIndex).getTags());
 		i.putExtra("authorName", resultList.get(selectedIndex).getAuthorName());
 		i.putExtra("authorId", resultList.get(selectedIndex).getAuthorID());
+		i.putExtra("thumbnail", resultList.get(selectedIndex).getThumbnailUrl());
 		startActivity(i);
 	}
 

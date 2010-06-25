@@ -11,55 +11,65 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".list.ListStories">
+        <activity android:name=".list.ListStories"
+        		  android:label="@string/app_name_liststories">
             <intent-filter>
                 <action android:name="android.intent.action.LISTSTORIES" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".gallery.GalleryArt">
+        <activity android:name=".gallery.GalleryArt"
+        		  android:label="@string/app_name_listgallery">
             <intent-filter>
                 <action android:name="android.intent.action.GALLERYART" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".list.ListJournals">
+        <activity android:name=".list.ListJournals"
+        		  android:label="@string/app_name_listjournals">
             <intent-filter>
                 <action android:name="android.intent.action.LISTJOURNALS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".PreviewArtActivity">
+        <activity android:name=".PreviewArtActivity"
+        		  android:screenOrientation="sensor"
+        		  android:label="@string/app_name_viewart">
             <intent-filter>
                 <action android:name="android.intent.action.PREVIEWARTACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ViewStoryActivity">
+        <activity android:name=".ViewStoryActivity"
+        		  android:label="@string/app_name_viewstory">
             <intent-filter>
                 <action android:name="android.intent.action.VIEWSTORYACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".list.ListPM">
+        <activity android:name=".list.ListPM"
+        		  android:label="@string/app_name_listpm">
             <intent-filter>
                 <action android:name="android.intent.action.LISTPM" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ViewPMActivity">
+        <activity android:name=".ViewPMActivity"
+        		  android:label="@string/app_name_viewpm">
             <intent-filter>
                 <action android:name="android.intent.action.VIEWPM" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".AccountActivity">
+        <activity android:name=".AccountActivity"
+        		  android:label="@string/app_name_settings">
             <intent-filter>
                 <action android:name="android.intent.action.ACCOUNTACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".chat.ChatActivity">
+        <activity android:name=".chat.ChatActivity"
+        		  android:label="@string/app_name_chat">
             <intent-filter>
                 <action android:name="android.intent.action.CHATACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
