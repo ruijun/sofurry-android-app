@@ -74,10 +74,14 @@ public class PreviewArtActivity extends Activity implements Runnable {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void handleMessage(Message msg) {
+			try {
 			pd.dismiss();
-			if (msg.obj != null) {
-				Bitmap b = (Bitmap) msg.obj;
-				image.setImageBitmap(b);
+				if (msg.obj != null) {
+					Bitmap b = (Bitmap) msg.obj;
+					image.setImageBitmap(b);
+				}
+			} catch (Exception e) {
+				Log.e("SF", "Exception in PreviewArtActivity Handler", e);
 			}
 		}
 	};
