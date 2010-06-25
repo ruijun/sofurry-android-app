@@ -14,17 +14,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.sofurry.model.Submission;
 
 public abstract class AbstractContentGallery<T> extends Activity implements ContentController<T> {
-	
+
 	private String requestUrl;
 	private Map<String, String> requestParameters;
 	private ProgressDialog pd;
@@ -35,6 +39,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 	protected ContentRequestThread<Submission> listRequestThread;
 	private GridView galleryView;
 	protected int currentPage = 0;
+	protected int viewSource = AppConstants.VIEWSOURCE_ALL;
 	protected int lastScrollY = 0;
 
 	// Separate handler to let android update the view whenever possible
@@ -61,17 +66,55 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallerylayout);
 		galleryView = (GridView) findViewById(R.id.galleryview);
-		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
-		loadPage(currentPage);
+		loadPage(currentPage, viewSource);
 	}
-	
-	protected void loadPage(int page) {
+
+	/* Creates the menu items */
+	public boolean onCreateOptionsMenu(Menu menu) {
+		boolean result = super.onCreateOptionsMenu(menu);
+		SubMenu viewSourceMenu = menu.addSubMenu("Filter");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_ALL, 0, "All Submissions");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FEATURED, 0, "Featured");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FAVORITES, 0, "Your Favorites");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST, 0, "Watchlist");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_GROUP, 0, "Your Groups");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST_COMBINED, 0, "Watches + Groups");
+		return result;
+	}
+
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case AppConstants.MENU_FILTER_ALL:
+			resetViewSource(AppConstants.VIEWSOURCE_ALL);
+			return true;
+		case AppConstants.MENU_FILTER_FEATURED:
+			resetViewSource(AppConstants.VIEWSOURCE_FEATURED);
+			return true;
+		case AppConstants.MENU_FILTER_FAVORITES:
+			resetViewSource(AppConstants.VIEWSOURCE_FAVORITES);
+			return true;
+		case AppConstants.MENU_FILTER_WATCHLIST:
+			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST);
+			return true;
+		case AppConstants.MENU_FILTER_GROUP:
+			resetViewSource(AppConstants.VIEWSOURCE_GROUP);
+			return true;
+		case AppConstants.MENU_FILTER_WATCHLIST_COMBINED:
+			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST_COMBINED);
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
+	}
+
+	protected void loadPage(int page, int source) {
 		if (thumbnailDownloaderThread != null) {
 			thumbnailDownloaderThread.stopThread();
 			thumbnailDownloaderThread = null;
 		}
+		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		requestUrl = getFetchUrl();
-		requestParameters = getFetchParameters(page);
+		requestParameters = getFetchParameters(page, source);
 		errorMessage = null;
 		listRequestThread = new ContentRequestThread(this, handler, requestUrl, requestParameters);
 		listRequestThread.start();
@@ -95,7 +138,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 			return;
 
 		lastScrollY = galleryView.getFirstVisiblePosition();
-		Log.i("SF AbstractContentList", "updateView called, last scrollpos: "+lastScrollY);
+		Log.i("SF AbstractContentList", "updateView called, last scrollpos: " + lastScrollY);
 		listRequestThread = null;
 		BaseAdapter adapter = getAdapter(this);
 		galleryView.setAdapter(adapter);
@@ -105,24 +148,21 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 				setSelectedIndex(position);
 			}
 		});
-	    galleryView.setOnScrollListener(new OnScrollListener() {
-	        public void onScroll(final AbsListView view, final int first,
-	                                    final int visible, final int total) {
-	            // detect if last item is visible
-	            if (visible < total && (first + visible == total) && listRequestThread == null) {
-	                Log.d("OnScrollListener - end of list", "fvi: " +
-	                   first + ", vic: " + visible + ", tic: " + total);
-	                currentPage++;
-	        		loadPage(currentPage);
-	            }
-	        }
+		galleryView.setOnScrollListener(new OnScrollListener() {
+			public void onScroll(final AbsListView view, final int first, final int visible, final int total) {
+				// detect if last item is visible
+				if (visible < total && (first + visible == total) && listRequestThread == null) {
+					Log.d("OnScrollListener - end of list", "fvi: " + first + ", vic: " + visible + ", tic: " + total);
+					currentPage++;
+					loadPage(currentPage, viewSource);
+				}
+			}
 
 			public void onScrollStateChanged(AbsListView view, int arg1) {
 			}
-	    }); 
-		Log.i("SF", "Scrolling TO: "+lastScrollY);
-	    galleryView.setSelection(lastScrollY+3);
-
+		});
+		Log.i("SF", "Scrolling TO: " + lastScrollY);
+		galleryView.setSelection(lastScrollY + 3);
 
 	}
 
@@ -152,23 +192,21 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 
 	protected abstract void setSelectedIndex(int selectedIndex);
 
-	protected abstract Map<String, String> getFetchParameters(int page);
+	protected abstract Map<String, String> getFetchParameters(int page, int source);
 
 	protected abstract BaseAdapter getAdapter(Context context);
+
+	protected abstract void resetViewSource(int newViewSource);
 
 	protected void updateContentList() {
 		updateView();
 	}
 
-	
 	@Override
 	public void finish() {
 		super.finish();
 		if (thumbnailDownloaderThread != null)
 			thumbnailDownloaderThread.stopThread();
 	}
-	
 
-
-	
 }

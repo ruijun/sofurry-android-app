@@ -14,6 +14,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -33,6 +36,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	protected ContentRequestThread<Submission> listRequestThread;
 	protected int currentPage = 0;
+	protected int viewSource = AppConstants.VIEWSOURCE_ALL;
 	protected int lastScrollY = 0;
 
 	// Separate handler to let android update the view whenever possible
@@ -57,17 +61,57 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
-		loadPage(currentPage);
+		loadPage(currentPage, viewSource);
 	}
 
-	public void loadPage(int pageNum) {
+	/* Creates the menu items */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		boolean result = super.onCreateOptionsMenu(menu);
+		SubMenu viewSourceMenu = menu.addSubMenu("Filter");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_ALL, 0, "All Submissions");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FEATURED, 0, "Featured");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FAVORITES, 0, "Your Favorites");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST, 0, "Watchlist");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_GROUP, 0, "Your Groups");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST_COMBINED, 0, "Watches + Groups");
+		return result;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case AppConstants.MENU_FILTER_ALL:
+			resetViewSource(AppConstants.VIEWSOURCE_ALL);
+			return true;
+		case AppConstants.MENU_FILTER_FEATURED:
+			resetViewSource(AppConstants.VIEWSOURCE_FEATURED);
+			return true;
+		case AppConstants.MENU_FILTER_FAVORITES:
+			resetViewSource(AppConstants.VIEWSOURCE_FAVORITES);
+			return true;
+		case AppConstants.MENU_FILTER_WATCHLIST:
+			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST);
+			return true;
+		case AppConstants.MENU_FILTER_GROUP:
+			resetViewSource(AppConstants.VIEWSOURCE_GROUP);
+			return true;
+		case AppConstants.MENU_FILTER_WATCHLIST_COMBINED:
+			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST_COMBINED);
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	public void loadPage(int pageNum, int source) {
 		if (thumbnailDownloaderThread != null) {
 			thumbnailDownloaderThread.stopThread();
 			thumbnailDownloaderThread = null;
 		}
+		pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		requestUrl = getFetchUrl();
-		requestParameters = getFetchParameters(pageNum);
+		requestParameters = getFetchParameters(pageNum, source);
 		errorMessage = null;
 		listRequestThread = new ContentRequestThread(this, handler, requestUrl, requestParameters);
 		listRequestThread.start();
@@ -110,7 +154,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 	                Log.d("OnScrollListener - end of list", "fvi: " +
 	                   first + ", vic: " + visible + ", tic: " + total);
 	                currentPage++;
-	        		loadPage(currentPage);
+	        		loadPage(currentPage, viewSource);
 	            }
 	        }
 
@@ -148,9 +192,11 @@ public abstract class AbstractContentList<T> extends ListActivity implements Con
 
 	protected abstract void setSelectedIndex(int selectedIndex);
 
-	protected abstract Map<String, String> getFetchParameters(int page);
+	protected abstract Map<String, String> getFetchParameters(int page, int source);
 
 	protected abstract ListAdapter getAdapter(Context context);
+
+	protected abstract void resetViewSource(int newViewSource);
 
 	protected void updateContentList() {
 		updateView();

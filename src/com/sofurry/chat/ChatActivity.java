@@ -287,7 +287,7 @@ public class ChatActivity extends Activity {
         else if (text.toString().startsWith("***"))
             color = Color.LTGRAY;
         /* cite color */
-        else if (!text.toString().startsWith(Authentication.getUsername()) && text.toString().contains(Authentication.getUsername())) {
+        else if (!text.toString().startsWith(Authentication.getUsername()) && text.toString().toLowerCase().contains(Authentication.getUsername().toLowerCase())) {
             color = Color.CYAN;
             Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             v.vibrate(200);
