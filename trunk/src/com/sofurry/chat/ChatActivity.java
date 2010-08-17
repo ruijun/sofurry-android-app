@@ -219,7 +219,15 @@ public class ChatActivity extends Activity {
 				if (message != null) {
 					//Build the request and send it
 					Map<String, String> requestParameters = new HashMap<String, String>();
-					requestParameters.put("f", "chatpost");
+					
+					// Check if message is meant to be a command and set the function accordingly
+					if(message.substring(0,1).contains("/")) {
+						requestParameters.put("f", "chatcommand");
+					}
+					else {
+						requestParameters.put("f", "chatpost");
+					}
+
 					requestParameters.put("message", ""+message);
 					requestParameters.put("roomid", ""+roomId);
 
