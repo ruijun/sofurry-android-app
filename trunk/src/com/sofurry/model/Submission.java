@@ -2,7 +2,12 @@ package com.sofurry.model;
 
 import java.io.Serializable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.graphics.Bitmap;
+
+import com.sofurry.util.IconStorage;
 
 public class Submission implements Serializable {
 
@@ -89,6 +94,25 @@ public class Submission implements Serializable {
 		this.thumbnail = thumbnail;
 	}
 	
+	/**
+	 * Populates the Submission with data from a JSON object
+	 * @param datasource
+	 * The object to extract the data from
+	 * @throws Exception
+	 */
+	public void populate(JSONObject datasource) throws JSONException {
+		setName(datasource.getString("name"));
+		setId(Integer.parseInt(datasource.getString("pid")));
+		setDate(datasource.getString("date"));
+		setAuthorName(datasource.getString("authorName"));
+		setAuthorID(datasource.getString("authorId"));
+		setContentLevel(datasource.getString("contentLevel"));
+		setTags(datasource.getString("keywords"));
+		setThumbnailUrl(datasource.getString("thumb"));
+		Bitmap thumb = IconStorage.loadSubmissionIcon(getId());
+		if (thumb != null)
+			setThumbnail(thumb);
 
+	}
 	
 }

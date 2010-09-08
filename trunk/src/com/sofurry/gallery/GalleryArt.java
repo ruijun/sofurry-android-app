@@ -51,18 +51,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> implements Co
 		numResults = items.length();
 		for (int i = 0; i < numResults; i++) {
 			Submission s = new Submission();
-			s.setName(items.getJSONObject(i).getString("name"));
-			s.setId(Integer.parseInt(items.getJSONObject(i).getString("pid")));
-			s.setDate(items.getJSONObject(i).getString("date"));
-			s.setAuthorName(items.getJSONObject(i).getString("authorName"));
-			s.setAuthorID(items.getJSONObject(i).getString("authorId"));
-			s.setContentLevel(items.getJSONObject(i).getString("contentLevel"));
-			s.setTags(items.getJSONObject(i).getString("keywords"));
-			s.setThumbnailUrl(items.getJSONObject(i).getString("thumb"));
-			Bitmap thumb = IconStorage.loadSubmissionIcon(s.getId());
-			if (thumb != null)
-				s.setThumbnail(thumb);
-
+			s.populate(items.getJSONObject(i));
 			list.add(s);
 			pageIDs.add("" + s.getId());
 		}
