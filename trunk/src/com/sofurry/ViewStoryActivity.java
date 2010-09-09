@@ -49,7 +49,7 @@ public class ViewStoryActivity extends Activity implements Runnable {
 				// Save request parameters in case we have to re-send the request
 				originalRequestParameters = new HashMap<String, String>(requestParameters);
 				// add authentication parameters to the request
-				requestParameters = Authentication.addAuthParametersToQuery(requestParameters);
+				Authentication.addAuthParametersToQuery(requestParameters);
 			}
 			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 			errorMessage = null;
@@ -74,7 +74,7 @@ public class ViewStoryActivity extends Activity implements Runnable {
 			try {
 				if (useAuthentication && Authentication.parseResponse(httpResult) == false) {
 					// Retry request with new otp sequence if it failed for the first time
-					requestParameters = Authentication.addAuthParametersToQuery(originalRequestParameters);
+					Authentication.addAuthParametersToQuery(originalRequestParameters);
 					response = HttpRequest.doPost(requestUrl, requestParameters);
 					httpResult = EntityUtils.toString(response.getEntity());
 				}

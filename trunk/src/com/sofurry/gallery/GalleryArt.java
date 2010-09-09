@@ -5,24 +5,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.BaseAdapter;
 
 import com.sofurry.AbstractContentGallery;
-import com.sofurry.ContentController;
 import com.sofurry.PreviewArtActivity;
 import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.model.Submission;
-import com.sofurry.util.Authentication;
-import com.sofurry.util.IconStorage;
 
-public class GalleryArt extends AbstractContentGallery<Submission> implements ContentController<Submission> {
+public class GalleryArt extends AbstractContentGallery<Submission> {
 
 	private ArrayList<String> pageIDs = new ArrayList<String>();
 
@@ -37,30 +32,55 @@ public class GalleryArt extends AbstractContentGallery<Submission> implements Co
 		kvPairs.put("page", "" + page);
 		return kvPairs;
 	}
-
-	public int parseResponse(String httpResult, ArrayList<Submission> list) throws JSONException {
-		int numResults;
-		Log.i("Stories.parseResponse", "response: " + httpResult);
-
-		if (resultList != null)
-			list.addAll(resultList);
-
-		JSONObject jsonParser = new JSONObject(httpResult);
-		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
-		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
-		numResults = items.length();
-		for (int i = 0; i < numResults; i++) {
-			Submission s = new Submission();
-			s.populate(items.getJSONObject(i));
-			list.add(s);
-			pageIDs.add("" + s.getId());
+	
+	/* (non-Javadoc)
+	 * @see com.sofurry.AbstractContentGallery#parseResponse(org.json.JSONObject)
+	 */
+	public void parseResponse(JSONObject obj) {
+		try {
+			JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
+			JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
+			numResults = items.length();
+			for (int i = 0; i < numResults; i++) {
+				
+				Submission s = new Submission();
+				s.populate(items.getJSONObject(i));
+				s.loadSubmissionIcon();
+				
+				resultList.add(s);
+				pageIDs.add("" + s.getId());
+			}
+		} catch (Exception e) {
+			ronError(e);
 		}
-
 		// Start downloading the thumbnails
-		thumbnailDownloaderThread = new ThumbnailDownloaderThread(false, handler, list);
+		thumbnailDownloaderThread = new ThumbnailDownloaderThread(false, requesthandler, resultList);
 		thumbnailDownloaderThread.start();
-		return numResults;
 	}
+
+//	public int parseResponse(String httpResult, ArrayList<Submission> list) throws JSONException {
+//		int numResults;
+//		Log.i("Stories.parseResponse", "response: " + httpResult);
+//
+//		if (resultList != null)
+//			list.addAll(resultList);
+//
+//		JSONObject jsonParser = new JSONObject(httpResult);
+//		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
+//		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
+//		numResults = items.length();
+//		for (int i = 0; i < numResults; i++) {
+//			Submission s = new Submission();
+//			s.populate(items.getJSONObject(i));
+//			list.add(s);
+//			pageIDs.add("" + s.getId());
+//		}
+//
+//		// Start downloading the thumbnails
+//		thumbnailDownloaderThread = new ThumbnailDownloaderThread(false, handler, list);
+//		thumbnailDownloaderThread.start();
+//		return numResults;
+//	}
 
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {
@@ -68,17 +88,11 @@ public class GalleryArt extends AbstractContentGallery<Submission> implements Co
 		Log.i("GalleryArt", "Viewing art ID: " + pageID);
 		Intent i = new Intent(this, PreviewArtActivity.class);
 		i.putExtra("pageID", pageID);
-		i.putExtra("name", resultList.get(selectedIndex).getName());
-		i.putExtra("tags", resultList.get(selectedIndex).getTags());
-		i.putExtra("authorName", resultList.get(selectedIndex).getAuthorName());
-		i.putExtra("authorId", resultList.get(selectedIndex).getAuthorID());
-		i.putExtra("thumbnail", resultList.get(selectedIndex).getThumbnailUrl());
+		resultList.get(selectedIndex).feedIntent(i);
 		startActivity(i);
+		if (thumbnailDownloaderThread != null) thumbnailDownloaderThread.stopThread();
 	}
 
-	public boolean useAuthentication() {
-		return (Authentication.getUsername() != null && Authentication.getUsername().trim().length() > 0);
-	}
 
 	@Override
 	protected BaseAdapter getAdapter(Context context) {

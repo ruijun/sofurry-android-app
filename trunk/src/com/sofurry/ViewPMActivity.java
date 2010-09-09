@@ -42,12 +42,13 @@ public class ViewPMActivity extends Activity implements Runnable {
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			PMID = extras.getInt("PMID");
+			
 			requestUrl = AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
 			requestParameters = getFetchParameters(PMID);
 			// Save request parameters in case we have to re-send the request
 			originalRequestParameters = new HashMap<String, String>(requestParameters);
 			// add authentication parameters to the request
-			requestParameters = Authentication.addAuthParametersToQuery(requestParameters);
+			Authentication.addAuthParametersToQuery(requestParameters);
 			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 			errorMessage = null;
 			Thread thread = new Thread(this);
@@ -72,7 +73,7 @@ public class ViewPMActivity extends Activity implements Runnable {
 				if (Authentication.parseResponse(httpResult) == false) {
 					// Retry request with new otp sequence if it failed for the
 					// first time
-					requestParameters = Authentication.addAuthParametersToQuery(originalRequestParameters);
+					Authentication.addAuthParametersToQuery(originalRequestParameters);
 					response = HttpRequest.doPost(requestUrl, requestParameters);
 					httpResult = EntityUtils.toString(response.getEntity());
 				}

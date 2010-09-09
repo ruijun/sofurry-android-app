@@ -21,6 +21,15 @@ public class AppConstants {
 	public static final int MENU_FILTER_GROUP = 9090904;
 	public static final int MENU_FILTER_WATCHLIST_COMBINED = 9090905;
 	
+	public static final int MENU_ADDFAV = 4201;
+	public static final int MENU_REMFAV = 4202;
+
+	public static final int MENU_RATE1 = 4301;
+	public static final int MENU_RATE2 = 4302;
+	public static final int MENU_RATE3 = 4303;
+	public static final int MENU_RATE4 = 4304;
+	public static final int MENU_RATE5 = 4305;
+	
 	public static final int VIEWSOURCE_ALL = 0;	
 	public static final int VIEWSOURCE_FEATURED = 8;	
 	public static final int VIEWSOURCE_FAVORITES = 1;	
@@ -32,5 +41,10 @@ public class AppConstants {
 	public static final String SITE_URL = "http://chat.sofurry.com";
 //	public static final String SITE_URL = "http://10.0.2.2";
 	public static final String SITE_REQUEST_SCRIPT = "/ajaxfetch.php";
+	
+	public static String getFetchUrl() {
+		return AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
+	}
+
 
 }

@@ -66,14 +66,27 @@ public class Authentication {
 	    return hash;
 	}
 
+	/**
+	 * Returns true, if Authentification Parameters are available
+	 * @return
+	 */
+	public static boolean useAuthentication() {
+		return (getUsername() != null && getUsername().trim().length() > 0);
+	}
 	
-	public static Map<String, String> addAuthParametersToQuery(Map<String, String> queryParams) {
-		Map<String, String> result = new HashMap<String, String>(queryParams);
-		result.put("otpuser", username);
-		result.put("otphash", generateRequestHash());
-		result.put("otpsequence", ""+currentAuthenticationSequence);
+	/**
+	 * Adds Authentication Parameters to a Request, if Authentication Credentials are available
+	 * @param queryParams
+	 * The Parameters to add Authentification to
+	 */
+	public static void addAuthParametersToQuery(Map<String, String> queryParams) {
+		if (!useAuthentication()) return;
+		//Map<String, String> result = new HashMap<String, String>(queryParams);
+		queryParams.put("otpuser", username);
+		queryParams.put("otphash", generateRequestHash());
+		queryParams.put("otpsequence", ""+currentAuthenticationSequence);
 		currentAuthenticationSequence = currentAuthenticationSequence+1;
-		return result;
+		//return result;
 	}
 		
 	public static long getCurrentAuthenticationSequence() {

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.ListAdapter;
@@ -43,37 +44,49 @@ public class ListPM extends AbstractContentList<PrivateMessage> implements Conte
 		kvPairs.put("page", "" + page);
 		return kvPairs;
 	}
+	
+	
 
-	public int parseResponse(String httpResult, ArrayList<PrivateMessage> list) throws JSONException {
-		int numResults;
-		Log.i("PM.parseResponse", "response: " + httpResult);
-
-		if (resultList != null)
-			list.addAll(resultList);
-
-		JSONObject jsonParser = new JSONObject(httpResult);
-		JSONArray items = new JSONArray(jsonParser.getString("items"));
-		numResults = items.length();
-		for (int i = 0; i < numResults; i++) {
-			JSONObject jsonItem = items.getJSONObject(i);
-			String id = jsonItem.getString("id");
-			String fromUserName = jsonItem.getString("fromUserName");
-			String date = jsonItem.getString("date");
-			String subject = jsonItem.getString("subject");
-			String status = jsonItem.getString("status");
-			PrivateMessage m = new PrivateMessage();
-			m.setFromUser(fromUserName);
-			m.setId(Integer.parseInt(id));
-			m.setDate(date);
-			m.setSubject(subject);
-			m.setStatus(status);
-
-			list.add(m);
-			pageIDs.add(id);
+	/* (non-Javadoc)
+	 * @see com.sofurry.AbstractContentList#parseResponse(org.json.JSONObject)
+	 * 
+	 * Parses the Response for private messages
+	 */
+	@Override
+	protected void parseResponse(JSONObject obj) {
+		try {
+			JSONArray items = new JSONArray(obj.getString("items"));
+			numResults = items.length();
+			for (int i = 0; i < numResults; i++) {
+				PrivateMessage m = new PrivateMessage();
+				m.populate(items.getJSONObject(i));
+				resultList.add(m);
+				pageIDs.add("" + m.getId());
+			}
+		} catch (Exception e) {
+			ronError(e);
 		}
-
-		return numResults;
 	}
+
+//	public int parseResponse(String httpResult, ArrayList<PrivateMessage> list) throws JSONException {
+//		int numResults;
+//		Log.i("PM.parseResponse", "response: " + httpResult);
+//
+//		if (resultList != null)
+//			list.addAll(resultList);
+//
+//		JSONObject jsonParser = new JSONObject(httpResult);
+//		JSONArray items = new JSONArray(jsonParser.getString("items"));
+//		numResults = items.length();
+//		for (int i = 0; i < numResults; i++) {
+//			PrivateMessage m = new PrivateMessage();
+//			m.populate(items.getJSONObject(i));
+//			list.add(m);
+//			pageIDs.add("" + m.getId());
+//		}
+//
+//		return numResults;
+//	}
 
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {
@@ -92,5 +105,6 @@ public class ListPM extends AbstractContentList<PrivateMessage> implements Conte
 	protected ListAdapter getAdapter(Context context) {
 		return new PrivateMessageAdapter(context, R.layout.listitemtwolineicon, resultList);
 	}
+
 
 }

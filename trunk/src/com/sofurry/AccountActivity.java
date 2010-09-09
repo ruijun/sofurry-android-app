@@ -1,10 +1,7 @@
 package com.sofurry;
 
-import com.sofurry.util.Authentication;
-
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -12,12 +9,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.sofurry.util.Authentication;
+
+/**
+ * @author SoFurry
+ * 
+ * The activity used to provide account credentials
+ *
+ */
 public class AccountActivity extends Activity {
 	
-	Button buttonOk;
-	Button buttonCancel;
-	EditText textfieldUsername;
-	EditText textfieldPassword;
+	private Button buttonOk;
+	private Button buttonCancel;
+	private EditText textfieldUsername;
+	private EditText textfieldPassword;
 	
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);

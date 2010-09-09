@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.sofurry.model.Submission;
+import com.sofurry.requests.IRequestHandler;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.IconStorage;
 
@@ -20,9 +21,9 @@ public class ThumbnailDownloaderThread extends Thread {
 	ArrayList<Submission> resultList;
 
 	// Set saveUserAvatar to true to save the returned thumbnail as the submission's user avatar
-	public ThumbnailDownloaderThread(boolean saveUserAvatar, Handler updateHandler, ArrayList<Submission> resultList) {
+	public ThumbnailDownloaderThread(boolean saveUserAvatar, IRequestHandler handler, ArrayList<Submission> resultList) {
 		this.saveUserAvatar = saveUserAvatar;
-		this.updateHandler = updateHandler;
+		this.updateHandler = handler.getRequestHandler();
 		this.resultList = resultList;
 	}
 
@@ -59,7 +60,7 @@ public class ThumbnailDownloaderThread extends Thread {
 	private void triggerRefresh() {
 		Log.i("SF ThumbDownloader", "Updating listview");
 		Message msg = updateHandler.obtainMessage();
-		msg.obj = null;
+		msg.obj = new RefreshRequest();
 		updateHandler.sendMessage(msg);
 	}
 }
