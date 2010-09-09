@@ -8,7 +8,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.CompressFormat;
 import android.util.Log;
 
-public class IconStorage {
+/**
+ * @author SoFurry
+ * 
+ * Storage facility for images
+ */
+public class ImageStorage {
 
 	
 	public static Bitmap loadSubmissionImage(int id) {

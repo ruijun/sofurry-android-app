@@ -104,9 +104,11 @@ public class AjaxRequest {
 	 * @param handler
 	 * The handler the requests are redirected to
 	 */
-	public void execute(IRequestHandler handler) {
+	public RequestThread execute(IRequestHandler handler) {
 		requestThread = new RequestThread(handler, this);
 		requestThread.start();
+		
+		return requestThread;
 	}
 	
 	

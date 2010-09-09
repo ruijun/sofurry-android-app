@@ -23,6 +23,7 @@ public class AppConstants {
 	
 	public static final int MENU_ADDFAV = 4201;
 	public static final int MENU_REMFAV = 4202;
+	public static final int MENU_CUM = 4203;
 
 	public static final int MENU_RATE1 = 4301;
 	public static final int MENU_RATE2 = 4302;

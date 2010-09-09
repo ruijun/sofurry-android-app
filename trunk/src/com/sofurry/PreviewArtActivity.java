@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +17,7 @@ import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.ContentDownloader;
-import com.sofurry.util.IconStorage;
+import com.sofurry.util.ImageStorage;
 
 public class PreviewArtActivity extends Activity implements Runnable {
 
@@ -49,7 +48,7 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	        authorId = extras.getString("authorId");
 	        thumbnailUrl = extras.getString("thumbnail");
 	        
-			Bitmap thumb = IconStorage.loadSubmissionIcon(pageID);
+			Bitmap thumb = ImageStorage.loadSubmissionIcon(pageID);
 			if (thumb != null)
 				image.setImageBitmap(thumb);
 			
@@ -70,10 +69,10 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	public void run() {
 		String url = thumbnailUrl.replace("/thumbnails/", "/preview/");
 		Log.i("SF ImageDownloader", "Downloading image for id " + pageID + " from " + url);
-		Bitmap b = IconStorage.loadSubmissionImage(pageID);
+		Bitmap b = ImageStorage.loadSubmissionImage(pageID);
 		if (b == null) {
 			b = ContentDownloader.downloadBitmap(url);
-			IconStorage.saveSubmissionImage(pageID, b);
+			ImageStorage.saveSubmissionImage(pageID, b);
 		}
 		// Send bitmap to our hungry thread
 		requesthandler.postMessage(b);
@@ -94,6 +93,7 @@ public class PreviewArtActivity extends Activity implements Runnable {
 		rate.add(0, AppConstants.MENU_RATE3, 0, "3 Star");
 		rate.add(0, AppConstants.MENU_RATE4, 0, "4 Star");
 		rate.add(0, AppConstants.MENU_RATE5, 0, "5 Star");
+		menu.add(0, AppConstants.MENU_CUM,0,"Cum!");
 		
 		return result;
 	}
@@ -120,6 +120,9 @@ public class PreviewArtActivity extends Activity implements Runnable {
 			return true;
 		case AppConstants.MENU_RATE5:
 			setRating(5);
+			return true;
+		case AppConstants.MENU_CUM:
+			cum();
 			return true;
 		default:
 			return super.onContextItemSelected(item);
@@ -163,6 +166,16 @@ public class PreviewArtActivity extends Activity implements Runnable {
 		request.execute(requesthandler);
 	}
 
+	/**
+	 * Flags the cum-counter for currently visible image
+	 */
+	public void cum() {
+		pd = ProgressDialog.show(this, "Cumming ...", "Please wait", true, false);
+		AjaxRequest request = new AjaxRequest();
+		request.addParameter("f", "cum");
+		request.addParameter("pid", "" + pageID);
+		request.execute(requesthandler);
+	}
 	
 
 //	// Separate handler to let android update the view whenever possible
