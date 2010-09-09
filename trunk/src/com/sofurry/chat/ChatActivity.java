@@ -33,10 +33,14 @@ import android.widget.TextView;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
+import com.sofurry.requests.AjaxRequest;
+import com.sofurry.requests.RequestThread;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.HttpRequest;
 
 public class ChatActivity extends Activity {
+	// TODO: Implement Change room
+	// TODO: 
     private ScrollView scrollView;
     private TextView chatView;
     private EditText chatEntry;
@@ -127,8 +131,6 @@ public class ChatActivity extends Activity {
             }
         });
 
-            
-		
 		chatPollThread = new ChatPollThread(this.roomId);
 		chatPollThread.start();
 		chatSendQueue = new LinkedBlockingQueue<String>();
@@ -138,22 +140,25 @@ public class ChatActivity extends Activity {
 
 	protected String pollChat(int roomId) {
 		//Send chat poll request, return result
-		Map<String, String> requestParameters = new HashMap<String, String>();
-		requestParameters.put("f", "chatfetch");
-		requestParameters.put("lastid", ""+chatSequence);
-		requestParameters.put("roomid", ""+roomId);
+		AjaxRequest req = new AjaxRequest(requestUrl);
+		
+		//Map<String, String> requestParameters = new HashMap<String, String>();
+		req.addParameter("f", "chatfetch");
+		req.addParameter("lastid", ""+chatSequence);
+		req.addParameter("roomid", ""+roomId);
 
 		try {
-			// add authentication parameters to the request
-			Authentication.addAuthParametersToQuery(requestParameters);
-			HttpResponse response = HttpRequest.doPost(requestUrl, requestParameters);
-			String httpResult = EntityUtils.toString(response.getEntity());
-			if (Authentication.parseResponse(httpResult) == false) {
-				// Retry request with new otp sequence if it failed for the first time
-				Authentication.addAuthParametersToQuery(requestParameters);
-				response = HttpRequest.doPost(requestUrl, requestParameters);
-				httpResult = EntityUtils.toString(response.getEntity());
-			}
+			String httpResult = RequestThread.authenticadedHTTPRequest(req);
+//			// add authentication parameters to the request
+//			Authentication.addAuthParametersToQuery(requestParameters);
+//			HttpResponse response = HttpRequest.doPost(requestUrl, requestParameters);
+//			String httpResult = EntityUtils.toString(response.getEntity());
+//			if (Authentication.parseResponse(httpResult) == false) {
+//				// Retry request with new otp sequence if it failed for the first time
+//				Authentication.addAuthParametersToQuery(requestParameters);
+//				response = HttpRequest.doPost(requestUrl, requestParameters);
+//				httpResult = EntityUtils.toString(response.getEntity());
+//			}
 			String errorMessage = parseErrorMessage(httpResult);
 			if (errorMessage == null) {
 				return httpResult;
@@ -216,32 +221,33 @@ public class ChatActivity extends Activity {
 			while (keepRunning) {
 				String message = chatSendQueue.poll();
 				if (message != null) {
+					AjaxRequest req = new AjaxRequest();
 					//Build the request and send it
-					Map<String, String> requestParameters = new HashMap<String, String>();
 					
 					// Check if message is meant to be a command and set the function accordingly
 					if(message.substring(0,1).contains("/")) {
-						requestParameters.put("f", "chatcommand");
+						req.addParameter("f", "chatcommand");
 					}
 					else {
-						requestParameters.put("f", "chatpost");
+						req.addParameter("f", "chatpost");
 					}
 
-					requestParameters.put("message", ""+message);
-					requestParameters.put("roomid", ""+roomId);
+					req.addParameter("message", ""+message);
+					req.addParameter("roomid", ""+roomId);
 
 					try {
-						// add authentication parameters to the request
-						Authentication.addAuthParametersToQuery(requestParameters);
-						HttpResponse response = HttpRequest.doPost(requestUrl, requestParameters);
-						String httpResult = EntityUtils.toString(response.getEntity());
-						ArrayList<String> resultList = new ArrayList<String>();
-						if (Authentication.parseResponse(httpResult) == false) {
-							// Retry request with new otp sequence if it failed for the first time
-							Authentication.addAuthParametersToQuery(requestParameters);
-							response = HttpRequest.doPost(requestUrl, requestParameters);
-							httpResult = EntityUtils.toString(response.getEntity());
-						}
+						String httpResult = RequestThread.authenticadedHTTPRequest(req);
+//						// add authentication parameters to the request
+//						Authentication.addAuthParametersToQuery(requestParameters);
+//						HttpResponse response = HttpRequest.doPost(requestUrl, requestParameters);
+//						String httpResult = EntityUtils.toString(response.getEntity());
+//						ArrayList<String> resultList = new ArrayList<String>();
+//						if (Authentication.parseResponse(httpResult) == false) {
+//							// Retry request with new otp sequence if it failed for the first time
+//							Authentication.addAuthParametersToQuery(requestParameters);
+//							response = HttpRequest.doPost(requestUrl, requestParameters);
+//							httpResult = EntityUtils.toString(response.getEntity());
+//						}
 						String errorMessage = parseErrorMessage(httpResult);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -372,7 +378,15 @@ public class ChatActivity extends Activity {
     	chatEntry.setText("");
     }
     
-	
+	@Override
+	public void onBackPressed() {
+		if (chatPollThread != null)
+			chatPollThread.stopThread();
+		if (chatSendThread != null)
+			chatSendThread.stopThread();
+		super.onBackPressed();
+	}
+
 	@Override
 	public void finish() {
 		super.finish();
