@@ -15,7 +15,6 @@ import android.util.Log;
 import android.widget.ListAdapter;
 
 import com.sofurry.AbstractContentList;
-import com.sofurry.ContentController;
 import com.sofurry.R;
 import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
@@ -23,7 +22,7 @@ import com.sofurry.model.Submission;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.IconStorage;
 
-public class ListStories extends AbstractContentList<Submission> implements ContentController<Submission> {
+public class ListStories extends AbstractContentList<Submission> {
 
 	private ArrayList<String> pageIDs = new ArrayList<String>();
 
@@ -38,41 +37,69 @@ public class ListStories extends AbstractContentList<Submission> implements Cont
 		kvPairs.put("page", "" + page);
 		return kvPairs;
 	}
+	
+	
 
-	public int parseResponse(String httpResult, ArrayList<Submission> list) throws JSONException {
-		int numResults;
-		Log.i("Stories.parseResponse", "response: " + httpResult);
+	@Override
+	protected void parseResponse(JSONObject obj) {
+		try {
+			JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
+			JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
+			numResults = items.length();
+			for (int i = 0; i < numResults; i++) {
+				Submission s = new Submission();
+				s.populate(items.getJSONObject(i));
+				s.loadUserIcon();
 
-		if (resultList != null)
-			list.addAll(resultList);
 
-		JSONObject jsonParser = new JSONObject(httpResult);
-		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
-		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
-		numResults = items.length();
-		for (int i = 0; i < numResults; i++) {
-			Submission s = new Submission();
-			s.setName(items.getJSONObject(i).getString("name"));
-			s.setId(Integer.parseInt(items.getJSONObject(i).getString("pid")));
-			s.setDate(items.getJSONObject(i).getString("date"));
-			s.setAuthorName(items.getJSONObject(i).getString("authorName"));
-			s.setAuthorID(items.getJSONObject(i).getString("authorId"));
-			s.setContentLevel(items.getJSONObject(i).getString("contentLevel"));
-			s.setTags(items.getJSONObject(i).getString("keywords"));
-			s.setThumbnailUrl(items.getJSONObject(i).getString("thumb"));
-			Bitmap thumb = IconStorage.loadUserIcon(Integer.parseInt(s.getAuthorID()));
-			if (thumb != null)
-				s.setThumbnail(thumb);
+				resultList.add(s);
+				pageIDs.add("" + s.getId());
+			}
 
-			list.add(s);
-			pageIDs.add("" + s.getId());
+		} catch (Exception e) {
+			ronError(e);
 		}
-
 		// Start downloading the thumbnails
-		thumbnailDownloaderThread = new ThumbnailDownloaderThread(true, handler, list);
+		thumbnailDownloaderThread = new ThumbnailDownloaderThread(true, requesthandler, resultList);
 		thumbnailDownloaderThread.start();
-		return numResults;
 	}
+
+
+
+//	public int parseResponse(String httpResult, ArrayList<Submission> list) throws JSONException {
+//		int numResults;
+//		Log.i("Stories.parseResponse", "response: " + httpResult);
+//
+//		if (resultList != null)
+//			list.addAll(resultList);
+//
+//		JSONObject jsonParser = new JSONObject(httpResult);
+//		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
+//		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
+//		numResults = items.length();
+//		for (int i = 0; i < numResults; i++) {
+//			Submission s = new Submission();
+//			s.setName(items.getJSONObject(i).getString("name"));
+//			s.setId(Integer.parseInt(items.getJSONObject(i).getString("pid")));
+//			s.setDate(items.getJSONObject(i).getString("date"));
+//			s.setAuthorName(items.getJSONObject(i).getString("authorName"));
+//			s.setAuthorID(items.getJSONObject(i).getString("authorId"));
+//			s.setContentLevel(items.getJSONObject(i).getString("contentLevel"));
+//			s.setTags(items.getJSONObject(i).getString("keywords"));
+//			s.setThumbnailUrl(items.getJSONObject(i).getString("thumb"));
+//			Bitmap thumb = IconStorage.loadUserIcon(Integer.parseInt(s.getAuthorID()));
+//			if (thumb != null)
+//				s.setThumbnail(thumb);
+//
+//			list.add(s);
+//			pageIDs.add("" + s.getId());
+//		}
+//
+//		// Start downloading the thumbnails
+//		//thumbnailDownloaderThread = new ThumbnailDownloaderThread(true, handler, list);
+//		//thumbnailDownloaderThread.start();
+//		return numResults;
+//	}
 
 	@Override
 	protected void setSelectedIndex(int selectedIndex) {

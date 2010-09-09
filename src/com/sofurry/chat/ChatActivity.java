@@ -145,14 +145,13 @@ public class ChatActivity extends Activity {
 
 		try {
 			// add authentication parameters to the request
-			Map<String, String> authRequestParameters = Authentication.addAuthParametersToQuery(requestParameters);
-			HttpResponse response = HttpRequest.doPost(requestUrl, authRequestParameters);
+			Authentication.addAuthParametersToQuery(requestParameters);
+			HttpResponse response = HttpRequest.doPost(requestUrl, requestParameters);
 			String httpResult = EntityUtils.toString(response.getEntity());
-			ArrayList<String> resultList = new ArrayList<String>();
 			if (Authentication.parseResponse(httpResult) == false) {
 				// Retry request with new otp sequence if it failed for the first time
-				authRequestParameters = Authentication.addAuthParametersToQuery(requestParameters);
-				response = HttpRequest.doPost(requestUrl, authRequestParameters);
+				Authentication.addAuthParametersToQuery(requestParameters);
+				response = HttpRequest.doPost(requestUrl, requestParameters);
 				httpResult = EntityUtils.toString(response.getEntity());
 			}
 			String errorMessage = parseErrorMessage(httpResult);
@@ -233,14 +232,14 @@ public class ChatActivity extends Activity {
 
 					try {
 						// add authentication parameters to the request
-						Map<String, String> authRequestParameters = Authentication.addAuthParametersToQuery(requestParameters);
-						HttpResponse response = HttpRequest.doPost(requestUrl, authRequestParameters);
+						Authentication.addAuthParametersToQuery(requestParameters);
+						HttpResponse response = HttpRequest.doPost(requestUrl, requestParameters);
 						String httpResult = EntityUtils.toString(response.getEntity());
 						ArrayList<String> resultList = new ArrayList<String>();
 						if (Authentication.parseResponse(httpResult) == false) {
 							// Retry request with new otp sequence if it failed for the first time
-							authRequestParameters = Authentication.addAuthParametersToQuery(requestParameters);
-							response = HttpRequest.doPost(requestUrl, authRequestParameters);
+							Authentication.addAuthParametersToQuery(requestParameters);
+							response = HttpRequest.doPost(requestUrl, requestParameters);
 							httpResult = EntityUtils.toString(response.getEntity());
 						}
 						String errorMessage = parseErrorMessage(httpResult);

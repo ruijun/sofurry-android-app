@@ -3,7 +3,6 @@ package com.sofurry;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -11,8 +10,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,43 +20,23 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 
-import com.sofurry.model.Submission;
+import com.sofurry.requests.AjaxRequest;
+import com.sofurry.requests.RequestHandler;
 
-public abstract class AbstractContentGallery<T> extends Activity implements ContentController<T> {
+public abstract class AbstractContentGallery<T> extends Activity {
 
-	private String requestUrl;
-	private Map<String, String> requestParameters;
+	//private String requestUrl;
+	//private Map<String, String> requestParameters;
 	private ProgressDialog pd;
 	protected int numResults;
 	protected ArrayList<T> resultList;
-	private String errorMessage;
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
-	protected ContentRequestThread<Submission> listRequestThread;
+	//protected ContentRequestThread<T> listRequestThread;
 	private GridView galleryView;
 	protected int currentPage = 0;
 	protected int viewSource = AppConstants.VIEWSOURCE_ALL;
 	protected int lastScrollY = 0;
-
-	// Separate handler to let android update the view whenever possible
-	protected Handler handler = new Handler() {
-		@SuppressWarnings("unchecked")
-		@Override
-		public void handleMessage(Message msg) {
-			if (msg.obj != null) {
-				resultList = (ArrayList<T>) msg.obj;
-				if (pd != null && pd.isShowing())
-					pd.dismiss();
-				updateView();
-				if (errorMessage != null) {
-					closeList();
-				}
-			} else {
-				updateContentList();
-			}
-		}
-	};
 
 	// Get parameters and initiate data fetch thread
 	@Override
@@ -68,6 +45,62 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 		setContentView(R.layout.gallerylayout);
 		galleryView = (GridView) findViewById(R.id.galleryview);
 		loadPage(currentPage, viewSource, true);
+	}
+	
+//	// Separate handler to let android update the view whenever possible
+//	protected Handler handler = new Handler() {
+//		@SuppressWarnings("unchecked")
+//		@Override
+//		public void handleMessage(Message msg) {
+//			if (msg.obj != null) {
+//				resultList = (ArrayList<T>) msg.obj;
+//				if (pd != null && pd.isShowing())
+//					pd.dismiss();
+//				updateView();
+//				if (errorMessage != null) {
+//					closeList();
+//				}
+//			} else {
+//				updateContentList();
+//			}
+//		}
+//	};
+	
+	/**
+	 * The request handler to be used to handle the feedback from the AjaxRequest
+	 */
+	protected RequestHandler requesthandler = new RequestHandler() {
+		
+		@Override
+		public void onError(Exception e) {
+			closeList();
+			ronError(e);
+		}
+		
+		@Override
+		public void onData(JSONObject obj) {
+			resultList = new ArrayList<T>();
+			parseResponse(obj);
+			if (pd != null && pd.isShowing())
+			  pd.dismiss();
+		    updateView();
+		}
+
+		@Override
+		public void refresh() {
+			updateContentList();
+		}
+		
+	};
+	
+	/**
+	 * Is called when an error occurs in the asyncronus thread
+	 * @param e
+	 */
+	public void ronError(Exception e) {
+		// TODO: Let the user know, what happened here.
+		Log.e("Error", e.getMessage());
+		
 	}
 
 	/* Creates the menu items */
@@ -116,19 +149,13 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 		if (showLoadingScreen)
 			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		
-		requestUrl = getFetchUrl();
-		requestParameters = getFetchParameters(page, source);
-		errorMessage = null;
-		listRequestThread = new ContentRequestThread(this, handler, requestUrl, requestParameters);
-		listRequestThread.start();
+		AjaxRequest request = new AjaxRequest(AppConstants.getFetchUrl(),getFetchParameters(page, source));
+		request.execute(requesthandler);		
 	}
 
 	// Goes back to the main menu
 	private void closeList() {
 		Bundle bundle = new Bundle();
-		if (errorMessage != null) {
-			bundle.putString("errorMessage", errorMessage);
-		}
 		Intent mIntent = new Intent();
 		mIntent.putExtras(bundle);
 		setResult(RESULT_OK, mIntent);
@@ -142,11 +169,12 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 
 		lastScrollY = galleryView.getFirstVisiblePosition();
 		Log.i("SF AbstractContentList", "updateView called, last scrollpos: " + lastScrollY);
-		listRequestThread = null;
+		//listRequestThread = null;
 		BaseAdapter adapter = getAdapter(this);
 		galleryView.setAdapter(adapter);
 		// bind a selection listener to the view
 		galleryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@SuppressWarnings("unchecked")
 			public void onItemClick(AdapterView parentView, View childView, int position, long id) {
 				setSelectedIndex(position);
 			}
@@ -154,7 +182,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 		galleryView.setOnScrollListener(new OnScrollListener() {
 			public void onScroll(final AbsListView view, final int first, final int visible, final int total) {
 				// detect if last item is visible
-				if (visible < total && (first + visible == total) && listRequestThread == null) {
+				if (visible < total && (first + visible == total)) {// && listRequestThread == null) {
 					Log.d("OnScrollListener - end of list", "fvi: " + first + ", vic: " + visible + ", tic: " + total);
 					currentPage++;
 					loadPage(currentPage, viewSource, false);
@@ -169,41 +197,48 @@ public abstract class AbstractContentGallery<T> extends Activity implements Cont
 
 	}
 
-	public String parseErrorMessage(String httpResult) {
-		try {
-			// check for json error message and parse it
-			Log.d("List.parseErrorMessage", "response: " + httpResult);
-			JSONObject jsonParser;
-			jsonParser = new JSONObject(httpResult);
-			int messageType = jsonParser.getInt("messageType");
-			if (messageType == AppConstants.AJAXTYPE_APIERROR) {
-				String error = jsonParser.getString("error");
-				Log.d("List.parseErrorMessage", "Error: " + error);
-				return error;
-			}
-		} catch (JSONException e) {
-			Log.d("Auth.parseResponse", e.toString());
-		}
-
-		return null;
-
-	}
-
-	protected String getFetchUrl() {
-		return AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
-	}
+//	public String parseErrorMessage(String httpResult) {
+//		try {
+//			// check for json error message and parse it
+//			Log.d("List.parseErrorMessage", "response: " + httpResult);
+//			JSONObject jsonParser;
+//			jsonParser = new JSONObject(httpResult);
+//			int messageType = jsonParser.getInt("messageType");
+//			if (messageType == AppConstants.AJAXTYPE_APIERROR) {
+//				String error = jsonParser.getString("error");
+//				Log.d("List.parseErrorMessage", "Error: " + error);
+//				return error;
+//			}
+//		} catch (JSONException e) {
+//			Log.d("Auth.parseResponse", e.toString());
+//		}
+//
+//		return null;
+//
+//	}
 
 	protected abstract void setSelectedIndex(int selectedIndex);
 
+	// TODO: Change this, so the AJAX request object is used
 	protected abstract Map<String, String> getFetchParameters(int page, int source);
 
 	protected abstract BaseAdapter getAdapter(Context context);
 
 	protected abstract void resetViewSource(int newViewSource);
+	
+	/**
+	 * Parses the response from the Ajax interface
+	 * @param obj
+	 */
+	protected abstract void parseResponse(JSONObject obj);
 
 	protected void updateContentList() {
 		updateView();
 	}
+	
+	//public Handler getHandler() {
+	//	return handler;
+	//}
 
 	@Override
 	public void finish() {

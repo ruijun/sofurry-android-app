@@ -5,8 +5,10 @@ import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 
+import com.sofurry.PreviewArtActivity;
 import com.sofurry.util.IconStorage;
 
 public class Submission implements Serializable {
@@ -109,10 +111,40 @@ public class Submission implements Serializable {
 		setContentLevel(datasource.getString("contentLevel"));
 		setTags(datasource.getString("keywords"));
 		setThumbnailUrl(datasource.getString("thumb"));
+	}
+	
+	/**
+	 * Loads this Submission's Icon
+	 */
+	public void loadSubmissionIcon() {
 		Bitmap thumb = IconStorage.loadSubmissionIcon(getId());
 		if (thumb != null)
 			setThumbnail(thumb);
+	}
+	
+	/**
+	 * Loads the icon of this submissions owner (user)
+	 */
+	public void loadUserIcon() {
+		Bitmap thumb = IconStorage.loadUserIcon(Integer.parseInt(getAuthorID()));
+		if (thumb != null)
+			setThumbnail(thumb);
+	}
+	
+	/**
+	 * Adds the submissions extra data to an intent
+	 * @param intent
+	 */
+	public void feedIntent(Intent intent) {
+		intent.putExtra("name", getName());
+		intent.putExtra("tags", getTags());
+		intent.putExtra("authorName", getAuthorName());
+		intent.putExtra("authorId", getAuthorID());
+		intent.putExtra("thumbnail", getThumbnailUrl());
 
 	}
+	
+	
+
 	
 }

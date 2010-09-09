@@ -1,15 +1,21 @@
 package com.sofurry;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sofurry.requests.AjaxRequest;
+import com.sofurry.requests.RequestHandler;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.IconStorage;
@@ -55,6 +61,12 @@ public class PreviewArtActivity extends Activity implements Runnable {
 		thread.start();
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 * 
+	 * Fetches an image, either from the icon storage
+	 * 
+	 */
 	public void run() {
 		String url = thumbnailUrl.replace("/thumbnails/", "/preview/");
 		Log.i("SF ImageDownloader", "Downloading image for id " + pageID + " from " + url);
@@ -63,28 +75,156 @@ public class PreviewArtActivity extends Activity implements Runnable {
 			b = ContentDownloader.downloadBitmap(url);
 			IconStorage.saveSubmissionImage(pageID, b);
 		}
-		Message msg = handler.obtainMessage();
-		msg.obj = b;
-		handler.sendMessage(msg);
-
+		// Send bitmap to our hungry thread
+		requesthandler.postMessage(b);
 	}
 
-	// Separate handler to let android update the view whenever possible
-	protected Handler handler = new Handler() {
-		@SuppressWarnings("unchecked")
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 * 
+	 * Creates the Context Menu for this Activity.
+	 */
+	public boolean onCreateOptionsMenu(Menu menu) {
+		boolean result = super.onCreateOptionsMenu(menu);
+		menu.add(0,AppConstants.MENU_ADDFAV,0,"Add Fav");
+		menu.add(0,AppConstants.MENU_REMFAV,0,"Remove Fav");
+		SubMenu rate = menu.addSubMenu("Rate");
+		rate.add(0, AppConstants.MENU_RATE1, 0, "1 Star");
+		rate.add(0, AppConstants.MENU_RATE2, 0, "2 Star");
+		rate.add(0, AppConstants.MENU_RATE3, 0, "3 Star");
+		rate.add(0, AppConstants.MENU_RATE4, 0, "4 Star");
+		rate.add(0, AppConstants.MENU_RATE5, 0, "5 Star");
+		
+		return result;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case AppConstants.MENU_ADDFAV:
+			setFavorite();
+			return true;
+		case AppConstants.MENU_REMFAV:
+			unsetFavorite();
+			return true;
+		case AppConstants.MENU_RATE1:
+			setRating(1);
+			return true;
+		case AppConstants.MENU_RATE2:
+			setRating(2);
+			return true;
+		case AppConstants.MENU_RATE3:
+			setRating(3);
+			return true;
+		case AppConstants.MENU_RATE4:
+			setRating(4);
+			return true;
+		case AppConstants.MENU_RATE5:
+			setRating(5);
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
+	}
+
+	
+	/**
+	 * Sets a Favorite for the currently Selected Image
+	 */
+	public void setFavorite() {
+		pd = ProgressDialog.show(this, "Setting favorite...", "Please wait", true, false);
+		AjaxRequest request = new AjaxRequest();
+		request.addParameter("f", "addfav");
+		request.addParameter("pid", "" + pageID);
+		request.execute(requesthandler);
+	}
+	
+	/**
+	 * Removes a Favorite for the currently Selected Image
+	 */
+	public void unsetFavorite() {
+		pd = ProgressDialog.show(this, "Removing favorite...", "Please wait", true, false);
+		AjaxRequest request = new AjaxRequest();
+		request.addParameter("f", "remfav");
+		request.addParameter("pid", "" + pageID);
+		request.execute(requesthandler);
+	}
+	
+	/**
+	 * Sets the number of stars on a submission that the user wants to set
+	 * @param stars
+	 * The number of stars to set (1-5)
+	 */
+	public void setRating(int stars) {
+		pd = ProgressDialog.show(this, "Rating ...", "Please wait", true, false);
+		AjaxRequest request = new AjaxRequest();
+		request.addParameter("f", "vote");
+		request.addParameter("pid", "" + pageID);
+		request.addParameter("votevalue", "" + stars);
+		request.execute(requesthandler);
+	}
+
+	
+
+//	// Separate handler to let android update the view whenever possible
+//	protected Handler handler = new Handler() {
+//		@Override
+//		public void handleMessage(Message msg) {
+//			try {
+//			  pd.dismiss();
+//				if (msg.obj != null) {
+//					Bitmap b = (Bitmap) msg.obj;
+//					image.setImageBitmap(b);
+//				}
+//			} catch (Exception e) {
+//				Log.e("SF", "Exception in PreviewArtActivity Handler", e);
+//			}
+//		}
+//	};
+	
+	/**
+	 * Makes the progress dialog hide
+	 */
+	private void dismissProgressDialog() {
+		if (pd != null && pd.isShowing())
+			  pd.dismiss();
+	}
+
+	/**
+	 * The request handler to be used to handle the feedback from the AjaxRequest
+	 */
+	protected RequestHandler requesthandler = new RequestHandler() {
+		
 		@Override
-		public void handleMessage(Message msg) {
-			try {
-			pd.dismiss();
-				if (msg.obj != null) {
-					Bitmap b = (Bitmap) msg.obj;
-					image.setImageBitmap(b);
-				}
-			} catch (Exception e) {
-				Log.e("SF", "Exception in PreviewArtActivity Handler", e);
-			}
+		public void onError(Exception e) {
+			dismissProgressDialog();
+			sonError(e);
+		}
+		
+		@Override
+		public void onData(JSONObject obj) {
+			dismissProgressDialog();
+			sonData(obj);
+		}
+		
+		@Override
+		public void refresh() {
+		}
+
+		@Override
+		public void onBitmap(Bitmap bmp) throws Exception {
+			dismissProgressDialog();
+			image.setImageBitmap(bmp);
 		}
 	};
+	
+	public void sonError(Exception e) {
+		// TODO:Visible exception please.
+		Log.d("Exception", e.getMessage());
+	}
+	
+	public void sonData(JSONObject obj) {
+		// TODO: Test if results are okay.
+	}
 
 
 }

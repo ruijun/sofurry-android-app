@@ -2,6 +2,9 @@ package com.sofurry.model;
 
 import java.io.Serializable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class PrivateMessage implements Serializable {
 
@@ -71,6 +74,25 @@ public class PrivateMessage implements Serializable {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	/**
+	 * Fills the Private Message object with the data from the provided JSONOBject
+	 * @param obj
+	 * An Object containting the messagedata
+	 * @throws JSONException
+	 */
+	public void populate(JSONObject obj) throws JSONException {
+		String id = obj.getString("id");
+		String fromUserName = obj.getString("fromUserName");
+		String date = obj.getString("date");
+		String subject = obj.getString("subject");
+		String status = obj.getString("status");
+		setFromUser(fromUserName);
+		setId(Integer.parseInt(id));
+		setDate(date);
+		setSubject(subject);
+		setStatus(status);
 	}
 	
 }
