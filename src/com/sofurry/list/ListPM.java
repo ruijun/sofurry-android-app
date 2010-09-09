@@ -5,23 +5,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.ListAdapter;
 
 import com.sofurry.AbstractContentList;
-import com.sofurry.ContentController;
 import com.sofurry.R;
 import com.sofurry.ViewPMActivity;
 import com.sofurry.model.PrivateMessage;
 
-public class ListPM extends AbstractContentList<PrivateMessage> implements ContentController<PrivateMessage> {
+public class ListPM extends AbstractContentList<PrivateMessage> {
 
 	private ArrayList<String> pageIDs = new ArrayList<String>();
 

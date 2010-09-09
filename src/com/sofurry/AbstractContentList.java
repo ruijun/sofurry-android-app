@@ -23,6 +23,7 @@ import android.widget.AbsListView.OnScrollListener;
 import com.sofurry.model.Submission;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
+import com.sofurry.requests.RequestThread;
 
 public abstract class AbstractContentList<T> extends ListActivity {
 
@@ -33,7 +34,7 @@ public abstract class AbstractContentList<T> extends ListActivity {
 	protected ArrayList<T> resultList;
 	private String errorMessage;
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
-	protected ContentRequestThread<Submission> listRequestThread;
+	private RequestThread listRequester = null;
 	protected int currentPage = 0;
 	protected int viewSource = AppConstants.VIEWSOURCE_ALL;
 	protected int lastScrollY = 0;
@@ -154,7 +155,7 @@ public abstract class AbstractContentList<T> extends ListActivity {
 		//requestParameters = getFetchParameters(pageNum, source);
 		AjaxRequest ar = new AjaxRequest(AppConstants.getFetchUrl(), getFetchParameters(pageNum, source));
 		errorMessage = null; // TODO: Whats this for?
-		ar.execute(requesthandler); // Requests the data, and will redirect results to this object
+		listRequester = ar.execute(requesthandler); // Requests the data, and will redirect results to this object
 		//listRequestThread = new ContentRequestThread(this, requestUrl, requestParameters);
 		//listRequestThread.start();
 	}
@@ -176,7 +177,7 @@ public abstract class AbstractContentList<T> extends ListActivity {
 
 		lastScrollY = getListView().getFirstVisiblePosition();
 		Log.i("SF AbstractContentList", "updateView called, last scrollpos: "+lastScrollY);
-		listRequestThread = null;
+		listRequester = null;
 		setListAdapter(getAdapter(this));
 		getListView().setTextFilterEnabled(true);
 		// bind a selection listener to the view
@@ -190,7 +191,7 @@ public abstract class AbstractContentList<T> extends ListActivity {
 	        public void onScroll(final AbsListView view, final int first,
 	                                    final int visible, final int total) {
 	            // detect if last item is visible
-	            if (visible < total && (first + visible == total) && listRequestThread == null) {
+	            if (visible < total && (first + visible == total) && listRequester == null) {
 	                Log.d("OnScrollListener - end of list", "fvi: " +
 	                   first + ", vic: " + visible + ", tic: " + total);
 	                currentPage++;

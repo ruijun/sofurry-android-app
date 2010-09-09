@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 
 import com.sofurry.PreviewArtActivity;
-import com.sofurry.util.IconStorage;
+import com.sofurry.util.ImageStorage;
 
 public class Submission implements Serializable {
 
@@ -117,7 +117,7 @@ public class Submission implements Serializable {
 	 * Loads this Submission's Icon
 	 */
 	public void loadSubmissionIcon() {
-		Bitmap thumb = IconStorage.loadSubmissionIcon(getId());
+		Bitmap thumb = ImageStorage.loadSubmissionIcon(getId());
 		if (thumb != null)
 			setThumbnail(thumb);
 	}
@@ -126,7 +126,7 @@ public class Submission implements Serializable {
 	 * Loads the icon of this submissions owner (user)
 	 */
 	public void loadUserIcon() {
-		Bitmap thumb = IconStorage.loadUserIcon(Integer.parseInt(getAuthorID()));
+		Bitmap thumb = ImageStorage.loadUserIcon(Integer.parseInt(getAuthorID()));
 		if (thumb != null)
 			setThumbnail(thumb);
 	}

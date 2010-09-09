@@ -5,26 +5,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.ListAdapter;
 
 import com.sofurry.AbstractContentList;
-import com.sofurry.ContentController;
 import com.sofurry.R;
 import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.util.Authentication;
-import com.sofurry.util.IconStorage;
 
-public class ListJournals extends AbstractContentList<Submission> implements ContentController<Submission> {
+public class ListJournals extends AbstractContentList<Submission> {
 
 	private ArrayList<String> pageIDs = new ArrayList<String>();
 

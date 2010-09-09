@@ -20,7 +20,7 @@ import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.util.Authentication;
-import com.sofurry.util.IconStorage;
+import com.sofurry.util.ImageStorage;
 
 public class ListStories extends AbstractContentList<Submission> {
 

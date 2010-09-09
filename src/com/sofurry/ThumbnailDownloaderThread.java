@@ -11,7 +11,7 @@ import android.util.Log;
 import com.sofurry.model.Submission;
 import com.sofurry.requests.IRequestHandler;
 import com.sofurry.util.ContentDownloader;
-import com.sofurry.util.IconStorage;
+import com.sofurry.util.ImageStorage;
 
 // TODO: This only works for art/stories/music/journals right now, NOT PMs
 public class ThumbnailDownloaderThread extends Thread {
@@ -42,9 +42,9 @@ public class ThumbnailDownloaderThread extends Thread {
 				s.setThumbnail(thumbnail);
 				Log.i("SF ThumbDownloader", "Storing image");
 				if (saveUserAvatar)
-					IconStorage.saveUserIcon(Integer.parseInt(s.getAuthorID()), thumbnail);
+					ImageStorage.saveUserIcon(Integer.parseInt(s.getAuthorID()), thumbnail);
 				else
-					IconStorage.saveSubmissionIcon(s.getId(), thumbnail);
+					ImageStorage.saveSubmissionIcon(s.getId(), thumbnail);
 
 				//Don't refresh more often than once every 4 seconds
 				if (System.currentTimeMillis() - lastRefresh > 4000) {
