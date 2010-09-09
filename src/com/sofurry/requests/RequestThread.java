@@ -63,6 +63,34 @@ public class RequestThread extends Thread {
 			Log.d("Auth.parseResponse", e.toString());
 		}
 	}
+	
+	/**
+	 * Standartized HTTP Request. Attempts authentification a second time, should it fail
+	 * @param request
+	 * The request to attempt
+	 * @return
+	 * Returns the result as plaintext
+	 * @throws Exception
+	 */
+	public static String authenticadedHTTPRequest(AjaxRequest request) throws Exception {
+		// add authentication parameters to the request
+		request.authenticate();
+		HttpResponse response = HttpRequest.doPost(request.getUrl(), request.getParameters());
+		String httpResult = EntityUtils.toString(response.getEntity());
+		
+		if (!Authentication.parseResponse(httpResult)) { // Try authentification again, in case the first request fails
+			// Retry request with new otp sequence if it failed for the first time
+			request.authenticate();
+			//requestParameters = Authentication.addAuthParametersToQuery(requestParameters);
+			response = HttpRequest.doPost(request.getUrl(), request.getParameters());
+			httpResult = EntityUtils.toString(response.getEntity());
+			if (!Authentication.parseResponse(httpResult)) {
+			  throw new Exception("Authentification Failed (2nd attempt)."); // Check the sequence reply
+			}
+		}
+		
+		return httpResult;
+	}
 
 	
 	// Asynchronous http request and result parsing
@@ -71,20 +99,7 @@ public class RequestThread extends Thread {
 		Object answer = null; // Will contain the answer that is returned to the client
 		try {
 			// add authentication parameters to the request
-			request.authenticate();
-			HttpResponse response = HttpRequest.doPost(request.getUrl(), request.getParameters());
-			String httpResult = EntityUtils.toString(response.getEntity());
-			
-			if (!Authentication.parseResponse(httpResult)) { // Try authentification again, in case the first request fails
-				// Retry request with new otp sequence if it failed for the first time
-				request.authenticate();
-				//requestParameters = Authentication.addAuthParametersToQuery(requestParameters);
-				response = HttpRequest.doPost(request.getUrl(), request.getParameters());
-				httpResult = EntityUtils.toString(response.getEntity());
-				if (!Authentication.parseResponse(httpResult)) {
-				  throw new Exception("Authentification Failed (2nd attempt)."); // Check the sequence reply
-				}
-			}
+			String httpResult = authenticadedHTTPRequest(request);
 			
 			if ("".equals(httpResult)) {
 				answer = new JSONObject();
