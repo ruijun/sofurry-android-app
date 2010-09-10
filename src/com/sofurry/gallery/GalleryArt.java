@@ -1,8 +1,6 @@
 package com.sofurry.gallery;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,24 +11,23 @@ import android.util.Log;
 import android.widget.BaseAdapter;
 
 import com.sofurry.AbstractContentGallery;
-import com.sofurry.PreviewArtActivity;
 import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.model.Submission;
+import com.sofurry.requests.AjaxRequest;
 
 public class GalleryArt extends AbstractContentGallery<Submission> {
 
 	private ArrayList<String> pageIDs = new ArrayList<String>();
 
 	@Override
-	protected Map<String, String> getFetchParameters(int page, int source) {
-		Map<String, String> kvPairs = new HashMap<String, String>();
-
-		kvPairs.put("f", "browse");
-		kvPairs.put("viewSource", ""+source);
-		kvPairs.put("contentType", "1");
-		kvPairs.put("entriesPerPage", "20");
-		kvPairs.put("page", "" + page);
-		return kvPairs;
+	public AjaxRequest getFetchParameters(int page, int source) {
+		AjaxRequest req = new AjaxRequest();
+		req.addParameter("f", "browse");
+		req.addParameter("viewSource", ""+source);
+		req.addParameter("contentType", "1");
+		req.addParameter("entriesPerPage", "20");
+		req.addParameter("page", "" + page);
+		return req;
 	}
 	
 	/* (non-Javadoc)
@@ -58,32 +55,8 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		thumbnailDownloaderThread.start();
 	}
 
-//	public int parseResponse(String httpResult, ArrayList<Submission> list) throws JSONException {
-//		int numResults;
-//		Log.i("Stories.parseResponse", "response: " + httpResult);
-//
-//		if (resultList != null)
-//			list.addAll(resultList);
-//
-//		JSONObject jsonParser = new JSONObject(httpResult);
-//		JSONArray pagecontents = new JSONArray(jsonParser.getString("pagecontents"));
-//		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
-//		numResults = items.length();
-//		for (int i = 0; i < numResults; i++) {
-//			Submission s = new Submission();
-//			s.populate(items.getJSONObject(i));
-//			list.add(s);
-//			pageIDs.add("" + s.getId());
-//		}
-//
-//		// Start downloading the thumbnails
-//		thumbnailDownloaderThread = new ThumbnailDownloaderThread(false, handler, list);
-//		thumbnailDownloaderThread.start();
-//		return numResults;
-//	}
-
 	@Override
-	protected void setSelectedIndex(int selectedIndex) {
+	public void setSelectedIndex(int selectedIndex) {
 		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
 		Log.i("GalleryArt", "Viewing art ID: " + pageID);
 		Intent i = new Intent(this, PreviewArtActivity.class);
@@ -95,12 +68,12 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 
 
 	@Override
-	protected BaseAdapter getAdapter(Context context) {
+	public BaseAdapter getAdapter(Context context) {
 		return new SubmissionGalleryAdapter(context, resultList);
 	}
 
 	@Override
-	protected void resetViewSource(int newViewSource) {
+	public void resetViewSource(int newViewSource) {
 		Log.i("SF", "ResetViewSource: "+newViewSource);
 		viewSource = newViewSource;
 		currentPage = 0;

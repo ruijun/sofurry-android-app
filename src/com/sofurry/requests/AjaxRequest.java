@@ -16,6 +16,7 @@ public class AjaxRequest {
 	private String url = null; // The requestURL
 	private Map<String,String> parameters = null; // The parameters to be passed
 	private String waitingMessage = null; // The message to be displayed, while waiting for the request
+	private int requestID = 0;			  // A choosable request ID that the handler my choose to interpret the returned data
 	
 	/**
 	 * Creates an Ajax Request to be passed to a ContentRequestThread
@@ -53,6 +54,23 @@ public class AjaxRequest {
 
 	public String getUrl() {
 		return url;
+	}
+	
+	/**
+	 * Sets an ID that is passed to the returning message
+	 * @param id
+	 * The ID of to recognize this request by
+	 */
+	public void setRequestID(int id) {
+		requestID = id;
+	}
+	
+	/**
+	 * Returns the ID this request is to be recognized by
+	 * @return
+	 */
+	public int getRequestID() {
+		return requestID;
 	}
 
 	

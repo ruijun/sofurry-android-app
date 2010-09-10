@@ -9,6 +9,7 @@ public class AppConstants {
 	public static final int ACTIVITY_JOURNALSLIST = 3;
 	public static final int ACTIVITY_GALLERYART = 4;
 	public static final int ACTIVITY_VIEWPM = 5;
+	public static final int ACTIVITY_TAGS = 6;
 
 	//Ajax message types
 	public static final int AJAXTYPE_APIERROR = 5;
@@ -20,6 +21,7 @@ public class AppConstants {
 	public static final int MENU_FILTER_WATCHLIST = 9090903;
 	public static final int MENU_FILTER_GROUP = 9090904;
 	public static final int MENU_FILTER_WATCHLIST_COMBINED = 9090905;
+	public static final int MENU_FILTER_KEYWORDS = 4204;
 	
 	public static final int MENU_ADDFAV = 4201;
 	public static final int MENU_REMFAV = 4202;
@@ -30,6 +32,9 @@ public class AppConstants {
 	public static final int MENU_RATE3 = 4303;
 	public static final int MENU_RATE4 = 4304;
 	public static final int MENU_RATE5 = 4305;
+
+	public static final int MENU_CHGROOM = 4401;
+	public static final int MENU_USERS = 4402;
 	
 	public static final int VIEWSOURCE_ALL = 0;	
 	public static final int VIEWSOURCE_FEATURED = 8;	
@@ -37,6 +42,10 @@ public class AppConstants {
 	public static final int VIEWSOURCE_WATCHLIST = 2;	
 	public static final int VIEWSOURCE_GROUP = 10;	
 	public static final int VIEWSOURCE_WATCHLIST_COMBINED = 11;	
+	public static final int VIEWSOURCE_SEARCH = 5;	
+	
+	public static final int REQUEST_ID_ROOMLIST = 4501;
+	public static final int REQUEST_ID_USERLIST = 4502;
 
 	public static final String PREFS_NAME = "SoFurryPreferences";
 	public static final String SITE_URL = "http://chat.sofurry.com";

@@ -1,7 +1,6 @@
 package com.sofurry;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.json.JSONObject;
 
@@ -21,21 +20,28 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.AbsListView.OnScrollListener;
 
+import com.sofurry.mainmenu.AccountActivity;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
+import com.sofurry.util.ErrorHandler;
 
-public abstract class AbstractContentGallery<T> extends Activity {
+/**
+ * @author SoFurry
+ *
+ * Class that is used as a base for all GalleryViews
+ *
+ * @param <T>
+ */
+public abstract class AbstractContentGallery<T> extends Activity implements IContentActivity {
 
-	//private String requestUrl;
-	//private Map<String, String> requestParameters;
 	private ProgressDialog pd;
 	protected int numResults;
 	protected ArrayList<T> resultList;
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
-	//protected ContentRequestThread<T> listRequestThread;
 	private GridView galleryView;
 	protected int currentPage = 0;
 	protected int viewSource = AppConstants.VIEWSOURCE_ALL;
+	protected String viewSearch = "";
 	protected int lastScrollY = 0;
 
 	// Get parameters and initiate data fetch thread
@@ -47,38 +53,19 @@ public abstract class AbstractContentGallery<T> extends Activity {
 		loadPage(currentPage, viewSource, true);
 	}
 	
-//	// Separate handler to let android update the view whenever possible
-//	protected Handler handler = new Handler() {
-//		@SuppressWarnings("unchecked")
-//		@Override
-//		public void handleMessage(Message msg) {
-//			if (msg.obj != null) {
-//				resultList = (ArrayList<T>) msg.obj;
-//				if (pd != null && pd.isShowing())
-//					pd.dismiss();
-//				updateView();
-//				if (errorMessage != null) {
-//					closeList();
-//				}
-//			} else {
-//				updateContentList();
-//			}
-//		}
-//	};
-	
 	/**
 	 * The request handler to be used to handle the feedback from the AjaxRequest
 	 */
 	protected RequestHandler requesthandler = new RequestHandler() {
 		
 		@Override
-		public void onError(Exception e) {
+		public void onError(int id,Exception e) {
 			closeList();
 			ronError(e);
 		}
 		
 		@Override
-		public void onData(JSONObject obj) {
+		public void onData(int id,JSONObject obj) {
 			resultList = new ArrayList<T>();
 			parseResponse(obj);
 			if (pd != null && pd.isShowing())
@@ -98,26 +85,38 @@ public abstract class AbstractContentGallery<T> extends Activity {
 	 * @param e
 	 */
 	public void ronError(Exception e) {
-		// TODO: Let the user know, what happened here.
-		Log.e("Error", e.getMessage());
-		
+		ErrorHandler.showError(this, e);
 	}
-
-	/* Creates the menu items */
-	public boolean onCreateOptionsMenu(Menu menu) {
-		boolean result = super.onCreateOptionsMenu(menu);
+	
+	/**
+	 * Creates a menu that can be used for all kinds of browsable lists. Used for Gallerys and lists alike here.
+	 * @param menu
+	 */
+	public static void createBrowsableMenu(Menu menu) {
 		SubMenu viewSourceMenu = menu.addSubMenu("Filter");
+		viewSourceMenu.add(0, AppConstants.MENU_FILTER_KEYWORDS, 0, "Keywords");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_ALL, 0, "All Submissions");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FEATURED, 0, "Featured");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FAVORITES, 0, "Your Favorites");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST, 0, "Watchlist");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_GROUP, 0, "Your Groups");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST_COMBINED, 0, "Watches + Groups");
+		//menu.add(0, AppConstants.MENU_FILTER_KEYWORDS, 0, "Keywords");
+	}
+
+	/* Creates the menu items */
+	public boolean onCreateOptionsMenu(Menu menu) {
+		boolean result = super.onCreateOptionsMenu(menu);
+		createBrowsableMenu(menu);
 		return result;
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case AppConstants.MENU_FILTER_KEYWORDS:
+			Intent intent = new Intent(this, TagEditor.class);
+			startActivityForResult(intent, AppConstants.ACTIVITY_TAGS);
+			return true;
 		case AppConstants.MENU_FILTER_ALL:
 			resetViewSource(AppConstants.VIEWSOURCE_ALL);
 			return true;
@@ -141,6 +140,27 @@ public abstract class AbstractContentGallery<T> extends Activity {
 		}
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// Handles the return value from TAGEditor
+		if (requestCode == AppConstants.ACTIVITY_TAGS) {
+			if (data == null) return;
+			viewSearch = data.getStringExtra("tags");
+			resetViewSource(AppConstants.VIEWSOURCE_SEARCH);
+			return;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	/**
+	 * Loads the next page of browse results
+	 * @param page
+	 * The page to be loaded
+	 * @param source
+	 * The source
+	 * @param showLoadingScreen
+	 * if true, a loading screen is shown
+	 */
 	protected void loadPage(int page, int source, boolean showLoadingScreen) {
 		if (thumbnailDownloaderThread != null) {
 			thumbnailDownloaderThread.stopThread();
@@ -149,11 +169,14 @@ public abstract class AbstractContentGallery<T> extends Activity {
 		if (showLoadingScreen)
 			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		
-		AjaxRequest request = new AjaxRequest(AppConstants.getFetchUrl(),getFetchParameters(page, source));
+		AjaxRequest request = getFetchParameters(page, source);
 		request.execute(requesthandler);		
 	}
 
-	// Goes back to the main menu
+	
+	/**
+	 * Closes this list and returns to the main menu
+	 */
 	private void closeList() {
 		Bundle bundle = new Bundle();
 		Intent mIntent = new Intent();
@@ -162,7 +185,9 @@ public abstract class AbstractContentGallery<T> extends Activity {
 		finish();
 	}
 
-	// Sets the resulting list on the screen
+	/**
+	 * Displays the list on screen
+	 */
 	private void updateView() {
 		if (resultList == null)
 			return;
@@ -194,43 +219,21 @@ public abstract class AbstractContentGallery<T> extends Activity {
 		});
 		Log.i("SF", "Scrolling TO: " + lastScrollY);
 		galleryView.setSelection(lastScrollY + 3);
-
 	}
 
-//	public String parseErrorMessage(String httpResult) {
-//		try {
-//			// check for json error message and parse it
-//			Log.d("List.parseErrorMessage", "response: " + httpResult);
-//			JSONObject jsonParser;
-//			jsonParser = new JSONObject(httpResult);
-//			int messageType = jsonParser.getInt("messageType");
-//			if (messageType == AppConstants.AJAXTYPE_APIERROR) {
-//				String error = jsonParser.getString("error");
-//				Log.d("List.parseErrorMessage", "Error: " + error);
-//				return error;
-//			}
-//		} catch (JSONException e) {
-//			Log.d("Auth.parseResponse", e.toString());
-//		}
-//
-//		return null;
-//
-//	}
+	public abstract void setSelectedIndex(int selectedIndex);
 
-	protected abstract void setSelectedIndex(int selectedIndex);
+	public abstract AjaxRequest getFetchParameters(int page, int source);
 
-	// TODO: Change this, so the AJAX request object is used
-	protected abstract Map<String, String> getFetchParameters(int page, int source);
+	public abstract BaseAdapter getAdapter(Context context);
 
-	protected abstract BaseAdapter getAdapter(Context context);
-
-	protected abstract void resetViewSource(int newViewSource);
+	public abstract void resetViewSource(int newViewSource);
 	
 	/**
 	 * Parses the response from the Ajax interface
 	 * @param obj
 	 */
-	protected abstract void parseResponse(JSONObject obj);
+	public abstract void parseResponse(JSONObject obj);
 
 	protected void updateContentList() {
 		updateView();

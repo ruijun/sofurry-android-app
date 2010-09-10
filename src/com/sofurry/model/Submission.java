@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
-import com.sofurry.PreviewArtActivity;
 import com.sofurry.util.ImageStorage;
 
 public class Submission implements Serializable {

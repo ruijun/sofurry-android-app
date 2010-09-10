@@ -30,7 +30,7 @@ public class RequestThread extends Thread {
 	//private Map<String, String> requestParameters;
 	//private Map<String, String> originalRequestParameters;
 	private AjaxRequest request = null;
-	private Handler handler;
+	private IRequestHandler handler;
 
 	/**
 	 * Creates a Request thread, that will attemt to fetch the data, specified in the request object
@@ -40,7 +40,7 @@ public class RequestThread extends Thread {
 	 * The Request to perform
 	 */
 	public RequestThread(IRequestHandler reqHandler, AjaxRequest request) {
-		this.handler = reqHandler.getRequestHandler();
+		this.handler = reqHandler;
 		this.request = request;
 	}
 
@@ -50,7 +50,7 @@ public class RequestThread extends Thread {
 	 * The HTML Data to examine
 	 * @return
 	 */
-	public void parseErrorMessage(JSONObject parsed) throws Exception {
+	public static void parseErrorMessage(JSONObject parsed) throws Exception {
 		try {
 			// check for json error message and parse it
 			int messageType = parsed.getInt("messageType");
@@ -124,9 +124,7 @@ public class RequestThread extends Thread {
 		}
 		
 		// Signal the result of the operation to our caller
-        Message msg = handler.obtainMessage();
-        msg.obj = answer;
-        handler.sendMessage(msg);
+		handler.postMessage(request.getRequestID(), answer);
 	}
 
 

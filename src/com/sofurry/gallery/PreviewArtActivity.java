@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.gallery;
 
 import org.json.JSONObject;
 
@@ -13,10 +13,13 @@ import android.view.SubMenu;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sofurry.AppConstants;
+import com.sofurry.R;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.ContentDownloader;
+import com.sofurry.util.ErrorHandler;
 import com.sofurry.util.ImageStorage;
 
 public class PreviewArtActivity extends Activity implements Runnable {
@@ -75,7 +78,7 @@ public class PreviewArtActivity extends Activity implements Runnable {
 			ImageStorage.saveSubmissionImage(pageID, b);
 		}
 		// Send bitmap to our hungry thread
-		requesthandler.postMessage(b);
+		requesthandler.postMessage(0,b);
 	}
 
 	/* (non-Javadoc)
@@ -134,7 +137,7 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	 * Sets a Favorite for the currently Selected Image
 	 */
 	public void setFavorite() {
-		pd = ProgressDialog.show(this, "Setting favorite...", "Please wait", true, false);
+		pd = ProgressDialog.show(this, "Setting favorite", "Please wait", true, false);
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "addfav");
 		request.addParameter("pid", "" + pageID);
@@ -145,7 +148,7 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	 * Removes a Favorite for the currently Selected Image
 	 */
 	public void unsetFavorite() {
-		pd = ProgressDialog.show(this, "Removing favorite...", "Please wait", true, false);
+		pd = ProgressDialog.show(this, "Removing favorite", "Please wait", true, false);
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "remfav");
 		request.addParameter("pid", "" + pageID);
@@ -158,7 +161,7 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	 * The number of stars to set (1-5)
 	 */
 	public void setRating(int stars) {
-		pd = ProgressDialog.show(this, "Rating ...", "Please wait", true, false);
+		pd = ProgressDialog.show(this, "Rating "+stars+" stars", "Please wait", true, false);
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "vote");
 		request.addParameter("pid", "" + pageID);
@@ -178,22 +181,6 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	}
 	
 
-//	// Separate handler to let android update the view whenever possible
-//	protected Handler handler = new Handler() {
-//		@Override
-//		public void handleMessage(Message msg) {
-//			try {
-//			  pd.dismiss();
-//				if (msg.obj != null) {
-//					Bitmap b = (Bitmap) msg.obj;
-//					image.setImageBitmap(b);
-//				}
-//			} catch (Exception e) {
-//				Log.e("SF", "Exception in PreviewArtActivity Handler", e);
-//			}
-//		}
-//	};
-	
 	/**
 	 * Makes the progress dialog hide
 	 */
@@ -208,13 +195,13 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	protected RequestHandler requesthandler = new RequestHandler() {
 		
 		@Override
-		public void onError(Exception e) {
+		public void onError(int id,Exception e) {
 			dismissProgressDialog();
 			sonError(e);
 		}
 		
 		@Override
-		public void onData(JSONObject obj) {
+		public void onData(int id, JSONObject obj) {
 			dismissProgressDialog();
 			sonData(obj);
 		}
@@ -224,15 +211,18 @@ public class PreviewArtActivity extends Activity implements Runnable {
 		}
 
 		@Override
-		public void onBitmap(Bitmap bmp) throws Exception {
+		public void onOther(int id,Object obj) throws Exception {
 			dismissProgressDialog();
-			image.setImageBitmap(bmp);
+			// If the returntype is bitmap, we know what to do with it
+			if (Bitmap.class.isAssignableFrom(obj.getClass()))
+			  image.setImageBitmap((Bitmap)obj);
+			else // If its not a bitmap, create an error message
+			  super.onOther(id,obj);
 		}
 	};
 	
 	public void sonError(Exception e) {
-		// TODO:Visible exception please.
-		Log.d("Exception", e.getMessage());
+		ErrorHandler.showError(this, e);
 	}
 	
 	public void sonData(JSONObject obj) {

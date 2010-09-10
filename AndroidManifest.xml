@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.sofurry"
-      android:versionCode="6" android:versionName="0.1.6 beta">
+      android:versionCode="5" android:versionName="0.1.7 beta">
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
-        <activity android:name=".MainMenu"
+        <activity android:name=".mainmenu.MainMenu"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,7 +31,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".PreviewArtActivity"
+        <activity android:name=".gallery.PreviewArtActivity"
         		  android:screenOrientation="sensor"
         		  android:label="@string/app_name_viewart">
             <intent-filter>
@@ -60,7 +60,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".AccountActivity"
+        <activity android:name=".mainmenu.AccountActivity"
         		  android:label="@string/app_name_settings">
             <intent-filter>
                 <action android:name="android.intent.action.ACCOUNTACTIVITY" />
@@ -74,7 +74,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-    </application>
+    
+<activity android:label="@string/app_name_tageditor" android:name=".TagEditor"><intent-filter><action android:name="android.intent.action.TAGSELECT"></action>
+<category android:name="android.intent.category.DEFAULT"></category>
+</intent-filter>
+</activity>
+</application>
     <uses-sdk android:minSdkVersion="3" />
 	<uses-permission android:name="android.permission.INTERNET" /> 
     <uses-permission android:name="android.permission.VIBRATE" />
