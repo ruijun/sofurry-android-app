@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.ListAdapter;
 
 import com.sofurry.AbstractContentList;
+import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
@@ -33,6 +34,8 @@ public class ListStories extends AbstractContentList<Submission> {
 
 		req.addParameter("f", "browse");
 		req.addParameter("viewSource", ""+source);
+		if (source == AppConstants.VIEWSOURCE_SEARCH)
+			  req.addParameter("search", viewSearch);
 		req.addParameter("contentType", "0");
 		req.addParameter("entriesPerPage", "30");
 		req.addParameter("page", "" + page);

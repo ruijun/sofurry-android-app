@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.BaseAdapter;
 
 import com.sofurry.AbstractContentGallery;
+import com.sofurry.AppConstants;
 import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.model.Submission;
 import com.sofurry.requests.AjaxRequest;
@@ -24,6 +25,8 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		AjaxRequest req = new AjaxRequest();
 		req.addParameter("f", "browse");
 		req.addParameter("viewSource", ""+source);
+		if (source == AppConstants.VIEWSOURCE_SEARCH)
+		  req.addParameter("search", viewSearch);
 		req.addParameter("contentType", "1");
 		req.addParameter("entriesPerPage", "20");
 		req.addParameter("page", "" + page);
