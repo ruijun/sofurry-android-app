@@ -10,4 +10,6 @@ import android.os.Handler;
  */
 public interface IRequestHandler {
 	public abstract Handler getRequestHandler();
+	public void postMessage(int id,Object obj);	
+	public void postMessage(Object obj);
 }

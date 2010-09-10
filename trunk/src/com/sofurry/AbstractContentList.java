@@ -1,7 +1,6 @@
 package com.sofurry;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.json.JSONObject;
 
@@ -13,63 +12,49 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.AbsListView.OnScrollListener;
 
-import com.sofurry.model.Submission;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.RequestThread;
+import com.sofurry.util.ErrorHandler;
 
-public abstract class AbstractContentList<T> extends ListActivity {
+/**
+ * @author SoFurry
+ *
+ * Class that is used as a base for all ListViews
+ * 
+ * @param <T>
+ */
+public abstract class AbstractContentList<T> extends ListActivity implements IContentActivity {
 
-	//private String requestUrl;
-	//private Map<String, String> requestParameters;
 	private ProgressDialog pd;
 	protected int numResults;
 	protected ArrayList<T> resultList;
-	private String errorMessage;
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	private RequestThread listRequester = null;
 	protected int currentPage = 0;
 	protected int viewSource = AppConstants.VIEWSOURCE_ALL;
+	protected String viewSearch = "";
 	protected int lastScrollY = 0;
 
-//	// Separate handler to let android update the view whenever possible
-//	protected Handler handler = new Handler() {
-//		@SuppressWarnings("unchecked")
-//		@Override
-//		public void handleMessage(Message msg) {
-//			if (msg.obj != null) {
-//				resultList = (ArrayList<T>) msg.obj;
-//				pd.dismiss();
-//				updateView();
-//				if (errorMessage != null) {
-//					closeList();
-//				}
-//			} else {
-//				updateContentList();
-//			}
-//		}
-//	};
-	
 	/**
 	 * The request handler to be used to handle the feedback from the AjaxRequest
 	 */
 	protected RequestHandler requesthandler = new RequestHandler() {
 		
 		@Override
-		public void onError(Exception e) {
+		public void onError(int id,Exception e) {
 			closeList();
 			ronError(e);
 		}
 		
 		@Override
-		public void onData(JSONObject obj) {
+		public void onData(int id,JSONObject obj) {
 			resultList = new ArrayList<T>();
 			parseResponse(obj);
 			if (pd != null && pd.isShowing())
@@ -89,13 +74,9 @@ public abstract class AbstractContentList<T> extends ListActivity {
 	 * @param e
 	 */
 	public void ronError(Exception e) {
-		// TODO: Let the user know, what happened here.
-		Log.e("Error", e.getMessage());
-		
+		ErrorHandler.showError(this, e);
 	}
 
-
-	
 	// Get parameters and initiate data fetch thread
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -107,19 +88,17 @@ public abstract class AbstractContentList<T> extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
-		SubMenu viewSourceMenu = menu.addSubMenu("Filter");
-		viewSourceMenu.add(0, AppConstants.MENU_FILTER_ALL, 0, "All Submissions");
-		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FEATURED, 0, "Featured");
-		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FAVORITES, 0, "Your Favorites");
-		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST, 0, "Watchlist");
-		viewSourceMenu.add(0, AppConstants.MENU_FILTER_GROUP, 0, "Your Groups");
-		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST_COMBINED, 0, "Watches + Groups");
+		AbstractContentGallery.createBrowsableMenu(menu);
 		return result;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case AppConstants.MENU_FILTER_KEYWORDS:
+			Intent intent = new Intent(this, TagEditor.class);
+			startActivityForResult(intent, AppConstants.ACTIVITY_TAGS);
+			return true;
 		case AppConstants.MENU_FILTER_ALL:
 			resetViewSource(AppConstants.VIEWSOURCE_ALL);
 			return true;
@@ -142,6 +121,18 @@ public abstract class AbstractContentList<T> extends ListActivity {
 			return false;
 		}
 	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// Handles the return value from TAGEditor
+		if (requestCode == AppConstants.ACTIVITY_TAGS) {
+			if (data == null) return;
+			viewSearch = data.getStringExtra("tags");
+			resetViewSource(AppConstants.VIEWSOURCE_SEARCH);
+			return;
+		} 
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 
 	public void loadPage(int pageNum, int source, boolean showLoadingScreen) {
 		if (thumbnailDownloaderThread != null) {
@@ -151,13 +142,8 @@ public abstract class AbstractContentList<T> extends ListActivity {
 		if (showLoadingScreen)
 			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		
-		//requestUrl = getFetchUrl();
-		//requestParameters = getFetchParameters(pageNum, source);
-		AjaxRequest ar = new AjaxRequest(AppConstants.getFetchUrl(), getFetchParameters(pageNum, source));
-		errorMessage = null; // TODO: Whats this for?
+		AjaxRequest ar = getFetchParameters(pageNum, source);
 		listRequester = ar.execute(requesthandler); // Requests the data, and will redirect results to this object
-		//listRequestThread = new ContentRequestThread(this, requestUrl, requestParameters);
-		//listRequestThread.start();
 	}
 	
 	
@@ -207,35 +193,15 @@ public abstract class AbstractContentList<T> extends ListActivity {
 
 	}
 
-//	public String parseErrorMessage(String httpResult) {
-//		try {
-//			// check for json error message and parse it
-//			Log.d("List.parseErrorMessage", "response: " + httpResult);
-//			JSONObject jsonParser;
-//			jsonParser = new JSONObject(httpResult);
-//			int messageType = jsonParser.getInt("messageType");
-//			if (messageType == AppConstants.AJAXTYPE_APIERROR) {
-//				String error = jsonParser.getString("error");
-//				Log.d("List.parseErrorMessage", "Error: " + error);
-//				return error;
-//			}
-//		} catch (JSONException e) {
-//			Log.d("Auth.parseResponse", e.toString());
-//		}
-//
-//		return null;
-//
-//	}
+	public abstract void setSelectedIndex(int selectedIndex);
 
-	protected abstract void setSelectedIndex(int selectedIndex);
-
-	protected abstract Map<String, String> getFetchParameters(int page, int source);
+	public abstract AjaxRequest getFetchParameters(int page, int source);
 
 	protected abstract ListAdapter getAdapter(Context context);
 
-	protected abstract void resetViewSource(int newViewSource);
+	public abstract void resetViewSource(int newViewSource);
 	
-	protected abstract void parseResponse(JSONObject obj);
+	public abstract void parseResponse(JSONObject obj);
 
 	protected void updateContentList() {
 		updateView();
