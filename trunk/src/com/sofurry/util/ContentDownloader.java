@@ -12,26 +12,25 @@ import android.util.Log;
 
 public class ContentDownloader {
 
-	public static Bitmap downloadBitmap(String url) {
-		try {
-			Log.d("SF ContentDownloader", "Fetching image...");
-			URL myImageURL = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
-			connection.setDoInput(true);
-			connection.connect();
-			InputStream is = connection.getInputStream();
-			Log.d("SF ContentDownloader", is.available() + " bytes available to be read from server");
-			Log.d("SF ContentDownloader", "creating drawable...");
-			Bitmap bitmap = BitmapFactory.decodeStream(is);
-
-			return bitmap;
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			return null;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+	/**
+	 * Downloads a bitmap from the server
+	 * @param url
+	 * The url to the bitmap
+	 * @return
+	 * Returns the bitmap as ready bitmap object
+	 * @throws Exception
+	 */
+	public static Bitmap downloadBitmap(String url) throws Exception {
+		Log.d("SF ContentDownloader", "Fetching image...");
+		URL myImageURL = new URL(url);
+		HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
+		connection.setDoInput(true);
+		connection.connect();
+		InputStream is = connection.getInputStream();
+		Log.d("SF ContentDownloader", is.available() + " bytes available to be read from server");
+		Log.d("SF ContentDownloader", "creating drawable...");
+		Bitmap bitmap = BitmapFactory.decodeStream(is);
+		return bitmap;
 	}
 
 	

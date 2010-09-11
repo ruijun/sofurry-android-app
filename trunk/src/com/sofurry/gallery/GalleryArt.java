@@ -12,9 +12,10 @@ import android.widget.BaseAdapter;
 
 import com.sofurry.AbstractContentGallery;
 import com.sofurry.AppConstants;
-import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.model.Submission;
+import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.requests.ThumbnailDownloaderThread;
 
 public class GalleryArt extends AbstractContentGallery<Submission> {
 
@@ -44,8 +45,9 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 			for (int i = 0; i < numResults; i++) {
 				
 				Submission s = new Submission();
+				s.setType(SUBMISSION_TYPE.ARTWORK);
 				s.populate(items.getJSONObject(i));
-				s.loadSubmissionIcon();
+				//s.loadSubmissionIcon();
 				
 				resultList.add(s);
 				pageIDs.add("" + s.getId());
@@ -54,19 +56,18 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 			ronError(e);
 		}
 		// Start downloading the thumbnails
-		thumbnailDownloaderThread = new ThumbnailDownloaderThread(false, requesthandler, resultList);
-		thumbnailDownloaderThread.start();
+		startThumbnailDownloader();
 	}
 
 	@Override
 	public void setSelectedIndex(int selectedIndex) {
+		stopThumbDownloader();
 		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
 		Log.i("GalleryArt", "Viewing art ID: " + pageID);
 		Intent i = new Intent(this, PreviewArtActivity.class);
 		i.putExtra("pageID", pageID);
 		resultList.get(selectedIndex).feedIntent(i);
 		startActivity(i);
-		if (thumbnailDownloaderThread != null) thumbnailDownloaderThread.stopThread();
 	}
 
 

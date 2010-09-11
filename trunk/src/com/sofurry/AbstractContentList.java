@@ -14,13 +14,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
-import android.widget.AbsListView.OnScrollListener;
 
+import com.sofurry.model.IHasThumbnail;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.RequestThread;
+import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.util.ErrorHandler;
 
 /**
@@ -134,11 +136,28 @@ public abstract class AbstractContentList<T> extends ListActivity implements ICo
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	public void loadPage(int pageNum, int source, boolean showLoadingScreen) {
+	/**
+	 * Terminates the thumbnail downloading thread
+	 */
+	public void stopThumbDownloader() {
 		if (thumbnailDownloaderThread != null) {
 			thumbnailDownloaderThread.stopThread();
 			thumbnailDownloaderThread = null;
 		}
+	}
+	
+	/**
+	 * Initializes the thumbnail downloading thread, for submissions
+	 */
+	public void startThumbnailDownloader() {
+		stopThumbDownloader();
+
+		thumbnailDownloaderThread = new ThumbnailDownloaderThread(requesthandler, (ArrayList<IHasThumbnail>)resultList);
+		thumbnailDownloaderThread.start();
+	}
+
+	public void loadPage(int pageNum, int source, boolean showLoadingScreen) {
+		stopThumbDownloader();
 		if (showLoadingScreen)
 			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		
@@ -211,8 +230,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements ICo
 	@Override
 	public void finish() {
 		super.finish();
-		if (thumbnailDownloaderThread != null)
-			thumbnailDownloaderThread.stopThread();
+		stopThumbDownloader();
 	}
 	
 }
