@@ -1,8 +1,6 @@
 package com.sofurry.list;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,7 +16,6 @@ import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.util.Authentication;
 
 public class ListJournals extends AbstractContentList<Submission> {
@@ -48,8 +45,7 @@ public class ListJournals extends AbstractContentList<Submission> {
 		try {
 			JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
 			JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
-			numResults = items.length();
-			for (int i = 0; i < numResults; i++) {
+			for (int i = 0; i < items.length(); i++) {
 				Submission s = new Submission();
 				s.populate(items.getJSONObject(i));
 				s.setType(SUBMISSION_TYPE.JOURNAL);
@@ -89,13 +85,8 @@ public class ListJournals extends AbstractContentList<Submission> {
 
 	@Override
 	public void resetViewSource(int newViewSource) {
-		Log.i("SF", "ResetViewSource: "+newViewSource);
-		viewSource = newViewSource;
-		currentPage = 0;
-		lastScrollY = 0;
-		resultList = new ArrayList<Submission>();
 		pageIDs = new ArrayList<String>();
-		loadPage(currentPage, viewSource, true);
+		super.resetViewSource(newViewSource);
 	}
 
 }

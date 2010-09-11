@@ -48,23 +48,32 @@ public class ThumbnailDownloaderThread extends Thread {
 	 */
 	public void run() {
 		try {
-			Iterator<IHasThumbnail> i = resultList.iterator();
-			long lastRefresh = 0;
-			while (runIt && i.hasNext()) {
-				IHasThumbnail s = i.next();
-				if (s == null) continue;
+			boolean tryAgain = true;
+			while (runIt && tryAgain) {
+				tryAgain = false;
 				
-				// The IHasThumbnail object will know what to do
-				if (s.getThumbnail() == null)
-				  s.populateThumbnail();
-				
-				//Don't refresh more often than once every 4 seconds
-				if (System.currentTimeMillis() - lastRefresh > 4000) {
-					triggerRefresh();
-					lastRefresh = System.currentTimeMillis();
+				Iterator<IHasThumbnail> i = resultList.iterator();
+				long lastRefresh = 0;
+				while (runIt && i.hasNext()) {
+					IHasThumbnail s = i.next();
+					if (s == null) continue;
+					
+					// The IHasThumbnail object will know what to do
+					if (s.getThumbnail() == null)
+					  s.populateThumbnail();
+					
+					// If fetching of one thumbnail fails, we will try the whole list again
+					if (s.getThumbnail() == null)
+						tryAgain = true;
+					
+					//Don't refresh more often than once every 4 seconds
+					if (System.currentTimeMillis() - lastRefresh > 4000) {
+						triggerRefresh();
+						lastRefresh = System.currentTimeMillis();
+					}
 				}
+				triggerRefresh();
 			}
-			triggerRefresh();
 		} catch (Exception e) {
 			updateHandler.postMessage(e);
 		}

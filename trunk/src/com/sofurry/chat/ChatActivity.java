@@ -12,8 +12,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.Vibrator;
 import android.text.Html;
 import android.text.SpannableString;
@@ -34,7 +32,6 @@ import android.widget.Toast;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
-import com.sofurry.model.Submission;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.RequestThread;
@@ -58,10 +55,9 @@ public class ChatActivity extends Activity {
 	protected ChatPollThread chatPollThread;
 	protected ChatSendThread chatSendThread;
 	String requestUrl = AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
-	//protected Handler chatHandler;
 	protected LinkedBlockingQueue<String> chatSendQueue;
 	
-	private static String MESSAGETYPE_MESSAGE = "message";
+	//private static String MESSAGETYPE_MESSAGE = "message";
 	private static String MESSAGETYPE_WHISPER = "whisper";
 		
 	/**
@@ -134,16 +130,15 @@ public class ChatActivity extends Activity {
         CharSequence serverResponse = (CharSequence) str;
 		JSONObject jsonParser = new JSONObject(serverResponse.toString());
 		JSONArray items = new JSONArray(jsonParser.getString("data"));
-		if (items == null)
-			return;
+
 		int numResults = items.length();
 		for (int i = 0; i < numResults; i++) {
 			JSONObject jsonItem = items.getJSONObject(i);
 			String id = jsonItem.getString("id");
 			String fromUserName = jsonItem.getString("fromUserName");
 			String type = jsonItem.getString("type"); //can be message or whisper
-			String date = jsonItem.getString("timestamp");
-			String toUserName = jsonItem.getString("toUserName");
+			//String date = jsonItem.getString("timestamp");
+			//String toUserName = jsonItem.getString("toUserName");
 			String message = jsonItem.getString("message");
 			if (Integer.parseInt(id) > chatSequence) {
 				chatSequence = Integer.parseInt(id);

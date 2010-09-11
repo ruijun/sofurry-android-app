@@ -1,8 +1,6 @@
 package com.sofurry.list;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,8 +52,7 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 	public void parseResponse(JSONObject obj) {
 		try {
 			JSONArray items = new JSONArray(obj.getString("items"));
-			numResults = items.length();
-			for (int i = 0; i < numResults; i++) {
+			for (int i = 0; i < items.length(); i++) {
 				PrivateMessage m = new PrivateMessage();
 				m.populate(items.getJSONObject(i));
 				resultList.add(m);

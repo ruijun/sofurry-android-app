@@ -19,6 +19,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.sofurry.model.IHasThumbnail;
 import com.sofurry.model.Submission;
@@ -37,7 +38,6 @@ import com.sofurry.util.ErrorHandler;
 public abstract class AbstractContentGallery<T> extends Activity implements IContentActivity {
 
 	private ProgressDialog pd;
-	protected int numResults;
 	protected ArrayList<T> resultList;
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	private GridView galleryView;
@@ -62,16 +62,15 @@ public abstract class AbstractContentGallery<T> extends Activity implements ICon
 		
 		@Override
 		public void onError(int id,Exception e) {
-			closeList();
+			//closeList();
 			ronError(e);
 		}
 		
 		@Override
 		public void onData(int id,JSONObject obj) {
-			resultList = new ArrayList<T>();
+			if (resultList == null)
+			  resultList = new ArrayList<T>();
 			parseResponse(obj);
-			if (pd != null && pd.isShowing())
-			  pd.dismiss();
 		    updateView();
 		}
 
@@ -83,10 +82,28 @@ public abstract class AbstractContentGallery<T> extends Activity implements ICon
 	};
 	
 	/**
+	 * Shows the progress Dialog
+	 * @param msg
+	 */
+	private void showProgressDialog(String msg) {
+		pd = ProgressDialog.show(this, msg, "Please wait", true, false);
+	}
+	
+	/**
+	 * Hides the progress Dialog
+	 */
+	private void hideProgressDialog() {
+		if (pd != null && pd.isShowing())
+			  pd.dismiss();
+	}
+
+	
+	/**
 	 * Is called when an error occurs in the asyncronus thread
 	 * @param e
 	 */
 	public void ronError(Exception e) {
+		hideProgressDialog();
 		ErrorHandler.showError(this, e);
 	}
 	
@@ -185,7 +202,9 @@ public abstract class AbstractContentGallery<T> extends Activity implements ICon
 	protected void loadPage(int page, int source, boolean showLoadingScreen) {
 		stopThumbDownloader();
 		if (showLoadingScreen)
-			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
+			showProgressDialog("Fetching data...");
+		else
+			Toast.makeText(getApplicationContext(), "Fetching next page", Toast.LENGTH_SHORT).show();
 		
 		AjaxRequest request = getFetchParameters(page, source);
 		request.execute(requesthandler);		
@@ -235,16 +254,25 @@ public abstract class AbstractContentGallery<T> extends Activity implements ICon
 			}
 		});
 		Log.i("SF", "Scrolling TO: " + lastScrollY);
-		//galleryView.setSelection(lastScrollY + 3);
+		galleryView.setSelection(lastScrollY + 3);
 	}
 
+	public void resetViewSource(int newViewSource) {
+		Log.i("SF", "ResetViewSource: "+newViewSource);
+		viewSource = newViewSource;
+		currentPage = 0;
+		lastScrollY = 0;
+		resultList = new ArrayList<T>();
+		loadPage(currentPage, viewSource, true);
+	}
+
+	
 	public abstract void setSelectedIndex(int selectedIndex);
 
 	public abstract AjaxRequest getFetchParameters(int page, int source);
 
 	public abstract BaseAdapter getAdapter(Context context);
 
-	public abstract void resetViewSource(int newViewSource);
 	
 	/**
 	 * Parses the response from the Ajax interface
@@ -254,6 +282,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements ICon
 
 	protected void updateContentList() {
 		updateView();
+		hideProgressDialog();
 	}
 	
 	//public Handler getHandler() {

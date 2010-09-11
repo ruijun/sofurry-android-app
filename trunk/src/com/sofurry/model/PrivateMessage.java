@@ -2,8 +2,6 @@ package com.sofurry.model;
 
 import java.io.Serializable;
 
-import javax.net.ssl.HandshakeCompletedListener;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
