@@ -11,6 +11,11 @@ public class AppConstants {
 	public static final int ACTIVITY_VIEWPM = 5;
 	public static final int ACTIVITY_TAGS = 6;
 
+
+	public static final int CONTENTTYPE_STORIES = 0;
+	public static final int CONTENTTYPE_JOURNALS = 3;
+	public static final int CONTENTTYPE_ART = 1;
+	
 	//Ajax message types
 	public static final int AJAXTYPE_APIERROR = 5;
 	public static final int AJAXTYPE_OTPAUTH = 6;
@@ -46,6 +51,7 @@ public class AppConstants {
 	
 	public static final int REQUEST_ID_ROOMLIST = 4501;
 	public static final int REQUEST_ID_USERLIST = 4502;
+	public static final int REQUEST_ID_FETCHDATA = 4503;
 
 	public static final String PREFS_NAME = "SoFurryPreferences";
 	public static final String SITE_URL = "http://chat.sofurry.com";

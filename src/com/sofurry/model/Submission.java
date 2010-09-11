@@ -31,6 +31,8 @@ public class Submission implements Serializable, IHasThumbnail {
 	private String thumbnailUrl;
 	private Bitmap thumbnail;
 	
+	private byte attempts = 0;
+	
 	public SUBMISSION_TYPE getType() {
 		return type;
 	}
@@ -131,6 +133,14 @@ public class Submission implements Serializable, IHasThumbnail {
 		
 		Log.i("SF ThumbDownloader", "Storing image");
 		storeIcon();
+	}
+	
+	/**
+	 * Returns the number of attempts that were used to get the thumbnail
+	 * @return
+	 */
+	public byte getThumbAttempts() {
+		return attempts++;
 	}
 	
 	

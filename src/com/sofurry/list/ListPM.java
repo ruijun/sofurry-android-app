@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
-import android.widget.ListAdapter;
+import android.widget.BaseAdapter;
 
 import com.sofurry.AbstractContentList;
 import com.sofurry.R;
@@ -23,13 +23,7 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		//TODO: PM Menu
 		return false;
-	}
-
-	@Override
-	public void resetViewSource(int newViewSource) {
-		//This function is blank on purpose, since no view filter change is supported yet
 	}
 
 	@Override
@@ -55,11 +49,11 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 			for (int i = 0; i < items.length(); i++) {
 				PrivateMessage m = new PrivateMessage();
 				m.populate(items.getJSONObject(i));
-				resultList.add(m);
+				man.getResultList().add(m);
 				pageIDs.add("" + m.getId());
 			}
 		} catch (Exception e) {
-			ronError(e);
+			man.ronError(e);
 		}
 	}
 
@@ -72,13 +66,12 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 		startActivity(i);
 	}
 
-	public boolean useAuthentication() {
-		return true;
+	@Override
+	public BaseAdapter getAdapter(Context context) {
+		return new PrivateMessageAdapter(context, R.layout.listitemtwolineicon, man.getResultList());
 	}
 
-	@Override
-	protected ListAdapter getAdapter(Context context) {
-		return new PrivateMessageAdapter(context, R.layout.listitemtwolineicon, resultList);
+	public void resetViewSourceExtra(int newViewSource) {
 	}
 
 

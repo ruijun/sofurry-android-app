@@ -1,9 +1,5 @@
 package com.sofurry.gallery;
 
-import org.json.JSONObject;
-
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,18 +9,18 @@ import android.view.SubMenu;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sofurry.ActivityWithRequests;
 import com.sofurry.AppConstants;
+import com.sofurry.ProgressBarHelper;
 import com.sofurry.R;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.RequestHandler;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.ContentDownloader;
-import com.sofurry.util.ErrorHandler;
 import com.sofurry.util.ImageStorage;
 
-public class PreviewArtActivity extends Activity implements Runnable {
+public class PreviewArtActivity extends ActivityWithRequests implements Runnable {
 
-	private ProgressDialog pd;
+	private ProgressBarHelper pbh = new ProgressBarHelper(this);
 	private ImageView image;
 	private TextView imageartisttext;
     int pageID;
@@ -58,7 +54,7 @@ public class PreviewArtActivity extends Activity implements Runnable {
 			imageartisttext.setText(name + "\n" + authorName);
 	    }
 
-		pd = ProgressDialog.show(this, "Fetching image...", "Please wait", true, false);
+	    pbh.showProgressDialog("Fetching image...");
 		Thread thread = new Thread(this);
 		thread.start();
 	}
@@ -83,7 +79,6 @@ public class PreviewArtActivity extends Activity implements Runnable {
 			// Send bitmap to our hungry thread
 			requesthandler.postMessage(0,b);
 		} catch (Exception e) {
-			// An error occured, send that back instead
 			requesthandler.postMessage(e);
 		}
 	}
@@ -143,7 +138,8 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	 * Sets a Favorite for the currently Selected Image
 	 */
 	public void setFavorite() {
-		pd = ProgressDialog.show(this, "Setting favorite", "Please wait", true, false);
+		pbh.showProgressDialog("Setting favorite");
+
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "addfav");
 		request.addParameter("pid", "" + pageID);
@@ -154,7 +150,8 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	 * Removes a Favorite for the currently Selected Image
 	 */
 	public void unsetFavorite() {
-		pd = ProgressDialog.show(this, "Removing favorite", "Please wait", true, false);
+		pbh.showProgressDialog("Removing favorite");
+		
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "remfav");
 		request.addParameter("pid", "" + pageID);
@@ -167,7 +164,7 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	 * The number of stars to set (1-5)
 	 */
 	public void setRating(int stars) {
-		pd = ProgressDialog.show(this, "Rating "+stars+" stars", "Please wait", true, false);
+		pbh.showProgressDialog("Rating "+stars+" stars");
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "vote");
 		request.addParameter("pid", "" + pageID);
@@ -179,61 +176,24 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	 * Flags the cum-counter for currently visible image
 	 */
 	public void cum() {
-		pd = ProgressDialog.show(this, "Cumming ...", "Please wait", true, false);
+		pbh.showProgressDialog("Cumming ...");
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "cum");
 		request.addParameter("pid", "" + pageID);
 		request.execute(requesthandler);
 	}
 	
-
-	/**
-	 * Makes the progress dialog hide
-	 */
-	private void dismissProgressDialog() {
-		if (pd != null && pd.isShowing())
-			  pd.dismiss();
-	}
-
-	/**
-	 * The request handler to be used to handle the feedback from the AjaxRequest
-	 */
-	protected RequestHandler requesthandler = new RequestHandler() {
-		
-		@Override
-		public void onError(int id,Exception e) {
-			dismissProgressDialog();
-			sonError(e);
-		}
-		
-		@Override
-		public void onData(int id, JSONObject obj) {
-			dismissProgressDialog();
-			sonData(obj);
-		}
-		
-		@Override
-		public void refresh() {
-		}
-
-		@Override
-		public void onOther(int id,Object obj) throws Exception {
-			dismissProgressDialog();
-			// If the returntype is bitmap, we know what to do with it
-			if (Bitmap.class.isAssignableFrom(obj.getClass()))
-			  image.setImageBitmap((Bitmap)obj);
-			else // If its not a bitmap, create an error message
-			  super.onOther(id,obj);
-		}
-	};
 	
-	public void sonError(Exception e) {
-		ErrorHandler.showError(this, e);
+	@Override
+	public void sonOther(int id, Object obj) throws Exception {
+		pbh.hideProgressDialog();
+		// If the returntype is bitmap, we know what to do with it
+		if (Bitmap.class.isAssignableFrom(obj.getClass()))
+		  image.setImageBitmap((Bitmap)obj);
+		else
+		  super.sonOther(id, obj);
 	}
-	
-	public void sonData(JSONObject obj) {
-		// TODO: Test if results are okay.
-	}
+
 
 
 }
