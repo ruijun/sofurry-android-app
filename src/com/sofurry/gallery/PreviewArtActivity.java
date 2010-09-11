@@ -55,7 +55,7 @@ public class PreviewArtActivity extends Activity implements Runnable {
 			if (thumb != null)
 				image.setImageBitmap(thumb);
 			
-			imageartisttext.setText(authorName);
+			imageartisttext.setText(name + "\n" + authorName);
 	    }
 
 		pd = ProgressDialog.show(this, "Fetching image...", "Please wait", true, false);
@@ -70,15 +70,22 @@ public class PreviewArtActivity extends Activity implements Runnable {
 	 * 
 	 */
 	public void run() {
-		String url = thumbnailUrl.replace("/thumbnails/", "/preview/");
-		Log.i("SF ImageDownloader", "Downloading image for id " + pageID + " from " + url);
-		Bitmap b = ImageStorage.loadSubmissionImage(pageID);
-		if (b == null) {
-			b = ContentDownloader.downloadBitmap(url);
-			ImageStorage.saveSubmissionImage(pageID, b);
+		try {
+			String url = thumbnailUrl.replace("/thumbnails/", "/preview/");
+			Log.i("SF ImageDownloader", "Downloading image for id " + pageID + " from " + url);
+			
+			Bitmap b = ImageStorage.loadSubmissionImage(pageID);
+			if (b == null) {
+				b = ContentDownloader.downloadBitmap(url);
+				ImageStorage.saveSubmissionImage(pageID, b);
+			}
+
+			// Send bitmap to our hungry thread
+			requesthandler.postMessage(0,b);
+		} catch (Exception e) {
+			// An error occured, send that back instead
+			requesthandler.postMessage(e);
 		}
-		// Send bitmap to our hungry thread
-		requesthandler.postMessage(0,b);
 	}
 
 	/* (non-Javadoc)
@@ -131,7 +138,6 @@ public class PreviewArtActivity extends Activity implements Runnable {
 			return super.onContextItemSelected(item);
 		}
 	}
-
 	
 	/**
 	 * Sets a Favorite for the currently Selected Image

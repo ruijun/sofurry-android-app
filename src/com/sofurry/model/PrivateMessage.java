@@ -2,11 +2,15 @@ package com.sofurry.model;
 
 import java.io.Serializable;
 
+import javax.net.ssl.HandshakeCompletedListener;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.graphics.Bitmap;
 
-public class PrivateMessage implements Serializable {
+
+public class PrivateMessage implements Serializable, IHasThumbnail {
 
 	private static final long serialVersionUID = -237449121440709783L;
 
@@ -19,6 +23,7 @@ public class PrivateMessage implements Serializable {
 	private String subject;
 	private String message;
 	private String status;
+	private Bitmap thumbnail;
 	
 	
 	public int getId() {
@@ -94,5 +99,15 @@ public class PrivateMessage implements Serializable {
 		setSubject(subject);
 		setStatus(status);
 	}
+	
+	public Bitmap getThumbnail() {
+		return null;
+	}
+	
+	public void populateThumbnail() throws Exception {
+	
+	}
+	
+	
 	
 }

@@ -7,14 +7,17 @@ import org.json.JSONObject;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.util.Log;
 
+import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.ImageStorage;
 
-public class Submission implements Serializable {
+public class Submission implements Serializable, IHasThumbnail {
 
 	private static final long serialVersionUID = -3841250259233075462L;
 
 	public enum SUBMISSION_TYPE {ARTWORK, STORY, JOURNAL, MUSIC};
+
 	
 	private SUBMISSION_TYPE type;
 	private int id = -1;
@@ -22,7 +25,7 @@ public class Submission implements Serializable {
 	private String content;
 	private String tags;
 	private String authorName;
-	private String authorID;
+	private int authorID;
 	private String contentLevel;
 	private String date;
 	private String thumbnailUrl;
@@ -34,6 +37,9 @@ public class Submission implements Serializable {
 	public void setType(SUBMISSION_TYPE type) {
 		this.type = type;
 	}
+	/* (non-Javadoc)
+	 * @see com.sofurry.model.IHasThumbnail#getId()
+	 */
 	public int getId() {
 		return id;
 	}
@@ -58,10 +64,10 @@ public class Submission implements Serializable {
 	public void setAuthorName(String authorName) {
 		this.authorName = authorName;
 	}
-	public String getAuthorID() {
+	public int getAuthorID() {
 		return authorID;
 	}
-	public void setAuthorID(String authorID) {
+	public void setAuthorID(int authorID) {
 		this.authorID = authorID;
 	}
 	public String getContent() {
@@ -82,18 +88,52 @@ public class Submission implements Serializable {
 	public void setDate(String date) {
 		this.date = date;
 	}
-	public String getThumbnailUrl() {
-		return thumbnailUrl;
-	}
+
 	public void setThumbnailUrl(String thumbnailUrl) {
 		this.thumbnailUrl = thumbnailUrl;
 	}
+	/* (non-Javadoc)
+	 * @see com.sofurry.model.IHasThumbnail#getThumbnail()
+	 */
 	public Bitmap getThumbnail() {
 		return thumbnail;
 	}
-	public void setThumbnail(Bitmap thumbnail) {
-		this.thumbnail = thumbnail;
+	
+	public void loadIconFromStorage() {
+		if (type == SUBMISSION_TYPE.ARTWORK) {
+			thumbnail = ImageStorage.loadSubmissionIcon(getId());
+		} else {
+			thumbnail = ImageStorage.loadUserIcon(getAuthorID());
+		}
 	}
+	
+	public void storeIcon() {
+		if (type == SUBMISSION_TYPE.ARTWORK) {
+			ImageStorage.saveSubmissionIcon(getId(), thumbnail);
+		} else {
+			ImageStorage.saveUserIcon(getAuthorID(), thumbnail);
+		}
+	}
+	
+	/**
+	 * Downloads the thumbnail for this submission
+	 */
+	public void populateThumbnail() throws Exception {
+		if (getId() == -1) return;
+
+		Log.i("SF ThumbDownloader", "Downloading thumb for pid " + getId() + " from " + thumbnailUrl);
+		
+		// See if we have the image in storage
+		loadIconFromStorage();
+		
+		if (thumbnail == null)
+		   thumbnail = ContentDownloader.downloadBitmap(thumbnailUrl);
+		
+		Log.i("SF ThumbDownloader", "Storing image");
+		storeIcon();
+	}
+	
+	
 	
 	/**
 	 * Populates the Submission with data from a JSON object
@@ -106,28 +146,13 @@ public class Submission implements Serializable {
 		setId(Integer.parseInt(datasource.getString("pid")));
 		setDate(datasource.getString("date"));
 		setAuthorName(datasource.getString("authorName"));
-		setAuthorID(datasource.getString("authorId"));
+		setAuthorID(Integer.parseInt(datasource.getString("authorId")));
 		setContentLevel(datasource.getString("contentLevel"));
 		setTags(datasource.getString("keywords"));
 		setThumbnailUrl(datasource.getString("thumb"));
 	}
 	
-	/**
-	 * Loads this Submission's Icon
-	 */
-	public void loadSubmissionIcon() {
-		Bitmap thumb = ImageStorage.loadSubmissionIcon(getId());
-		if (thumb != null)
-			setThumbnail(thumb);
-	}
-	
-	/**
-	 * Loads the icon of this submissions owner (user)
-	 */
-	public void loadUserIcon() {
-		Bitmap thumb = ImageStorage.loadUserIcon(Integer.parseInt(getAuthorID()));
-		if (thumb != null)
-			setThumbnail(thumb);
+	public void storeSubmissionIcon() {
 	}
 	
 	/**
@@ -139,8 +164,7 @@ public class Submission implements Serializable {
 		intent.putExtra("tags", getTags());
 		intent.putExtra("authorName", getAuthorName());
 		intent.putExtra("authorId", getAuthorID());
-		intent.putExtra("thumbnail", getThumbnailUrl());
-
+		intent.putExtra("thumbnail", thumbnailUrl);
 	}
 	
 	

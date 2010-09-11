@@ -17,10 +17,11 @@ import android.widget.ListAdapter;
 import com.sofurry.AbstractContentList;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
-import com.sofurry.ThumbnailDownloaderThread;
 import com.sofurry.ViewStoryActivity;
 import com.sofurry.model.Submission;
+import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.ImageStorage;
 
@@ -53,7 +54,8 @@ public class ListStories extends AbstractContentList<Submission> {
 			for (int i = 0; i < numResults; i++) {
 				Submission s = new Submission();
 				s.populate(items.getJSONObject(i));
-				s.loadUserIcon();
+				s.setType(SUBMISSION_TYPE.STORY);
+				//s.loadUserIcon();
 
 
 				resultList.add(s);
@@ -64,8 +66,7 @@ public class ListStories extends AbstractContentList<Submission> {
 			ronError(e);
 		}
 		// Start downloading the thumbnails
-		thumbnailDownloaderThread = new ThumbnailDownloaderThread(true, requesthandler, resultList);
-		thumbnailDownloaderThread.start();
+		startThumbnailDownloader();
 	}
 
 

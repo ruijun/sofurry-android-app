@@ -15,14 +15,16 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.AbsListView.OnScrollListener;
 
-import com.sofurry.mainmenu.AccountActivity;
+import com.sofurry.model.IHasThumbnail;
+import com.sofurry.model.Submission;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
+import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.util.ErrorHandler;
 
 /**
@@ -151,6 +153,25 @@ public abstract class AbstractContentGallery<T> extends Activity implements ICon
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
+	
+	/**
+	 * Terminates the thumbnail downloading thread
+	 */
+	public void stopThumbDownloader() {
+		if (thumbnailDownloaderThread != null) {
+			thumbnailDownloaderThread.stopThread();
+			thumbnailDownloaderThread = null;
+		}
+	}
+	
+	/**
+	 * Initializes the thumbnail downloading thread, for submissions
+	 */
+	public void startThumbnailDownloader() {
+		stopThumbDownloader();
+		thumbnailDownloaderThread = new ThumbnailDownloaderThread(requesthandler, (ArrayList<IHasThumbnail>)resultList);
+		thumbnailDownloaderThread.start();
+	}
 
 	/**
 	 * Loads the next page of browse results
@@ -162,10 +183,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements ICon
 	 * if true, a loading screen is shown
 	 */
 	protected void loadPage(int page, int source, boolean showLoadingScreen) {
-		if (thumbnailDownloaderThread != null) {
-			thumbnailDownloaderThread.stopThread();
-			thumbnailDownloaderThread = null;
-		}
+		stopThumbDownloader();
 		if (showLoadingScreen)
 			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
 		
@@ -199,7 +217,6 @@ public abstract class AbstractContentGallery<T> extends Activity implements ICon
 		galleryView.setAdapter(adapter);
 		// bind a selection listener to the view
 		galleryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@SuppressWarnings("unchecked")
 			public void onItemClick(AdapterView parentView, View childView, int position, long id) {
 				setSelectedIndex(position);
 			}
@@ -218,7 +235,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements ICon
 			}
 		});
 		Log.i("SF", "Scrolling TO: " + lastScrollY);
-		galleryView.setSelection(lastScrollY + 3);
+		//galleryView.setSelection(lastScrollY + 3);
 	}
 
 	public abstract void setSelectedIndex(int selectedIndex);

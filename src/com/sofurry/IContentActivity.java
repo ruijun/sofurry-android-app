@@ -3,6 +3,7 @@ package com.sofurry;
 import org.json.JSONObject;
 
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.requests.ThumbnailDownloaderThread;
 
 /**
  * @author Rangarig
@@ -18,5 +19,17 @@ public interface IContentActivity {
 	void resetViewSource(int newViewSource);
 	
 	void parseResponse(JSONObject obj);
+	
+	/**
+	 * Terminates the thumbnail downloading thread
+	 */
+	void stopThumbDownloader();
+	
+	/**
+	 * Initializes the thumbnail downloading thread
+	 * @param mode
+	 */
+	void startThumbnailDownloader();
+
 
 }

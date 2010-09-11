@@ -34,17 +34,10 @@ public class PrivateMessageAdapter extends ArrayAdapter<PrivateMessage> {
 		if (m != null) {
 			TextView tt = (TextView) v.findViewById(R.id.toptext);
 			TextView bt = (TextView) v.findViewById(R.id.bottomtext);
-			if (tt != null) {
+			if (tt != null) 
 				tt.setText(m.getSubject());
-			} else {
-				tt.setText("");
-			}
-			if (bt != null && bt.length() > 0) {
+			if (bt != null) 
 				bt.setText("From: " + m.getFromUser());
-			} else {
-				bt.setText("");
-			}
-			
 		}
 		return v;
 	}
