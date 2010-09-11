@@ -6,9 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -30,16 +28,15 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sofurry.ActivityWithRequests;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.RequestThread;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.ErrorHandler;
 
-public class ChatActivity extends Activity {
-	// TODO: Implement show Userlist
+public class ChatActivity extends ActivityWithRequests {
     private ScrollView scrollView;
     private TextView chatView;
     private TextView roomView;
@@ -51,7 +48,6 @@ public class ChatActivity extends Activity {
 	private int roomIds[] = null;
 	private String roomNames[] = null;
 	private String userNames[] = null;
-	private ProgressDialog pd;
 	protected ChatPollThread chatPollThread;
 	protected ChatSendThread chatSendThread;
 	String requestUrl = AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
@@ -60,60 +56,65 @@ public class ChatActivity extends Activity {
 	//private static String MESSAGETYPE_MESSAGE = "message";
 	private static String MESSAGETYPE_WHISPER = "whisper";
 		
-	/**
-	 * The request handler to be used to handle the feedback from the AjaxRequest
-	 */
-	protected RequestHandler requesthandler = new RequestHandler() {
-		
-		@Override
-		public void onError(int id,Exception e) {
-			showError(e);
-		}
-		
-		@Override
-		public void onData(int id,JSONObject obj) {
-			if (id == AppConstants.REQUEST_ID_ROOMLIST) {
-				populateRoomList(obj);
-			}
-			if (id == AppConstants.REQUEST_ID_USERLIST) {
-				populateUserList(obj);
-			}
-		}
+//	/**
+//	 * The request handler to be used to handle the feedback from the AjaxRequest
+//	 */
+//	protected RequestHandler requesthandler = new RequestHandler() {
+//		
+//		@Override
+//		public void onError(int id,Exception e) {
+//			showError(e);
+//		}
+//		
+//		@Override
+//		public void onData(int id,JSONObject obj) {
+//			if (id == AppConstants.REQUEST_ID_ROOMLIST) {
+//				populateRoomList(obj);
+//			}
+//			if (id == AppConstants.REQUEST_ID_USERLIST) {
+//				populateUserList(obj);
+//			}
+//		}
+//
+//		@Override
+//		public void refresh() {
+//			// Dito.
+//		}
+//
+//		@Override
+//		public void onOther(int id,Object obj) throws Exception {
+//			// If the object is text, it will be handled by the texthandler
+//			if (String.class.isAssignableFrom(obj.getClass())) {
+//				addTextToChatLog((String)obj);
+//			} else
+//			    super.onOther(id,obj);
+//		}
+//		
+//		
+//		
+//	};
+	
 
-		@Override
-		public void refresh() {
-			// Dito.
+	@Override
+	public void sonData(int id, JSONObject obj) throws Exception {
+		if (id == AppConstants.REQUEST_ID_ROOMLIST) {
+			populateRoomList(obj);
 		}
+		if (id == AppConstants.REQUEST_ID_USERLIST) {
+			populateUserList(obj);
+		}
+	}
 
-		@Override
-		public void onOther(int id,Object obj) throws Exception {
-			// If the object is text, it will be handled by the texthandler
-			if (String.class.isAssignableFrom(obj.getClass())) {
-				addTextToChatLog((String)obj);
-			} else
-			    super.onOther(id,obj);
-		}
-		
-		
-		
-	};
-	
-	/**
-	 * Shows the progress Dialog
-	 * @param msg
-	 */
-	private void showProgressDialog(String msg) {
-		pd = ProgressDialog.show(this, msg, "Please wait", true, false);
+	@Override
+	public void sonOther(int id, Object obj) throws Exception {
+		// If the object is text, it will be handled by the texthandler
+		if (String.class.isAssignableFrom(obj.getClass())) {
+			addTextToChatLog((String)obj);
+		} else
+		    super.sonOther(id,obj);
 	}
-	
-	/**
-	 * Hides the progress Dialog
-	 */
-	private void hideProgressDialog() {
-		if (pd != null && pd.isShowing())
-			  pd.dismiss();
-	}
-	
+
+
 	/**
 	 * Displays errors as they occur
 	 * @param e
@@ -165,48 +166,7 @@ public class ChatActivity extends Activity {
         chatEntry = (EditText) findViewById(R.id.chatentry);
         sendButton = (Button) findViewById(R.id.send);
 
-//        /* Create text handler */
-//        chatHandler = new Handler() {
-//                @Override public void handleMessage(Message msg)
-//                {
-//            		//Parse server response
-//            		try {
-//            			if (msg.obj == null)
-//            				return;
-//                        CharSequence serverResponse = (CharSequence) msg.obj.toString();
-//            			JSONObject jsonParser = new JSONObject(serverResponse.toString());
-//            			JSONArray items = new JSONArray(jsonParser.getString("data"));
-//            			if (items == null)
-//            				return;
-//            			int numResults = items.length();
-//            			for (int i = 0; i < numResults; i++) {
-//            				JSONObject jsonItem = items.getJSONObject(i);
-//            				String id = jsonItem.getString("id");
-//            				String fromUserName = jsonItem.getString("fromUserName");
-//            				String type = jsonItem.getString("type"); //can be message or whisper
-//            				String date = jsonItem.getString("timestamp");
-//            				String toUserName = jsonItem.getString("toUserName");
-//            				String message = jsonItem.getString("message");
-//            				if (Integer.parseInt(id) > chatSequence) {
-//            					chatSequence = Integer.parseInt(id);
-//            				}
-//            				chatView.append(fromUserName);
-//            				chatView.append(": ");
-//                            SpannableString str = colorText(message, type);
-//                            chatView.append(str);
-//                            Linkify.addLinks(chatView, Linkify.ALL);
-//                            chatView.append("\n");
-//            			}
-//
-//            			scrollView.scrollTo(0, chatView.getHeight());
-//
-//            		} catch (Exception e) {
-//            			Log.e("SF CHAT", e.getMessage());
-//            			e.printStackTrace();
-//            		}
-//                }
-//        };
-        
+       
         /* Create send button callback */
         sendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -281,7 +241,7 @@ public class ChatActivity extends Activity {
 	private void getRoomList() {
 		// Do we need to fetch the room list?
 		if (roomIds == null) {
-			showProgressDialog("Fetching rooms");
+			pbh.showProgressDialog("Fetching rooms");
 			AjaxRequest getRooms = new AjaxRequest();
 			getRooms.addParameter("f", "chatrooms");
 			getRooms.setRequestID(AppConstants.REQUEST_ID_ROOMLIST); // Mark this request, so the return value handler knows what to do with the result
@@ -304,7 +264,7 @@ public class ChatActivity extends Activity {
 			for (int i = 0; i < cnt; i++) {
 				JSONObject item = items.getJSONObject(i);
 				Log.d("item", item.getString("name") + " " + item.getString("id"));
-				roomNames[i] = item.getString("name");
+				roomNames[i] = Html.fromHtml(item.getString("name")).toString();
 				roomIds[i] = Integer.parseInt(item.getString("id")); 
 			}
 			
@@ -313,7 +273,7 @@ public class ChatActivity extends Activity {
 		} catch (Exception e) {
 			showError(e);
 		} finally {
-			hideProgressDialog();
+			pbh.hideProgressDialog();
 		}
 	}
 	
@@ -360,7 +320,7 @@ public class ChatActivity extends Activity {
 	 * Since this list is subject to change, it gets updated every time, and destroyed once the menu is not used anymore
 	 */
 	private void getUserList() {
-		showProgressDialog("Fetching users");
+		pbh.showProgressDialog("Fetching users");
 		AjaxRequest getRooms = new AjaxRequest();
 		getRooms.addParameter("f", "onlineUsers");
 		getRooms.addParameter("roomid", "" + this.roomId);
@@ -379,7 +339,7 @@ public class ChatActivity extends Activity {
 			userNames = new String[cnt];
 			for (int i = 0; i < cnt; i++) {
 				JSONObject item = items.getJSONObject(i);
-				userNames[i] = item.getString("name");
+				userNames[i] = Html.fromHtml(item.getString("name")).toString();
 			}
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -395,7 +355,7 @@ public class ChatActivity extends Activity {
 		} catch (Exception e) {
 			showError(e);
 		} finally {
-			hideProgressDialog();
+			pbh.hideProgressDialog();
 		}
 	}
 	

@@ -58,9 +58,15 @@ public class ThumbnailDownloaderThread extends Thread {
 					IHasThumbnail s = i.next();
 					if (s == null) continue;
 					
+					if (s.getThumbAttempts() > 3) continue;  // We will give up after trying to fetch the thumbnail 3 times
+					
 					// The IHasThumbnail object will know what to do
 					if (s.getThumbnail() == null)
-					  s.populateThumbnail();
+					  try {
+						  s.populateThumbnail();
+					  } catch (Exception e) {
+						  // This is intentionally left blank. If thumbnail fetching fails... well... so be it, could be worse.
+					  }
 					
 					// If fetching of one thumbnail fails, we will try the whole list again
 					if (s.getThumbnail() == null)

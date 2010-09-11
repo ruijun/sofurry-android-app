@@ -11,5 +11,6 @@ public interface IHasThumbnail {
 
 	Bitmap getThumbnail();
 	void populateThumbnail() throws Exception;
+	byte getThumbAttempts();
 
 }

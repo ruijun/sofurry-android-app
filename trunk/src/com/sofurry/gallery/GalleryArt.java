@@ -20,17 +20,37 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 
 	private ArrayList<String> pageIDs = new ArrayList<String>();
 
-	@Override
-	public AjaxRequest getFetchParameters(int page, int source) {
+	/**
+	 * Creates a browse command, to be used with the AJax interface
+	 * @param page
+	 * The page to get
+	 * @param source
+	 * the viewsource
+	 * @param viewSearch
+	 * the tags
+	 * @param contentType
+	 * the contenttype
+	 * @param entries
+	 * the number of entries to return
+	 * @return
+	 * Returns an ajax request with parameters
+	 */
+	public static AjaxRequest createBrowse(int page, int source, String viewSearch, int contentType, int entries) {
 		AjaxRequest req = new AjaxRequest();
 		req.addParameter("f", "browse");
 		req.addParameter("viewSource", ""+source);
 		if (source == AppConstants.VIEWSOURCE_SEARCH)
 		  req.addParameter("search", viewSearch);
-		req.addParameter("contentType", "1");
-		req.addParameter("entriesPerPage", "20");
+		req.addParameter("contentType", "" + contentType);
+		req.addParameter("entriesPerPage", "" + entries);
 		req.addParameter("page", "" + page);
 		return req;
+	}
+
+	
+	@Override
+	public AjaxRequest getFetchParameters(int page, int source) {
+		return createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_ART,20);
 	}
 	
 	/* (non-Javadoc)
@@ -47,37 +67,34 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 				s.populate(items.getJSONObject(i));
 				//s.loadSubmissionIcon();
 				
-				resultList.add(s);
+				man.getResultList().add(s);
 				pageIDs.add("" + s.getId());
 			}
 		} catch (Exception e) {
-			ronError(e);
+			man.ronError(e);
 		}
 		// Start downloading the thumbnails
-		startThumbnailDownloader();
+		man.startThumbnailDownloader();
 	}
 
 	@Override
 	public void setSelectedIndex(int selectedIndex) {
-		stopThumbDownloader();
 		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
 		Log.i("GalleryArt", "Viewing art ID: " + pageID);
 		Intent i = new Intent(this, PreviewArtActivity.class);
 		i.putExtra("pageID", pageID);
-		resultList.get(selectedIndex).feedIntent(i);
+		man.getResultList().get(selectedIndex).feedIntent(i);
 		startActivity(i);
 	}
 
 
 	@Override
 	public BaseAdapter getAdapter(Context context) {
-		return new SubmissionGalleryAdapter(context, resultList);
+		return new SubmissionGalleryAdapter(context, man.getResultList());
 	}
 
-	@Override
-	public void resetViewSource(int newViewSource) {
+	public void resetViewSourceExtra(int newViewSource) {
 		pageIDs = new ArrayList<String>();
-		super.resetViewSource(newViewSource);
 	}
 
 }

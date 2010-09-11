@@ -98,12 +98,17 @@ public class PrivateMessage implements Serializable, IHasThumbnail {
 		setStatus(status);
 	}
 	
+	// TODO: Create item fetching here
 	public Bitmap getThumbnail() {
 		return null;
 	}
 	
 	public void populateThumbnail() throws Exception {
 	
+	}
+	
+	public byte getThumbAttempts() {
+		return 10;
 	}
 	
 	

@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Toast;
 
 import com.sofurry.model.IHasThumbnail;
@@ -33,211 +33,91 @@ import com.sofurry.util.ErrorHandler;
  * 
  * @param <T>
  */
-public abstract class AbstractContentList<T> extends ListActivity implements IContentActivity {
+public abstract class AbstractContentList<T> extends ListActivity implements IManagedActivity<T> {
 
-	private ProgressDialog pd;
-	protected ArrayList<T> resultList;
-	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
-	private RequestThread listRequester = null;
-	protected int currentPage = 0;
-	protected int viewSource = AppConstants.VIEWSOURCE_ALL;
-	protected String viewSearch = "";
-	protected int lastScrollY = 0;
-
-	/**
-	 * The request handler to be used to handle the feedback from the AjaxRequest
-	 */
-	protected RequestHandler requesthandler = new RequestHandler() {
-		
-		@Override
-		public void onError(int id,Exception e) {
-			//closeList();
-			ronError(e);
-		}
-		
-		@Override
-		public void onData(int id,JSONObject obj) {
-			if (resultList == null)
-			  resultList = new ArrayList<T>();
-			parseResponse(obj);
-		    updateView();
-		}
-
-		@Override
-		public void refresh() {
-			updateContentList();
-		}
-		
-	};
-	
-	/**
-	 * Shows the progress Dialog
-	 * @param msg
-	 */
-	private void showProgressDialog(String msg) {
-		pd = ProgressDialog.show(this, msg, "Please wait", true, false);
-	}
-	
-	/**
-	 * Hides the progress Dialog
-	 */
-	private void hideProgressDialog() {
-		if (pd != null && pd.isShowing())
-			  pd.dismiss();
-	}
-
-	
-	/**
-	 * Is called when an error occurs in the asyncronus thread
-	 * @param e
-	 */
-	public void ronError(Exception e) {
-		hideProgressDialog();
-		ErrorHandler.showError(this, e);
-	}
+	protected ActivityManager<T> man = new ActivityManager<T>(this);
 
 	// Get parameters and initiate data fetch thread
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		loadPage(currentPage, viewSource, true);
+		man.onActCreate();
 	}
 
 	/* Creates the menu items */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
-		AbstractContentGallery.createBrowsableMenu(menu);
+		man.createBrowsableMenu(menu);
 		return result;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see com.sofurry.IManagedActivity#onOptionsItemSelected(android.view.MenuItem)
+	 */
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case AppConstants.MENU_FILTER_KEYWORDS:
-			Intent intent = new Intent(this, TagEditor.class);
-			startActivityForResult(intent, AppConstants.ACTIVITY_TAGS);
+		if (man.onOptionsItemSelected(item))
 			return true;
-		case AppConstants.MENU_FILTER_ALL:
-			resetViewSource(AppConstants.VIEWSOURCE_ALL);
-			return true;
-		case AppConstants.MENU_FILTER_FEATURED:
-			resetViewSource(AppConstants.VIEWSOURCE_FEATURED);
-			return true;
-		case AppConstants.MENU_FILTER_FAVORITES:
-			resetViewSource(AppConstants.VIEWSOURCE_FAVORITES);
-			return true;
-		case AppConstants.MENU_FILTER_WATCHLIST:
-			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST);
-			return true;
-		case AppConstants.MENU_FILTER_GROUP:
-			resetViewSource(AppConstants.VIEWSOURCE_GROUP);
-			return true;
-		case AppConstants.MENU_FILTER_WATCHLIST_COMBINED:
-			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST_COMBINED);
-			return true;
-		default:
-			return false;
-		}
+		else
+			return super.onOptionsItemSelected(item);
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// Handles the return value from TAGEditor
-		if (requestCode == AppConstants.ACTIVITY_TAGS) {
-			if (data == null) return;
-			viewSearch = data.getStringExtra("tags");
-			resetViewSource(AppConstants.VIEWSOURCE_SEARCH);
-			return;
-		} 
+		if (man.onActivityResult(requestCode, resultCode, data)) return;
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	/**
-	 * Terminates the thumbnail downloading thread
-	 */
-	public void stopThumbDownloader() {
-		if (thumbnailDownloaderThread != null) {
-			thumbnailDownloaderThread.stopThread();
-			thumbnailDownloaderThread = null;
-		}
-	}
-	
-	/**
-	 * Initializes the thumbnail downloading thread, for submissions
-	 */
-	public void startThumbnailDownloader() {
-		stopThumbDownloader();
-
-		thumbnailDownloaderThread = new ThumbnailDownloaderThread(requesthandler, (ArrayList<IHasThumbnail>)resultList);
-		thumbnailDownloaderThread.start();
-	}
-
-	public void loadPage(int pageNum, int source, boolean showLoadingScreen) {
-		stopThumbDownloader();
-		if (showLoadingScreen)
-			showProgressDialog("Fetching data...");
-		else
-			Toast.makeText(getApplicationContext(), "Fetching next page", Toast.LENGTH_SHORT).show();
-
-		AjaxRequest ar = getFetchParameters(pageNum, source);
-		listRequester = ar.execute(requesthandler); // Requests the data, and will redirect results to this object
-	}
-	
-	
 	// Goes back to the main menu
 	private void closeList() {
-		Bundle bundle = new Bundle();
-		Intent mIntent = new Intent();
-		mIntent.putExtras(bundle);
-		setResult(RESULT_OK, mIntent);
-		finish();
+		man.closeList();
 	}
-
-	// Sets the resulting list on the screen
-	private void updateView() {
-		if (resultList == null)
-			return;
-
-		lastScrollY = getListView().getFirstVisiblePosition();
+	
+	/* (non-Javadoc)
+	 * @see com.sofurry.IManagedActivity#plugInAdapter()
+	 * 
+	 * Creates the plugin adapter
+	 */
+	public void plugInAdapter() {
+		int lastScrollY = getListView().getFirstVisiblePosition();
 		Log.i("SF AbstractContentList", "updateView called, last scrollpos: "+lastScrollY);
-		listRequester = null;
+
 		setListAdapter(getAdapter(this));
 		getListView().setTextFilterEnabled(true);
 		// bind a selection listener to the view
 		getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@SuppressWarnings("unchecked")
 			public void onItemClick(AdapterView parentView, View childView, int position, long id) {
+				man.stopThumbDownloader();
 				setSelectedIndex(position);
 			}
 		});
 	    getListView().setOnScrollListener(new OnScrollListener() {
-	        public void onScroll(final AbsListView view, final int first,
-	                                    final int visible, final int total) {
-	            // detect if last item is visible
-	            if (visible < total && (first + visible == total) && listRequester == null) {
-	                Log.d("OnScrollListener - end of list", "fvi: " +
-	                   first + ", vic: " + visible + ", tic: " + total);
-	                currentPage++;
-	        		loadPage(currentPage, viewSource, false);
-	            }
+	        public void onScroll(final AbsListView view, final int first,final int visible, final int total) {
+	        	man.onScroll(view, first, visible, total);
 	        }
 
 			public void onScrollStateChanged(AbsListView view, int arg1) {
 			}
 	    }); 
-		Log.i("SF", "Scrolling TO: "+lastScrollY);
 	    getListView().setSelection(lastScrollY);
-	    hideProgressDialog();
+	    man.hideProgressDialog();
 	}
 
-	public void resetViewSource(int newViewSource) {
-		Log.i("SF", "ResetViewSource: "+newViewSource);
-		viewSource = newViewSource;
-		currentPage = 0;
-		lastScrollY = 0;
-		resultList = new ArrayList<T>();
-		loadPage(currentPage, viewSource, true);
+	/* (non-Javadoc)
+	 * @see com.sofurry.IManagedActivity#resetViewSourceExtra(int)
+	 * 
+	 * Everything that needs to be done, but is not done by the ActivityManager
+	 */
+	public void resetViewSourceExtra(int newViewSource) {
+		// Intentionally left blank
+	}
+
+	// Sets the resulting list on the screen
+	public void updateView() {
+		//plugInAdapter();
+		getListView().invalidateViews();
+		
+		Log.i("SF", "Refresh");
 	}
 
 	
@@ -245,7 +125,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements ICo
 
 	public abstract AjaxRequest getFetchParameters(int page, int source);
 
-	protected abstract ListAdapter getAdapter(Context context);
+	public abstract BaseAdapter getAdapter(Context context);
 
 	public abstract void parseResponse(JSONObject obj);
 
@@ -253,11 +133,10 @@ public abstract class AbstractContentList<T> extends ListActivity implements ICo
 		updateView();
 	}
 
-	
 	@Override
 	public void finish() {
 		super.finish();
-		stopThumbDownloader();
+		man.stopThumbDownloader();
 	}
 	
 }
