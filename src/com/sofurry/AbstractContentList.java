@@ -17,6 +17,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.Toast;
 
 import com.sofurry.model.IHasThumbnail;
 import com.sofurry.requests.AjaxRequest;
@@ -35,7 +36,6 @@ import com.sofurry.util.ErrorHandler;
 public abstract class AbstractContentList<T> extends ListActivity implements IContentActivity {
 
 	private ProgressDialog pd;
-	protected int numResults;
 	protected ArrayList<T> resultList;
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	private RequestThread listRequester = null;
@@ -51,17 +51,16 @@ public abstract class AbstractContentList<T> extends ListActivity implements ICo
 		
 		@Override
 		public void onError(int id,Exception e) {
-			closeList();
+			//closeList();
 			ronError(e);
 		}
 		
 		@Override
 		public void onData(int id,JSONObject obj) {
-			resultList = new ArrayList<T>();
+			if (resultList == null)
+			  resultList = new ArrayList<T>();
 			parseResponse(obj);
-			if (pd != null && pd.isShowing())
-			  pd.dismiss();
- 		      updateView();
+		    updateView();
 		}
 
 		@Override
@@ -72,10 +71,28 @@ public abstract class AbstractContentList<T> extends ListActivity implements ICo
 	};
 	
 	/**
+	 * Shows the progress Dialog
+	 * @param msg
+	 */
+	private void showProgressDialog(String msg) {
+		pd = ProgressDialog.show(this, msg, "Please wait", true, false);
+	}
+	
+	/**
+	 * Hides the progress Dialog
+	 */
+	private void hideProgressDialog() {
+		if (pd != null && pd.isShowing())
+			  pd.dismiss();
+	}
+
+	
+	/**
 	 * Is called when an error occurs in the asyncronus thread
 	 * @param e
 	 */
 	public void ronError(Exception e) {
+		hideProgressDialog();
 		ErrorHandler.showError(this, e);
 	}
 
@@ -159,8 +176,10 @@ public abstract class AbstractContentList<T> extends ListActivity implements ICo
 	public void loadPage(int pageNum, int source, boolean showLoadingScreen) {
 		stopThumbDownloader();
 		if (showLoadingScreen)
-			pd = ProgressDialog.show(this, "Fetching data...", "Please wait", true, false);
-		
+			showProgressDialog("Fetching data...");
+		else
+			Toast.makeText(getApplicationContext(), "Fetching next page", Toast.LENGTH_SHORT).show();
+
 		AjaxRequest ar = getFetchParameters(pageNum, source);
 		listRequester = ar.execute(requesthandler); // Requests the data, and will redirect results to this object
 	}
@@ -209,17 +228,25 @@ public abstract class AbstractContentList<T> extends ListActivity implements ICo
 	    }); 
 		Log.i("SF", "Scrolling TO: "+lastScrollY);
 	    getListView().setSelection(lastScrollY);
-
+	    hideProgressDialog();
 	}
 
+	public void resetViewSource(int newViewSource) {
+		Log.i("SF", "ResetViewSource: "+newViewSource);
+		viewSource = newViewSource;
+		currentPage = 0;
+		lastScrollY = 0;
+		resultList = new ArrayList<T>();
+		loadPage(currentPage, viewSource, true);
+	}
+
+	
 	public abstract void setSelectedIndex(int selectedIndex);
 
 	public abstract AjaxRequest getFetchParameters(int page, int source);
 
 	protected abstract ListAdapter getAdapter(Context context);
 
-	public abstract void resetViewSource(int newViewSource);
-	
 	public abstract void parseResponse(JSONObject obj);
 
 	protected void updateContentList() {

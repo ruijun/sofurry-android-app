@@ -8,8 +8,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import com.sofurry.AppConstants;

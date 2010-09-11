@@ -15,7 +15,6 @@ import com.sofurry.AppConstants;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.ThumbnailDownloaderThread;
 
 public class GalleryArt extends AbstractContentGallery<Submission> {
 
@@ -41,8 +40,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		try {
 			JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
 			JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
-			numResults = items.length();
-			for (int i = 0; i < numResults; i++) {
+			for (int i = 0; i < items.length(); i++) {
 				
 				Submission s = new Submission();
 				s.setType(SUBMISSION_TYPE.ARTWORK);
@@ -78,13 +76,8 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 
 	@Override
 	public void resetViewSource(int newViewSource) {
-		Log.i("SF", "ResetViewSource: "+newViewSource);
-		viewSource = newViewSource;
-		currentPage = 0;
-		lastScrollY = 0;
-		resultList = new ArrayList<Submission>();
 		pageIDs = new ArrayList<String>();
-		loadPage(currentPage, viewSource, true);
+		super.resetViewSource(newViewSource);
 	}
 
 }

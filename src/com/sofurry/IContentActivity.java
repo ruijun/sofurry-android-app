@@ -3,7 +3,6 @@ package com.sofurry;
 import org.json.JSONObject;
 
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.ThumbnailDownloaderThread;
 
 /**
  * @author Rangarig
@@ -16,8 +15,6 @@ public interface IContentActivity {
 
 	AjaxRequest getFetchParameters(int page, int source);
 
-	void resetViewSource(int newViewSource);
-	
 	void parseResponse(JSONObject obj);
 	
 	/**

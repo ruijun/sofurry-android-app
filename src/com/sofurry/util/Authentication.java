@@ -3,17 +3,16 @@ package com.sofurry.util;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.sofurry.AppConstants;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.util.Log;
+
+import com.sofurry.AppConstants;
 
 public class Authentication {
 
