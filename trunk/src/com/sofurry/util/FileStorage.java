@@ -41,6 +41,9 @@ public class FileStorage {
 			Log.i("FileStorage", "writing file "+filename);
 			return new FileOutputStream(f);
 		}
+		
+		
+		
 		return null;
 	}
 	

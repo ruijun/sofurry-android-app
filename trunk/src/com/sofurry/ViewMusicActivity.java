@@ -30,9 +30,9 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 	
 	private WebView webview;
 	private Button buttondownload;
+	private boolean notwice = false;
 	
 	private AsyncFileDownloader down = null; // Placeholder for the downloader thread if it would be used.
-
 
 	public void onCreate(Bundle savedInstanceState) {
 		
@@ -51,7 +51,12 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 	    Bundle extras = getIntent().getExtras() ;
 	    if( extras != null ){
 	        pageID = extras.getInt( "pageID" ) ;
-//	        
+	        //String username = removeExtraChars(extras.getString( "username" )).toLowerCase();  
+	        //String name = removeExtraChars(extras.getString( "name" )).toLowerCase();  
+	        
+	        // Well this is not partciulary neat, but since there is currently no other way to obtain the URL that I am aware of...
+	        //fileurl = AppConstants.SITE_URL + "/art/music/" + username + "/" + username + "_" + name + ".mp3";
+	        
 			AjaxRequest req = getFetchParameters(pageID);
 			pbh.showProgressDialog("Fetching desc...");
 			req.execute(requesthandler);
@@ -68,7 +73,6 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 		AjaxRequest req = new AjaxRequest();
 		req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
 		req.addParameter("f", "getpagecontent");
-//		req.addParameter("f", "getdata");
 		req.addParameter("pid", "" + pageID);
 		return req;
 	}
@@ -77,12 +81,9 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 	 * Creates a request for submission data
 	 * @return
 	 */
-	public static AjaxRequest getSubmissionData(int pid) {
-		AjaxRequest req = new AjaxRequest();
+	public static AjaxRequest getFilenameRequest(int pid) {
+		AjaxRequest req = new AjaxRequest(AppConstants.SITE_URL + "/page/" + pid);
 		req.setRequestID(AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA);
-		req.addParameter("f", "getpagecontent");
-//		req.addParameter("f", "getdata");
-		req.addParameter("pid", "" + pid);
 		return req;
 	}
 	
@@ -90,27 +91,50 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 	 * Downloads the music file, and replays it
 	 */
 	public void downloadAndPlay() {
-		if (down != null) return; // We will not support nervous klickers
+		if (notwice) return;
+		notwice = true;
 		
-		AjaxRequest req = getSubmissionData(pageID);
+		pbh.showProgressDialog("Fetching song data...");
+		AjaxRequest req = getFilenameRequest(pageID);
 		req.execute(requesthandler);
+//		downloadFile(fileurl);
 	}
 
-	
 	/**
 	 * Extracts the file URL from the fetched data, and downloads the file
 	 * @param obj
 	 */
-	public void downloadFile(JSONObject obj) throws Exception {
-		String url = obj.getString("filename");
+	public void downloadFile(String html) throws Exception {
+		//String url = obj.getString("filename");
 		
-		//String tmp = sub.getFilenameUrl();
-		File f = new File(url);
+		// Find markers
+		int end = html.indexOf(AppConstants.MP3DownloadLinkEndMarker);
+		int beg = end;
+		int len = AppConstants.MP3DownloadLinkStartMarker.length();
+		boolean found = false;
+		// Okay, this might suck, but right now I cant remember the correct phrase. It will work though.
+		while ((beg > 0) && (!found)) {
+			beg--;
+			if (html.substring(beg, beg + len).equals(AppConstants.MP3DownloadLinkStartMarker))
+				found = true;
+		}
+		if (beg == 0) throw new Exception("URL Extract failed");
 		
-		playPath = FileStorage.getPath(f.getName());
-	
-		down = ContentDownloader.asyncDownload(url, f.getName(), requesthandler);
+		beg += len;
+		
+		String tmp = html.substring(beg,end);
+
+		String fname = "music" + pageID + ".mp3";
+		playPath = FileStorage.getPath(fname);
+
+		File f = new File(playPath);
+		if (f.exists()) {
+			playmusic();
+			return;
+		}
+		
 		pbh.showProgressDialog("Downloading song...");
+		down = ContentDownloader.asyncDownload(tmp, fname, requesthandler);
 	}
 	
 	/* (non-Javadoc)
@@ -120,18 +144,35 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 	 */
 	@Override
 	public void sonOther(int id, Object obj) throws Exception {
+		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
+			String str = (String)obj;
+			downloadFile(str);
+			return; // Important :/
+		}
+		
 		// Filedownload is finished, the the android play the file
 		if (obj.getClass().equals(AsyncFileDownloader.class)) {
-			Intent intent = new Intent(android.content.Intent.ACTION_VIEW); 
-	        intent.setDataAndType(Uri.parse(playPath),"audio/mp3"); 
-	        try { 
-	           startActivity(intent); 
-	        } catch (ActivityNotFoundException e) { 
-	           sonError(id, e);
-	        } 			
+			playmusic();
 			return;
 		}
 		super.sonOther(id, obj);
+	}
+	
+	/**
+	 * Plays the music file submitted
+	 * @param path
+	 */
+	public void playmusic() {
+		down = null;
+		pbh.hideProgressDialog();
+		Intent intent = new Intent(android.content.Intent.ACTION_VIEW); 
+        intent.setDataAndType(Uri.parse("file:///" + playPath),"audio/mp3"); 
+        try { 
+           startActivity(intent); 
+        } catch (ActivityNotFoundException e) { 
+           sonError(-1, e);
+        } 	
+		notwice = false;
 	}
 
 	@Override
@@ -140,9 +181,19 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 		  String content = obj.getString("content");
 		  webview.loadData(content, "text/html", "utf-8");
 		}
-		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
-			downloadFile(obj);
-		}
+//		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
+//			downloadFile(obj);
+//		}
 	}
+
+
+	@Override
+	public void sonError(int id, Exception e) {
+		down = null;
+		pbh.hideProgressDialog();
+		super.sonError(id, e);
+	}
+	
+	
 
 }
