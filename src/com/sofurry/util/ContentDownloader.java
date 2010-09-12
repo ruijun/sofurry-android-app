@@ -59,7 +59,7 @@ public class ContentDownloader {
 	 * @throws Exception
 	 */
 	public static void downloadFile(String url, String filename) throws Exception {
-		Log.d("SF ContentDownloader", "Fetching image...");
+		Log.d("SF ContentDownloader", "Fetching file...");
 		URL myImageURL = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
 		connection.setDoInput(true);
@@ -75,8 +75,10 @@ public class ContentDownloader {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-	        is.close();
-	        os.close();
+			if (is != null)
+	          is.close();
+			if (os != null)
+	          os.close();
 		}
 	}
 

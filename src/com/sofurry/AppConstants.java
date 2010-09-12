@@ -62,6 +62,9 @@ public class AppConstants {
 //	public static final String SITE_URL = "http://10.0.2.2";
 	public static final String SITE_REQUEST_SCRIPT = "/ajaxfetch.php";
 	
+	public static final String MP3DownloadLinkEndMarker = "\">Download as MP3</a>";
+	public static final String MP3DownloadLinkStartMarker = "<a href=\"";
+	
 	public static String getFetchUrl() {
 		return AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
 	}

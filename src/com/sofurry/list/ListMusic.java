@@ -37,6 +37,8 @@ public class ListMusic extends AbstractContentList<Submission> {
 		Log.i("ListMusic", "Viewing music ID: " + s.getId());
 		Intent i = new Intent(this, ViewMusicActivity.class);
 		i.putExtra("pageID", s.getId());
+//		i.putExtra("username", s.getAuthorName());
+//		i.putExtra("name", s.getName());
 		startActivity(i);
 	}
 
