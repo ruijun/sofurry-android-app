@@ -120,6 +120,17 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 		Log.i("SF", "Refresh");
 	}
 
+	/**
+	 * Returns an item of the resultlist at the specified index
+	 * @param idx
+	 * The index to return from
+	 * @return
+	 * Returns the item of the instanced type
+	 */
+	public T getDataItem(int idx) {
+		T temp = man.getResultList().get(idx);
+		return temp;
+	}
 	
 	public abstract void setSelectedIndex(int selectedIndex);
 
@@ -127,7 +138,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 
 	public abstract BaseAdapter getAdapter(Context context);
 
-	public abstract void parseResponse(JSONObject obj);
+	public abstract void parseResponse(JSONObject obj) throws Exception;
 
 	protected void updateContentList() {
 		updateView();

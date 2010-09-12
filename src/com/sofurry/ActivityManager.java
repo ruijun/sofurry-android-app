@@ -34,6 +34,7 @@ public class ActivityManager<T> {
 	protected String viewSearch = "";						// The currently selected view Search
 	protected int currentPage = 0;							// The currently selected page
 	protected ArrayList<T> resultList;
+	//protected ArrayList<String> pageIDs;					// The page ids
 
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	private boolean currentlyFetching = false;
@@ -77,14 +78,6 @@ public class ActivityManager<T> {
 		this.currentPage = currentPage;
 	}
 
-//	public int getLastScrollY() {
-//		return lastScrollY;
-//	}
-//
-//	public void setLastScrollY(int lastScrollY) {
-//		this.lastScrollY = lastScrollY;
-//	}
-
 	public boolean isCurrentlyFetching() {
 		return currentlyFetching;
 	}
@@ -104,12 +97,21 @@ public class ActivityManager<T> {
 	public void setResultList(ArrayList<T> resultList) {
 		this.resultList = resultList;
 	}
+	
+//	public ArrayList<String> getPageIDs() {
+//		return pageIDs;
+//	}
+//
+//	public void setPageIDs(ArrayList<String> pageIDs) {
+//		this.pageIDs = pageIDs;
+//	}
 
 	/**
 	 * Is called after the Activity Initialization is finished
 	 */
 	public void onActCreate() {
 	    resultList = new ArrayList<T>();
+	    //pageIDs = new ArrayList<String>();
 	    myAct.plugInAdapter();
 		loadPage(true);
 	}
@@ -148,7 +150,13 @@ public class ActivityManager<T> {
 		public void onData(int id,JSONObject obj) {
 			if (id == AppConstants.REQUEST_ID_FETCHDATA) {
 				currentlyFetching = false; // Fetching was successful, new pages may be fetched
-				myAct.parseResponse(obj);
+				// Interpret the feedback data
+				try {
+					myAct.parseResponse(obj);
+				} catch (Exception e) {
+					ronError(e);
+				}
+				// Reset the adapter, so new entries are shown
 				myAct.plugInAdapter();
 			}
 		    //myAct.updateView();
@@ -294,6 +302,7 @@ public class ActivityManager<T> {
 		viewSource = newViewSource;
 		currentPage = 0;
 		resultList = new ArrayList<T>();
+	    //pageIDs = new ArrayList<String>();
 		loadPage(true);
 		myAct.resetViewSourceExtra(newViewSource);
 	}

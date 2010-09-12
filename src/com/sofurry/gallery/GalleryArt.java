@@ -1,8 +1,7 @@
 package com.sofurry.gallery;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -11,14 +10,13 @@ import android.util.Log;
 import android.widget.BaseAdapter;
 
 import com.sofurry.AbstractContentGallery;
+import com.sofurry.ActivityManager;
 import com.sofurry.AppConstants;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
 
 public class GalleryArt extends AbstractContentGallery<Submission> {
-
-	private ArrayList<String> pageIDs = new ArrayList<String>();
 
 	/**
 	 * Creates a browse command, to be used with the AJax interface
@@ -47,7 +45,25 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		return req;
 	}
 
-	
+	/**
+	 * Converts Json-submission objects into a list of Submission objects
+	 * @param obj
+	 * The base JSON object as returned by the fetcher thread
+	 * @throws JSONException
+	 */
+	public static void jsonToResultlist(JSONObject obj, ActivityManager<Submission> man, SUBMISSION_TYPE typ) throws JSONException {
+		JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
+		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
+		for (int i = 0; i < items.length(); i++) {
+			Submission s = new Submission();
+			s.setType(typ);
+			s.populate(items.getJSONObject(i));
+
+			man.getResultList().add(s);
+			//man.getPageIDs().add("" + s.getId());
+		}
+	}
+
 	@Override
 	public AjaxRequest getFetchParameters(int page, int source) {
 		return createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_ART,20);
@@ -58,18 +74,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 	 */
 	public void parseResponse(JSONObject obj) {
 		try {
-			JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
-			JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
-			for (int i = 0; i < items.length(); i++) {
-				
-				Submission s = new Submission();
-				s.setType(SUBMISSION_TYPE.ARTWORK);
-				s.populate(items.getJSONObject(i));
-				//s.loadSubmissionIcon();
-				
-				man.getResultList().add(s);
-				pageIDs.add("" + s.getId());
-			}
+			jsonToResultlist(obj, man, SUBMISSION_TYPE.ARTWORK);
 		} catch (Exception e) {
 			man.ronError(e);
 		}
@@ -79,10 +84,11 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 
 	@Override
 	public void setSelectedIndex(int selectedIndex) {
-		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
-		Log.i("GalleryArt", "Viewing art ID: " + pageID);
+		Submission s = getDataItem(selectedIndex);
+//		int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
+		Log.i("GalleryArt", "Viewing art ID: " + s.getId());
 		Intent i = new Intent(this, PreviewArtActivity.class);
-		i.putExtra("pageID", pageID);
+		i.putExtra("pageID", s.getId());
 		man.getResultList().get(selectedIndex).feedIntent(i);
 		startActivity(i);
 	}
@@ -94,7 +100,6 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 	}
 
 	public void resetViewSourceExtra(int newViewSource) {
-		pageIDs = new ArrayList<String>();
 	}
 
 }

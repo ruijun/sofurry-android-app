@@ -13,10 +13,16 @@ import com.sofurry.R;
 import com.sofurry.chat.ChatActivity;
 import com.sofurry.gallery.GalleryArt;
 import com.sofurry.list.ListJournals;
+import com.sofurry.list.ListMusic;
 import com.sofurry.list.ListPM;
 import com.sofurry.list.ListStories;
 import com.sofurry.util.Authentication;
 
+/**
+ * @author SoFurry
+ *
+ * Main menu activity
+ */
 public class MainMenu extends Activity {
 
 	Button buttonPMs;
@@ -45,7 +51,7 @@ public class MainMenu extends Activity {
 		
 		buttonForums.setEnabled(false);
 		buttonLogbook.setEnabled(false);
-		buttonMusic.setEnabled(false);
+		//buttonMusic.setEnabled(false);
 
 		checkButtonDisabledState();
 		
@@ -58,6 +64,12 @@ public class MainMenu extends Activity {
 		buttonArt.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
 				launchArtGallery();
+			}
+		});
+
+		buttonMusic.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View arg0) {
+				launchMusicList();
 			}
 		});
 
@@ -105,6 +117,11 @@ public class MainMenu extends Activity {
 	private void launchPMList() {
 		Intent intent = new Intent(this, ListPM.class);
 		startActivityForResult(intent, AppConstants.ACTIVITY_PMLIST);
+	}
+
+	private void launchMusicList() {
+		Intent intent = new Intent(this, ListMusic.class);
+		startActivityForResult(intent, AppConstants.ACTIVITY_MUSICLIST);
 	}
 
 	private void launchAccountActivity() {

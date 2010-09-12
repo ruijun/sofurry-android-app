@@ -10,9 +10,11 @@ public class AppConstants {
 	public static final int ACTIVITY_GALLERYART = 4;
 	public static final int ACTIVITY_VIEWPM = 5;
 	public static final int ACTIVITY_TAGS = 6;
+	public static final int ACTIVITY_MUSICLIST = 7;
 
 
 	public static final int CONTENTTYPE_STORIES = 0;
+	public static final int CONTENTTYPE_MUSIC = 2;
 	public static final int CONTENTTYPE_JOURNALS = 3;
 	public static final int CONTENTTYPE_ART = 1;
 	
@@ -51,7 +53,9 @@ public class AppConstants {
 	
 	public static final int REQUEST_ID_ROOMLIST = 4501;
 	public static final int REQUEST_ID_USERLIST = 4502;
-	public static final int REQUEST_ID_FETCHDATA = 4503;
+	public static final int REQUEST_ID_FETCHCONTENT = 4503;
+	public static final int REQUEST_ID_FETCHSUBMISSIONDATA = 4504;
+	public static final int REQUEST_ID_FETCHDATA = 4505;
 
 	public static final String PREFS_NAME = "SoFurryPreferences";
 	public static final String SITE_URL = "http://chat.sofurry.com";
