@@ -14,6 +14,12 @@ import android.widget.TextView;
 import com.sofurry.R;
 import com.sofurry.model.Submission;
 
+/**
+ * @author SoFurry
+ *
+ * Adapter that will display "submission" objects in a ListView
+ *
+ */
 public class SubmissionListAdapter extends ArrayAdapter<Submission> {
 
 	private ArrayList<Submission> items;

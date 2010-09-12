@@ -5,8 +5,10 @@
 	<string name="app_name_liststories">SoFurry | Browse Stories</string>
 	<string name="app_name_listgallery">SoFurry | Browse Art</string>
 	<string name="app_name_listjournals">SoFurry | Browse Journals</string>
+	<string name="app_name_listmusic">SoFurry | Browse Music</string>
 	<string name="app_name_viewart">SoFurry | View Art</string>
 	<string name="app_name_viewstory">SoFurry | Read Story</string>
+	<string name="app_name_viewmusic">SoFurry | Listen</string>
 	<string name="app_name_listpm">SoFurry | Private Messages</string>
 	<string name="app_name_viewpm">SoFurry | Private Message</string>
 	<string name="app_name_settings">SoFurry | Account Settings</string>

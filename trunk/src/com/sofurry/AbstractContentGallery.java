@@ -113,6 +113,18 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		galleryView.invalidateViews();
 		Log.i("SF", "Refresh");
 	}
+	
+	/**
+	 * Returns an item of the resultlist at the specified index
+	 * @param idx
+	 * The index to return from
+	 * @return
+	 * Returns the item of the instanced type
+	 */
+	public T getDataItem(int idx) {
+		T temp = man.getResultList().get(idx);
+		return temp;
+	}
 
 
 	/* (non-Javadoc)
@@ -134,7 +146,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#parseResponse(org.json.JSONObject)
 	 */
-	public abstract void parseResponse(JSONObject obj);
+	public abstract void parseResponse(JSONObject obj) throws Exception;
 	
 	public abstract void resetViewSourceExtra(int newViewSource);
 

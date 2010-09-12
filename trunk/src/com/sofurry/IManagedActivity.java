@@ -28,7 +28,7 @@ public interface IManagedActivity<T> {
 
 	public abstract BaseAdapter getAdapter(Context context);
 
-	public abstract void parseResponse(JSONObject obj);
+	public abstract void parseResponse(JSONObject obj) throws Exception;
 
 	public abstract void finish();
 	

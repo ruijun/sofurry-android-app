@@ -14,7 +14,6 @@ import com.sofurry.AppConstants;
 import com.sofurry.ProgressBarHelper;
 import com.sofurry.R;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.util.Authentication;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.ImageStorage;
 
@@ -32,7 +31,7 @@ public class PreviewArtActivity extends ActivityWithRequests implements Runnable
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Authentication.loadAuthenticationInformation(this);
+//		Authentication.loadAuthenticationInformation(this);
 		setContentView(R.layout.artdetails);
 		
 		image = (ImageView) findViewById(R.id.imagepreview);

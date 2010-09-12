@@ -13,6 +13,18 @@ public class FileStorage {
 
 	private static boolean mExternalStorageAvailable = false;
 	private static boolean mExternalStorageWriteable = false;
+	
+	private static String pathroot = "/Android/data/com.sofurry/files/";
+	
+	/**
+	 * Returns the complete filename to the app storage
+	 * @param filename
+	 * The filename to complete with path
+	 * @return
+	 */
+	public static String getPath(String filename) {
+		return Environment.getExternalStorageDirectory()+pathroot+filename;
+	}
 
 	public static FileOutputStream getFileOutputStream(String filename) throws IOException {
 		checkExternalMedia();
@@ -21,10 +33,10 @@ public class FileStorage {
 			return null;
 		}
 		
-		File d = new File(Environment.getExternalStorageDirectory()+"/Android/data/com.sofurry/files/");
+		File d = new File(Environment.getExternalStorageDirectory()+pathroot);
 		d.mkdirs();
 				
-		File f = new File(Environment.getExternalStorageDirectory()+"/Android/data/com.sofurry/files/"+filename);
+		File f = new File(Environment.getExternalStorageDirectory()+pathroot+filename);
 		if (f.createNewFile() && f.canWrite()) {
 			Log.i("FileStorage", "writing file "+filename);
 			return new FileOutputStream(f);
@@ -39,7 +51,7 @@ public class FileStorage {
 			return null;
 		}
 		
-		File f = new File(Environment.getExternalStorageDirectory()+"/Android/data/com.sofurry/files/"+filename);
+		File f = new File(Environment.getExternalStorageDirectory()+pathroot+filename);
 		if (f.canRead()) {
 			return new FileInputStream(f);
 		} else {

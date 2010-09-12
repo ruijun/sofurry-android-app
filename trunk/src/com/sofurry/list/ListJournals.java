@@ -1,8 +1,5 @@
 package com.sofurry.list;
 
-import java.util.ArrayList;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -21,8 +18,6 @@ import com.sofurry.requests.AjaxRequest;
 
 public class ListJournals extends AbstractContentList<Submission> {
 
-	private ArrayList<String> pageIDs = new ArrayList<String>();
-
 	@Override
 	public AjaxRequest getFetchParameters(int page, int source) {
 		return GalleryArt.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_JOURNALS,30);
@@ -35,17 +30,18 @@ public class ListJournals extends AbstractContentList<Submission> {
 	@Override
 	public void parseResponse(JSONObject obj) {
 		try {
-			JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
-			JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
-			for (int i = 0; i < items.length(); i++) {
-				Submission s = new Submission();
-				s.populate(items.getJSONObject(i));
-				s.setType(SUBMISSION_TYPE.JOURNAL);
-				//s.loadUserIcon();
-
-				man.getResultList().add(s);
-				pageIDs.add("" + s.getId());
-			}
+			GalleryArt.jsonToResultlist(obj, man, SUBMISSION_TYPE.JOURNAL);
+//			JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
+//			JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
+//			for (int i = 0; i < items.length(); i++) {
+//				Submission s = new Submission();
+//				s.populate(items.getJSONObject(i));
+//				s.setType(SUBMISSION_TYPE.JOURNAL);
+//				//s.loadUserIcon();
+//
+//				man.getResultList().add(s);
+//				pageIDs.add("" + s.getId());
+//			}
 		} catch (Exception e) {
 			man.ronError(e);
 		}
@@ -56,10 +52,11 @@ public class ListJournals extends AbstractContentList<Submission> {
 
 	@Override
 	public void setSelectedIndex(int selectedIndex) {
-		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
-		Log.i("ListJournals", "Viewing journal ID: " + pageID);
+		Submission s = getDataItem(selectedIndex);
+		//int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
+		Log.i("ListJournals", "Viewing journal ID: " + s.getId());
 		Intent i = new Intent(this, ViewStoryActivity.class);
-		i.putExtra("pageID", pageID);
+		i.putExtra("pageID", s.getId());
 		//i.putExtra("useAuthentication", useAuthentication());
 		startActivity(i);
 		
@@ -73,7 +70,6 @@ public class ListJournals extends AbstractContentList<Submission> {
 	
 	
 	public void resetViewSourceExtra(int newViewSource) {
-		pageIDs = new ArrayList<String>();
 	}
 
 }

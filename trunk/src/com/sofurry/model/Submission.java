@@ -17,7 +17,6 @@ public class Submission implements Serializable, IHasThumbnail {
 	private static final long serialVersionUID = -3841250259233075462L;
 
 	public enum SUBMISSION_TYPE {ARTWORK, STORY, JOURNAL, MUSIC};
-
 	
 	private SUBMISSION_TYPE type;
 	private int id = -1;
@@ -30,7 +29,7 @@ public class Submission implements Serializable, IHasThumbnail {
 	private String date;
 	private String thumbnailUrl;
 	private Bitmap thumbnail;
-	
+
 	private byte attempts = 0;
 	
 	public SUBMISSION_TYPE getType() {
@@ -94,6 +93,10 @@ public class Submission implements Serializable, IHasThumbnail {
 	public void setThumbnailUrl(String thumbnailUrl) {
 		this.thumbnailUrl = thumbnailUrl;
 	}
+	
+//	public String getFilenameUrl() {
+//		return filenameUrl;
+//	}
 	/* (non-Javadoc)
 	 * @see com.sofurry.model.IHasThumbnail#getThumbnail()
 	 */
@@ -160,9 +163,9 @@ public class Submission implements Serializable, IHasThumbnail {
 		setContentLevel(datasource.getString("contentLevel"));
 		setTags(datasource.getString("keywords"));
 		setThumbnailUrl(datasource.getString("thumb"));
-	}
-	
-	public void storeSubmissionIcon() {
+//		if (type == SUBMISSION_TYPE.MUSIC) {
+//			filenameUrl = datasource.getString("filename");
+//		}
 	}
 	
 	/**

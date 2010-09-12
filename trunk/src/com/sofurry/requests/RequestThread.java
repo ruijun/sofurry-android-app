@@ -102,7 +102,6 @@ public class RequestThread extends Thread {
 			if ("".equals(httpResult)) {
 				answer = new JSONObject();
 			} else {
-
 				try {
 					// Analyse results
 					JSONObject jsonParser = new JSONObject(httpResult);

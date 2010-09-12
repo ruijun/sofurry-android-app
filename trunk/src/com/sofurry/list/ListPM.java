@@ -1,7 +1,5 @@
 package com.sofurry.list;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -19,8 +17,11 @@ import com.sofurry.requests.AjaxRequest;
 
 public class ListPM extends AbstractContentList<PrivateMessage> {
 
-	private ArrayList<String> pageIDs = new ArrayList<String>();
-
+	/* (non-Javadoc)
+	 * @see com.sofurry.AbstractContentList#onCreateOptionsMenu(android.view.Menu)
+	 * 
+	 * Suppresses the default options menu. Which would not make a terrible lot of sense in this context.
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		return false;
@@ -35,8 +36,6 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 		return req;
 	}
 	
-	
-
 	/* (non-Javadoc)
 	 * @see com.sofurry.AbstractContentList#parseResponse(org.json.JSONObject)
 	 * 
@@ -50,7 +49,7 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 				PrivateMessage m = new PrivateMessage();
 				m.populate(items.getJSONObject(i));
 				man.getResultList().add(m);
-				pageIDs.add("" + m.getId());
+				//man.getPageIDs().add("" + m.getId());
 			}
 		} catch (Exception e) {
 			man.ronError(e);
@@ -59,10 +58,11 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 
 	@Override
 	public void setSelectedIndex(int selectedIndex) {
-		int pageID = Integer.parseInt(pageIDs.get(selectedIndex));
-		Log.i("ListPM", "Viewing PM ID: " + pageID);
+		PrivateMessage pm = getDataItem(selectedIndex);
+		//int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
+		Log.i("ListPM", "Viewing PM ID: " + pm.getId());
 		Intent i = new Intent(this, ViewPMActivity.class);
-		i.putExtra("PMID", pageID);
+		i.putExtra("PMID", pm.getId());
 		startActivity(i);
 	}
 

@@ -31,6 +31,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".list.ListMusic"
+        		  android:label="@string/app_name_listmusic">
+            <intent-filter>
+                <action android:name="android.intent.action.LISTMUSIC" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".gallery.PreviewArtActivity"
         		  android:screenOrientation="sensor"
         		  android:label="@string/app_name_viewart">
@@ -57,6 +64,13 @@
         		  android:label="@string/app_name_viewpm">
             <intent-filter>
                 <action android:name="android.intent.action.VIEWPM" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ViewMusicActivity"
+        		  android:label="@string/app_name_viewmusic">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEWMUSIC" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
