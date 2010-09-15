@@ -21,7 +21,7 @@ public class ImageStorage {
 		return loadIcon("image"+id);
 	}
 
-	public static void saveSubmissionImage(int id, Bitmap icon) {
+	public static void saveSubmissionImage(int id, Bitmap icon) throws Exception  {
 		saveIcon("image"+id, icon);
 	}
 	
@@ -29,7 +29,7 @@ public class ImageStorage {
 		return loadIcon("thumb"+id);
 	}
 
-	public static void saveSubmissionIcon(int id, Bitmap icon) {
+	public static void saveSubmissionIcon(int id, Bitmap icon) throws Exception  {
 		saveIcon("thumb"+id, icon);
 	}
 
@@ -37,7 +37,7 @@ public class ImageStorage {
 		return loadIcon("avatar"+uid);
 	}
 
-	public static void saveUserIcon(int uid, Bitmap icon) {
+	public static void saveUserIcon(int uid, Bitmap icon) throws Exception {
 		saveIcon("avatar"+uid, icon);
 	}
 	
@@ -67,7 +67,8 @@ public class ImageStorage {
 		return bitmap;
 	}
 	
-	private static void saveIcon(String filename, Bitmap icon) {
+	private static void saveIcon(String filename, Bitmap icon) throws Exception{
+		if (icon == null) throw new Exception("Attempt to store null icon for " + filename);
 		FileOutputStream os = null;
 		try {
 			os = FileStorage.getFileOutputStream(filename );
@@ -77,7 +78,7 @@ public class ImageStorage {
 				Log.w("soFurryApp", "Can't save to external storage");
 			}
 		} catch (Exception e) {
-			Log.e("soFurryApp", "error in saveIcon", e);
+			throw new Exception("Saving Icon failed.",e );
 		} finally {
 			if (os != null) {
 				try {

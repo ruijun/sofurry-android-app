@@ -3,7 +3,9 @@ package com.sofurry.list;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,11 +26,15 @@ public class SubmissionListAdapter extends ArrayAdapter<Submission> {
 
 	private ArrayList<Submission> items;
 	private Context context;
+	private Drawable defaultImage = null;
 
 	public SubmissionListAdapter(Context context, int textViewResourceId, ArrayList<Submission> items) {
 		super(context, textViewResourceId, items);
 		this.items = items;
 		this.context = context;
+		
+		Resources res = context.getResources();
+		defaultImage = res.getDrawable(R.drawable.icon);
 	}
 
 	@Override
@@ -52,6 +58,8 @@ public class SubmissionListAdapter extends ArrayAdapter<Submission> {
 			if (icon != null) {
 				iconview.setImageBitmap(icon);
 				iconview.setPadding(0, 0, 0, 0);
+			} else {
+				iconview.setImageDrawable(defaultImage);
 			}
 			
 			if (centertext != null) {

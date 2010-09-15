@@ -43,7 +43,8 @@ public class ManagerStore {
 	public static ActivityManager retrieve(IManagedActivity act) {
 		String key = act.getClass().getName();
 		ActivityManager man = storage.get(key);
-		man.setActivity(act); // Important! The activity object at this point is likely brand new!
+		if (man != null)
+		  man.setActivity(act); // Important! The activity object at this point is likely brand new!
 		storage.remove(key);
 		return man;
 	}
