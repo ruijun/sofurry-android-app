@@ -35,13 +35,36 @@ import com.sofurry.util.ErrorHandler;
  */
 public abstract class AbstractContentList<T> extends ListActivity implements IManagedActivity<T> {
 
-	protected ActivityManager<T> man = new ActivityManager<T>(this);
+	protected ActivityManager<T> man = null;
 
 	// Get parameters and initiate data fetch thread
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		man.onActCreate();
+		if (ManagerStore.isStored(this)) {
+		    man = ManagerStore.retrieve(this);
+		    plugInAdapter();
+		} else {
+			man = new ActivityManager<T>(this);
+			man.onActCreate();
+		}
+		
+	}
+	
+	public ActivityManager<T> getActivityManager() {
+		return man;
+	}
+	
+	@Override
+	protected void onPause() {
+		ManagerStore.store(this);
+		super.onPause();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
 	}
 
 	/* Creates the menu items */
@@ -100,6 +123,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 			}
 	    }); 
 	    getListView().setSelection(lastScrollY);
+	    getListView().invalidateViews();
 	    man.hideProgressDialog();
 	}
 
@@ -148,6 +172,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 	public void finish() {
 		super.finish();
 		man.stopThumbDownloader();
+		ManagerStore.retrieve(this); // Clean up manager store, so we don't have unused items laying aaround
 	}
 	
 }

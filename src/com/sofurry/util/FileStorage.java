@@ -25,7 +25,7 @@ public class FileStorage {
 	public static String getPath(String filename) {
 		return Environment.getExternalStorageDirectory()+pathroot+filename;
 	}
-
+	
 	public static FileOutputStream getFileOutputStream(String filename) throws IOException {
 		checkExternalMedia();
 		if (!mExternalStorageWriteable) {
@@ -36,7 +36,7 @@ public class FileStorage {
 		File d = new File(Environment.getExternalStorageDirectory()+pathroot);
 		d.mkdirs();
 				
-		File f = new File(Environment.getExternalStorageDirectory()+pathroot+filename);
+		File f = new File(getPath(filename));
 		if (f.createNewFile() && f.canWrite()) {
 			Log.i("FileStorage", "writing file "+filename);
 			return new FileOutputStream(f);
@@ -47,6 +47,19 @@ public class FileStorage {
 		return null;
 	}
 	
+	/**
+	 * Returns true, if the file in question exists
+	 * @param filename
+	 * The file's filename
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean fileExists(String filename) throws IOException {
+		File f = new File(getPath(filename));
+		
+		return f.exists();
+	}
+
 	public static FileInputStream getFileInputStream(String filename) throws FileNotFoundException {
 		checkExternalMedia();
 		if (!mExternalStorageAvailable) {
@@ -54,7 +67,7 @@ public class FileStorage {
 			return null;
 		}
 		
-		File f = new File(Environment.getExternalStorageDirectory()+pathroot+filename);
+		File f = new File(getPath(filename));
 		if (f.canRead()) {
 			return new FileInputStream(f);
 		} else {

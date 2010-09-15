@@ -32,9 +32,13 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	
 	protected GridView galleryView;
 	protected ListAdapter myAdapter;
-
+	
+	public ActivityManager<T> getActivityManager() {
+		return man;
+	}
 
 	// Get parameters and initiate data fetch thread
+	@SuppressWarnings("unchecked")
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#onCreate(android.os.Bundle)
 	 */
@@ -43,7 +47,20 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallerylayout);
 		galleryView = (GridView) findViewById(R.id.galleryview);
-		man.onActCreate();
+		
+		if (ManagerStore.isStored(this)) {
+		    man = ManagerStore.retrieve(this);
+		    plugInAdapter();
+		} else {
+			man = new ActivityManager<T>(this);
+			man.onActCreate();
+		}
+	}
+	
+	@Override
+	protected void onPause() {
+		ManagerStore.store(this);
+		super.onPause();
 	}
 
 	/**
@@ -157,6 +174,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	public void finish() {
 		super.finish();
 		man.stopThumbDownloader();
+		ManagerStore.retrieve(this); // Clean up manager store, so we don't have unused items laying aaround
 	}
 
 }
