@@ -37,17 +37,21 @@ import com.sofurry.util.Authentication;
 import com.sofurry.util.ErrorHandler;
 
 public class ChatActivity extends ActivityWithRequests {
-    private ScrollView scrollView;
+    
+	private ScrollView scrollView;
     private TextView chatView;
     private TextView roomView;
     private EditText chatEntry;
     private Button sendButton;
-	private int chatSequence = 0;
-	private int roomId = 1;
 	
-	private int roomIds[] = null;
-	private String roomNames[] = null;
+    private static int chatSequence = 0;
+	private static int roomId = -1;
+	
+	private static int roomIds[] = null;
+	private static String roomNames[] = null;
 	private String userNames[] = null;
+	private static CharSequence textSave = null;
+	
 	protected ChatPollThread chatPollThread;
 	protected ChatSendThread chatSendThread;
 	String requestUrl = AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
@@ -56,45 +60,6 @@ public class ChatActivity extends ActivityWithRequests {
 	//private static String MESSAGETYPE_MESSAGE = "message";
 	private static String MESSAGETYPE_WHISPER = "whisper";
 		
-//	/**
-//	 * The request handler to be used to handle the feedback from the AjaxRequest
-//	 */
-//	protected RequestHandler requesthandler = new RequestHandler() {
-//		
-//		@Override
-//		public void onError(int id,Exception e) {
-//			showError(e);
-//		}
-//		
-//		@Override
-//		public void onData(int id,JSONObject obj) {
-//			if (id == AppConstants.REQUEST_ID_ROOMLIST) {
-//				populateRoomList(obj);
-//			}
-//			if (id == AppConstants.REQUEST_ID_USERLIST) {
-//				populateUserList(obj);
-//			}
-//		}
-//
-//		@Override
-//		public void refresh() {
-//			// Dito.
-//		}
-//
-//		@Override
-//		public void onOther(int id,Object obj) throws Exception {
-//			// If the object is text, it will be handled by the texthandler
-//			if (String.class.isAssignableFrom(obj.getClass())) {
-//				addTextToChatLog((String)obj);
-//			} else
-//			    super.onOther(id,obj);
-//		}
-//		
-//		
-//		
-//	};
-	
-
 	@Override
 	public void sonData(int id, JSONObject obj) throws Exception {
 		if (id == AppConstants.REQUEST_ID_ROOMLIST) {
@@ -112,6 +77,29 @@ public class ChatActivity extends ActivityWithRequests {
 			addTextToChatLog((String)obj);
 		} else
 		    super.sonOther(id,obj);
+	}
+	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onPause()
+	 * Saves some data in static fields, so the data can be restored after the orientation change
+	 */
+	@Override
+	protected void onPause() {
+		killThreads();
+		textSave = chatView.getText();
+		super.onPause();
+	}
+	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 * Setzt daten 
+	 */
+	@Override
+	protected void onResume() {
+		if (textSave != null)
+		  chatView.setText(textSave);
+		textSave = null;
+		super.onResume();
 	}
 
 
@@ -166,7 +154,6 @@ public class ChatActivity extends ActivityWithRequests {
         chatEntry = (EditText) findViewById(R.id.chatentry);
         sendButton = (Button) findViewById(R.id.send);
 
-       
         /* Create send button callback */
         sendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -181,16 +168,39 @@ public class ChatActivity extends ActivityWithRequests {
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     onSend();
                     return true;
-                /* 'Tab' pressed */
-                } else if ((event.isAltPressed() && keyCode == KeyEvent.KEYCODE_Q && event.getAction() == KeyEvent.ACTION_DOWN) || keyCode == KeyEvent.KEYCODE_TAB && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    return onTab();
                 } else {
                     return false;
                 }
             }
         });
         
-        getRoomList(); // Get Room list will populate the room list, and start the room selection
+        if (roomId == -1) // This might be called for the first time in the app's lifecycle
+          getRoomList(); // Get Room list will populate the room list, and start the room selection
+        else
+        {  // The data is already available
+        	try {
+     		   changeRoom(roomIdToIdx(roomId));
+			} catch (Exception e) {
+				sonError(-1, e);
+			}
+		}
+	}
+
+	/**
+	 * Looks up the RoomID in the list of roomid's
+	 * @param roomid
+	 * The roomid to look up
+	 * @return
+	 * Returns the index to the roomID's
+	 * @throws Exception
+	 */
+	private static int roomIdToIdx(int roomid) throws Exception {
+        int idx = -1;
+        for (int i = 0; i < roomIds.length; i++)
+     	   if (roomIds[i] == roomId)
+     		   idx = i;
+        if (idx == -1) throw new Exception("RoomID was not found in RoomID list");
+        return idx;
 	}
 
     /**
@@ -201,6 +211,8 @@ public class ChatActivity extends ActivityWithRequests {
 			chatPollThread.stopThread();
 		if (chatSendThread != null)
 			chatSendThread.stopThread();
+		chatPollThread = null;
+		chatSendThread = null;
     }
 
 	
@@ -287,6 +299,8 @@ public class ChatActivity extends ActivityWithRequests {
 		builder.setItems(roomNames, new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int item) {
 		    	changeRoom(item);
+				// Let us know we changed the room some more
+		    	Toast.makeText(getApplicationContext(), "Selected:" + roomNames[item] + "("+roomIds[item]+")", Toast.LENGTH_SHORT).show();
 		    }
 		});
 		AlertDialog roomchooser = builder.create();
@@ -301,7 +315,8 @@ public class ChatActivity extends ActivityWithRequests {
 	private void changeRoom(int idx) {
 		killThreads(); // For recalls
 		roomView.setText("Your Room:" + roomNames[idx]);
-		this.roomId = roomIds[idx];
+		roomId = roomIds[idx];
+		chatSequence = 0;
 		chatView.setText(""); // Clear chat window
 		
 		// Start the polling for our new room
@@ -311,8 +326,6 @@ public class ChatActivity extends ActivityWithRequests {
 		chatSendThread = new ChatSendThread(this.roomId);
 		chatSendThread.start();
 		
-		// Let us know we changed the room some more
-    	Toast.makeText(getApplicationContext(), "Selected:" + roomNames[idx] + "("+roomIds[idx]+")", Toast.LENGTH_SHORT).show();
 	}
 
 	/**
@@ -525,52 +538,6 @@ public class ChatActivity extends ActivityWithRequests {
         return str;
     }
 
-    // username autocompletion when pressing TAB key 
-    public boolean onTab() {
-/*        LinkedList<String> available = new LinkedList<String>();
-        String text = mEditText.getText().toString();
-        String b = text.substring(text.lastIndexOf(' ') + 1, text.length());
-        for (String nick : getUserList()) {
-            if (nick.startsWith(b)) {
-                available.add(nick);
-            }
-        }
-        if (available.size() == 0)  nothing to do 
-            return false;
-        else if (available.size() == 1) {
-             complete nickname 
-            mEditText.append(available.getFirst().substring(b.length(), available.getFirst().length()) + ": ");
-            return true;
-        } else {
-            String display = new String("*** ");
-            for (String nick : available) {
-                display = display + nick + " ";
-            }
-            SpannableString str = colorText(display);
-            mTextView.append(str);
-            mTextView.append("\n");
-            mScrollView.scrollTo(0, mTextView.getHeight());
-
-            String subnick = "";
-            boolean found = false;
-            for (int i = 0; !found; i++) {
-                for (String nick : available) {
-                    if (nick.length() < i || available.getFirst().charAt(i) != nick.charAt(i)) {
-                        found = true;  no more found 
-                        break;
-                    }
-                    else {
-                        subnick = nick.substring(0, i);
-                    }
-                }
-            }
-            mEditText.append(subnick.substring(b.length(), subnick.length()));
-            return true;
-        }
-*/
-    		return false;
-    }
-
     private void onSend() {
     	Log.i("SF chat", "onSend() called");
     	chatSendQueue.add(chatEntry.getText().toString());
@@ -591,6 +558,9 @@ public class ChatActivity extends ActivityWithRequests {
 	public void finish() {
 		super.finish();
 		killThreads();
+		roomId = -1;
+		roomIds = null;
+		roomNames = null;
 	}
 
 }

@@ -126,16 +126,16 @@ public class Submission implements Serializable, IHasThumbnail {
 	public void populateThumbnail() throws Exception {
 		if (getId() == -1) return;
 
-		Log.i("SF ThumbDownloader", "Downloading thumb for pid " + getId() + " from " + thumbnailUrl);
 		
 		// See if we have the image in storage
 		loadIconFromStorage();
 		
-		if (thumbnail == null)
+		if (thumbnail == null) {
+			Log.i("SF ThumbDownloader", "Downloading thumb for pid " + getId() + " from " + thumbnailUrl);
 		   thumbnail = ContentDownloader.downloadBitmap(thumbnailUrl);
-		
-		Log.i("SF ThumbDownloader", "Storing image");
-		storeIcon();
+			Log.i("SF ThumbDownloader", "Storing image");
+			storeIcon();
+		}
 	}
 	
 	/**

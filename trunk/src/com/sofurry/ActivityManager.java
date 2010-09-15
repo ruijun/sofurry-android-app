@@ -35,13 +35,21 @@ public class ActivityManager<T> {
 	protected int currentPage = 0;							// The currently selected page
 	protected ArrayList<T> resultList;
 	//protected ArrayList<String> pageIDs;					// The page ids
-
+	
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	private boolean currentlyFetching = false;
 	
 	private IManagedActivity<T> myAct = null;
 	
 	public ActivityManager(IManagedActivity<T> myAct) {
+		setActivity(myAct);
+	}
+	
+	/**
+	 * Sets the activity this view is parented to
+	 * @param myAct
+	 */
+	public void setActivity(IManagedActivity<T> myAct) {
 		this.myAct = myAct;
 		progh = new ProgressBarHelper(getAct());
 	}
@@ -156,6 +164,7 @@ public class ActivityManager<T> {
 				} catch (Exception e) {
 					ronError(e);
 				}
+				Log.d("ONDATA", "OnData Received" + resultList.size());
 				// Reset the adapter, so new entries are shown
 				myAct.plugInAdapter();
 			}

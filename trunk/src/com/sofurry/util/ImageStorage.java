@@ -2,6 +2,7 @@ package com.sofurry.util;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,7 +43,7 @@ public class ImageStorage {
 	
 	
 	private static Bitmap loadIcon(String filename) {
-		FileInputStream is;
+		FileInputStream is = null;
 		Bitmap bitmap = null;
 		try {
 			is = FileStorage.getFileInputStream(filename);
@@ -53,13 +54,21 @@ public class ImageStorage {
 			}
 		} catch (Exception e) {
 			Log.e("soFurryApp", "error in loadIcon", e);
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return bitmap;
 	}
 	
 	private static void saveIcon(String filename, Bitmap icon) {
-		FileOutputStream os;
+		FileOutputStream os = null;
 		try {
 			os = FileStorage.getFileOutputStream(filename );
 			if (os != null) {
@@ -69,7 +78,17 @@ public class ImageStorage {
 			}
 		} catch (Exception e) {
 			Log.e("soFurryApp", "error in saveIcon", e);
+		} finally {
+			if (os != null) {
+				try {
+					os.flush();
+					os.close();
+				} catch (Exception e2) {
+					// Intentionally left blank
+				}
+			}
 		}
+		Log.d("soFurryApp", "icon saved " + filename);
 	}
 	
 }

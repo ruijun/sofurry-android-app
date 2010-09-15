@@ -34,5 +34,7 @@ public interface IManagedActivity<T> {
 	
 	public abstract void resetViewSourceExtra(int newViewSource);
 	
+	public abstract ActivityManager<T> getActivityManager();
+	
 	
 }
