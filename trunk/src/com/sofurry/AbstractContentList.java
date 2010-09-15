@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -167,6 +168,17 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 	protected void updateContentList() {
 		updateView();
 	}
+	
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+        	finish();
+            //return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
 
 	@Override
 	public void finish() {

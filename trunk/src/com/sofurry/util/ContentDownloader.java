@@ -4,6 +4,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+
+import org.apache.http.client.utils.URLEncodedUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,14 +29,25 @@ public class ContentDownloader {
 	public static Bitmap downloadBitmap(String url) throws Exception {
 		if (url.startsWith("images/")) url = AppConstants.SITE_URL + "/" + url;
 		Log.d("SF ContentDownloader", "Fetching image...");
-		URL myImageURL = new URL(url);
-		HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
-		connection.setDoInput(true);
-		connection.connect();
-		InputStream is = connection.getInputStream();
-		Log.d("SF ContentDownloader", is.available() + " bytes available to be read from server");
-		Log.d("SF ContentDownloader", "creating drawable...");
-		Bitmap bitmap = BitmapFactory.decodeStream(is);
+		
+		URL myImageURL = new URL(HttpRequest.encodeURL(url));
+		HttpURLConnection connection = null;
+		InputStream is = null;
+		Bitmap bitmap = null;
+		try {
+			connection = (HttpURLConnection) myImageURL.openConnection();
+			connection.setDoInput(true);
+			connection.connect();
+			is = connection.getInputStream();
+			//Log.d("SF ContentDownloader", is.available() + " bytes available to be read from server");
+			Log.d("SF ContentDownloader", "creating drawable...");
+			bitmap = BitmapFactory.decodeStream(is);
+		} catch (Exception e) {
+			throw e;
+		} finally {
+		  is.close();
+		  connection.disconnect();
+		}
 		return bitmap;
 	}
 	
@@ -60,7 +74,7 @@ public class ContentDownloader {
 	 */
 	public static void downloadFile(String url, String filename) throws Exception {
 		Log.d("SF ContentDownloader", "Fetching file...");
-		URL myImageURL = new URL(url);
+		URL myImageURL = new URL(HttpRequest.encodeURL(url));
 		HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
 		connection.setDoInput(true);
 		connection.connect();

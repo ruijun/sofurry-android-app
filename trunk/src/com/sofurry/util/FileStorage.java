@@ -39,7 +39,8 @@ public class FileStorage {
 		File f = new File(getPath(filename));
 		if (f.createNewFile() && f.canWrite()) {
 			Log.i("FileStorage", "writing file "+filename);
-			return new FileOutputStream(f);
+			FileOutputStream fo = new FileOutputStream(f);
+			return fo;
 		}
 		
 		

@@ -1,6 +1,8 @@
 package com.sofurry.util;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,9 +13,11 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import android.text.Html;
 import android.util.Log;
 
 
@@ -47,6 +51,17 @@ public class HttpRequest {
 		HttpResponse response;
 		response = httpclient.execute(httppost);
 		return response;
+	}
+	
+	/**
+	 * Encodes an URL ready for use with the webserver
+	 * @param url
+	 * Die zu encodende URL
+	 * @return
+	 */
+	public static String encodeURL(String url) {
+		// since URLEncoder.encode(url, "UTF-8") is not the right way to do this, this will have to suffice:
+		return url.replaceAll(" ", "%20");
 	}
 
 }

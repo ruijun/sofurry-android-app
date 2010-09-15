@@ -1,6 +1,7 @@
 package com.sofurry.requests;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -73,14 +74,15 @@ public class RequestThread extends Thread {
 	public static String authenticadedHTTPRequest(AjaxRequest request) throws Exception {
 		// add authentication parameters to the request
 		request.authenticate();
-		HttpResponse response = HttpRequest.doPost(request.getUrl(), request.getParameters());
+		String url = HttpRequest.encodeURL(request.getUrl());
+		HttpResponse response = HttpRequest.doPost(url, request.getParameters());
 		String httpResult = EntityUtils.toString(response.getEntity());
 		
 		if (!Authentication.parseResponse(httpResult)) { // Try authentification again, in case the first request fails
 			// Retry request with new otp sequence if it failed for the first time
 			request.authenticate();
 			//requestParameters = Authentication.addAuthParametersToQuery(requestParameters);
-			response = HttpRequest.doPost(request.getUrl(), request.getParameters());
+			response = HttpRequest.doPost(url, request.getParameters());
 			httpResult = EntityUtils.toString(response.getEntity());
 			if (!Authentication.parseResponse(httpResult)) {
 			  throw new Exception("Authentification Failed (2nd attempt)."); // Check the sequence reply

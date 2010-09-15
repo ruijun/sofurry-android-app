@@ -112,7 +112,7 @@ public class Submission implements Serializable, IHasThumbnail {
 		}
 	}
 	
-	public void storeIcon() {
+	public void storeIcon() throws Exception {
 		if (type == SUBMISSION_TYPE.ARTWORK) {
 			ImageStorage.saveSubmissionIcon(getId(), thumbnail);
 		} else {
@@ -131,10 +131,10 @@ public class Submission implements Serializable, IHasThumbnail {
 		loadIconFromStorage();
 		
 		if (thumbnail == null) {
-			Log.i("SF ThumbDownloader", "Downloading thumb for pid " + getId() + " from " + thumbnailUrl);
-		   thumbnail = ContentDownloader.downloadBitmap(thumbnailUrl);
-			Log.i("SF ThumbDownloader", "Storing image");
-			storeIcon();
+		  Log.i("SF ThumbDownloader", "Downloading thumb for pid " + getId() + " from " + thumbnailUrl);
+		  thumbnail = ContentDownloader.downloadBitmap(thumbnailUrl);
+		  Log.i("SF ThumbDownloader", "Storing image");
+		  storeIcon();
 		}
 	}
 	

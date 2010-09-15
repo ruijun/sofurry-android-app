@@ -3,22 +3,30 @@ package com.sofurry.gallery;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.sofurry.R;
 import com.sofurry.model.Submission;
 
 public class SubmissionGalleryAdapter extends BaseAdapter {
     private Context context;
 	private ArrayList<Submission> items;
+	private Drawable defaultImage = null;
 
     public SubmissionGalleryAdapter(Context c, ArrayList<Submission> items) {
     	super();
 		this.items = items;
         context = c;
+
+        Resources res = context.getResources();
+		defaultImage = res.getDrawable(R.drawable.icon);
     }
 
     public int getCount() {
@@ -35,7 +43,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
 
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
+        ImageView imageView = null;
         if (convertView == null) {  // if it's not recycled, initialize some attributes
             imageView = new ImageView(context);
             imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
@@ -45,7 +53,11 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageBitmap(items.get(position).getThumbnail());
+        Bitmap thumb = items.get(position).getThumbnail();
+        if (thumb != null)
+          imageView.setImageBitmap(thumb);
+        else
+          imageView.setImageDrawable(defaultImage);
         return imageView;
     }
 }

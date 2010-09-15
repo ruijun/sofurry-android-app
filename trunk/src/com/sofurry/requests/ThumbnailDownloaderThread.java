@@ -65,7 +65,7 @@ public class ThumbnailDownloaderThread extends Thread {
 					  try {
 						  s.populateThumbnail();
 					  } catch (Exception e) {
-						  tryAgain = true;
+						  Log.d("thumb", "Thumbloading failed " + e.getMessage());
 						  // This is intentionally left blank. If thumbnail fetching fails... well... so be it, could be worse.
 					  }
 					
