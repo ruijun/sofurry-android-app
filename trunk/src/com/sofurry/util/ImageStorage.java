@@ -18,27 +18,38 @@ public class ImageStorage {
 
 	
 	public static Bitmap loadSubmissionImage(int id) {
-		return loadIcon("image"+id);
+		return loadIcon(getSubmissionImagePath(id));
+	}
+	
+	/**
+	 * Returns the submission image path, minus the path to the apps file storage.
+	 * Needs to be encapsulated in FileStorage.getPath(getSubmissionImagePath(id))
+	 * @param id
+	 * The id of the image to show.
+	 * @return
+	 */
+	public static String getSubmissionImagePath(int id) {
+		return "image/i"+id;
 	}
 
 	public static void saveSubmissionImage(int id, Bitmap icon) throws Exception  {
-		saveIcon("image"+id, icon);
+		saveIcon(getSubmissionImagePath(id), icon);
 	}
 	
 	public static Bitmap loadSubmissionIcon(int id) {
-		return loadIcon("thumb"+id);
+		return loadIcon("thumb/t"+id);
 	}
 
 	public static void saveSubmissionIcon(int id, Bitmap icon) throws Exception  {
-		saveIcon("thumb"+id, icon);
+		saveIcon("thumb/t"+id, icon);
 	}
 
 	public static Bitmap loadUserIcon(int uid) {
-		return loadIcon("avatar"+uid);
+		return loadIcon("avatar/a"+uid);
 	}
 
 	public static void saveUserIcon(int uid, Bitmap icon) throws Exception {
-		saveIcon("avatar"+uid, icon);
+		saveIcon("avatar/a"+uid, icon);
 	}
 	
 	
@@ -75,7 +86,7 @@ public class ImageStorage {
 			if (os != null) {
 				icon.compress(CompressFormat.JPEG, 80, os);
 			} else {
-				Log.w("soFurryApp", "Can't save to external storage");
+				throw new Exception("GetFileOutputstream for filename failed.");
 			}
 		} catch (Exception e) {
 			throw new Exception("Saving Icon failed.",e );

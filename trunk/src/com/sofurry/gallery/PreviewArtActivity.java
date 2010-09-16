@@ -1,11 +1,17 @@
 package com.sofurry.gallery;
 
+import java.io.File;
+
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,8 +19,11 @@ import com.sofurry.ActivityWithRequests;
 import com.sofurry.AppConstants;
 import com.sofurry.ProgressBarHelper;
 import com.sofurry.R;
+import com.sofurry.RateActivity;
+import com.sofurry.TagEditor;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.util.ContentDownloader;
+import com.sofurry.util.FileStorage;
 import com.sofurry.util.ImageStorage;
 
 public class PreviewArtActivity extends ActivityWithRequests implements Runnable {
@@ -22,11 +31,14 @@ public class PreviewArtActivity extends ActivityWithRequests implements Runnable
 	private ProgressBarHelper pbh = new ProgressBarHelper(this);
 	private ImageView image;
 	private TextView imageartisttext;
-    int pageID;
+	
+	private Button hdButton = null;
+    
+	int pageID;
     String name;
     String tags;
     String authorName;
-    String authorId;
+    int authorId;
     String thumbnailUrl;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -36,6 +48,13 @@ public class PreviewArtActivity extends ActivityWithRequests implements Runnable
 		
 		image = (ImageView) findViewById(R.id.imagepreview);
 		imageartisttext = (TextView) findViewById(R.id.imageartisttext);
+		
+	    hdButton = (Button) findViewById(R.id.HDViewButton);
+	    hdButton.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View arg0) {
+				doHdView();
+			}});
+	    hdButton.setEnabled(false);
 
 		Bundle extras = getIntent().getExtras() ;
 	    if( extras != null ) {
@@ -43,7 +62,7 @@ public class PreviewArtActivity extends ActivityWithRequests implements Runnable
 	        name = extras.getString("name");
 	        tags = extras.getString("tags");
 	        authorName = extras.getString("authorName");
-	        authorId = extras.getString("authorId");
+	        authorId = extras.getInt("authorId");
 	        thumbnailUrl = extras.getString("thumbnail");
 	        
 			Bitmap thumb = ImageStorage.loadSubmissionIcon(pageID);
@@ -89,42 +108,51 @@ public class PreviewArtActivity extends ActivityWithRequests implements Runnable
 	 */
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
-		menu.add(0,AppConstants.MENU_ADDFAV,0,"Add Fav");
-		menu.add(0,AppConstants.MENU_REMFAV,0,"Remove Fav");
-		SubMenu rate = menu.addSubMenu("Rate");
-		rate.add(0, AppConstants.MENU_RATE1, 0, "1 Star");
-		rate.add(0, AppConstants.MENU_RATE2, 0, "2 Star");
-		rate.add(0, AppConstants.MENU_RATE3, 0, "3 Star");
-		rate.add(0, AppConstants.MENU_RATE4, 0, "4 Star");
-		rate.add(0, AppConstants.MENU_RATE5, 0, "5 Star");
-		menu.add(0, AppConstants.MENU_CUM,0,"Cum!");
+		menu.add(0,AppConstants.MENU_HD     ,0,"HD View");
+		menu.add(0,AppConstants.MENU_ADDFAV ,0,"Add Fav");
+		menu.add(0,AppConstants.MENU_REMFAV ,0,"Remove Fav");
+		menu.add(0,AppConstants.MENU_RATE   ,0,"Rate");
+		//SubMenu rate = menu.addSubMenu("Rate");
+//		rate.add(0, AppConstants.MENU_RATE1 ,0,"1 Star");
+//		rate.add(0, AppConstants.MENU_RATE2 ,0,"2 Star");
+//		rate.add(0, AppConstants.MENU_RATE3 ,0,"3 Star");
+//		rate.add(0, AppConstants.MENU_RATE4 ,0,"4 Star");
+//		rate.add(0, AppConstants.MENU_RATE5 ,0,"5 Star");
+		menu.add(0, AppConstants.MENU_CUM   ,0,"Cum!");
 		
 		return result;
 	}
 	
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case AppConstants.MENU_HD:
+			doHdView();
+			return true;
 		case AppConstants.MENU_ADDFAV:
 			setFavorite();
 			return true;
 		case AppConstants.MENU_REMFAV:
 			unsetFavorite();
 			return true;
-		case AppConstants.MENU_RATE1:
-			setRating(1);
+		case AppConstants.MENU_RATE:
+			Intent intent = new Intent(this, RateActivity.class);
+			startActivityForResult(intent, AppConstants.ACTIVITY_RATE);
 			return true;
-		case AppConstants.MENU_RATE2:
-			setRating(2);
-			return true;
-		case AppConstants.MENU_RATE3:
-			setRating(3);
-			return true;
-		case AppConstants.MENU_RATE4:
-			setRating(4);
-			return true;
-		case AppConstants.MENU_RATE5:
-			setRating(5);
-			return true;
+//		case AppConstants.MENU_RATE1:
+//			setRating(1);
+//			return true;
+//		case AppConstants.MENU_RATE2:
+//			setRating(2);
+//			return true;
+//		case AppConstants.MENU_RATE3:
+//			setRating(3);
+//			return true;
+//		case AppConstants.MENU_RATE4:
+//			setRating(4);
+//			return true;
+//		case AppConstants.MENU_RATE5:
+//			setRating(5);
+//			return true;
 		case AppConstants.MENU_CUM:
 			cum();
 			return true;
@@ -158,6 +186,24 @@ public class PreviewArtActivity extends ActivityWithRequests implements Runnable
 	}
 	
 	/**
+	 * Is forwarded from the activity, to handle callbacks of the TagEditor
+	 * @param requestCode
+	 * @param resultCode
+	 * @param data
+	 * @return
+	 */
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// Handles the return value from TAGEditor
+		if (requestCode == AppConstants.ACTIVITY_RATE) {
+			if (data == null) return;
+			int rating = data.getIntExtra("rating", -1);
+			if (rating != -1) setRating(rating);
+			return;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	/**
 	 * Sets the number of stars on a submission that the user wants to set
 	 * @param stars
 	 * The number of stars to set (1-5)
@@ -183,12 +229,35 @@ public class PreviewArtActivity extends ActivityWithRequests implements Runnable
 	}
 	
 	
+	/**
+	 * Views the button using the acitivty that is associated with images
+	 */
+	public void doHdView() {
+		File f = new File(FileStorage.getPath(ImageStorage.getSubmissionImagePath(pageID)));
+		if (!f.exists()) return; // Until that file exists, there is nothing we can do really.
+
+		// Starts the associated image viewer, so the user can zoom and tilt
+		Intent intent = new Intent();  
+		intent.setAction(android.content.Intent.ACTION_VIEW);  
+		intent.setDataAndType(Uri.fromFile(f), "image/*");  
+		startActivity(intent);   
+	}
+	
+	@Override
+	public void sonError(int id, Exception e) {
+		super.sonError(id, e);
+		
+		pbh.hideProgressDialog();
+	}
+
 	@Override
 	public void sonOther(int id, Object obj) throws Exception {
 		pbh.hideProgressDialog();
 		// If the returntype is bitmap, we know what to do with it
-		if (Bitmap.class.isAssignableFrom(obj.getClass()))
+		if (Bitmap.class.isAssignableFrom(obj.getClass())) {
 		  image.setImageBitmap((Bitmap)obj);
+		  hdButton.setEnabled(true);
+		}
 		else
 		  super.sonOther(id, obj);
 	}

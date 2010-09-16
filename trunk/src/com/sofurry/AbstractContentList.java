@@ -37,6 +37,7 @@ import com.sofurry.util.ErrorHandler;
 public abstract class AbstractContentList<T> extends ListActivity implements IManagedActivity<T> {
 
 	protected ActivityManager<T> man = null;
+	private boolean finished = false;
 
 	// Get parameters and initiate data fetch thread
 	@SuppressWarnings("unchecked")
@@ -59,7 +60,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 	
 	@Override
 	protected void onPause() {
-		ManagerStore.store(this);
+		if (!finished) ManagerStore.store(this);
 		super.onPause();
 	}
 	
@@ -183,6 +184,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 	@Override
 	public void finish() {
 		super.finish();
+		finished = true;
 		man.stopThumbDownloader();
 		ManagerStore.retrieve(this); // Clean up manager store, so we don't have unused items laying aaround
 	}

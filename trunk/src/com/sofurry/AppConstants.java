@@ -11,6 +11,7 @@ public class AppConstants {
 	public static final int ACTIVITY_VIEWPM = 5;
 	public static final int ACTIVITY_TAGS = 6;
 	public static final int ACTIVITY_MUSICLIST = 7;
+	public static final int ACTIVITY_RATE = 7;
 
 
 	public static final int CONTENTTYPE_STORIES = 0;
@@ -33,7 +34,9 @@ public class AppConstants {
 	public static final int MENU_ADDFAV = 4201;
 	public static final int MENU_REMFAV = 4202;
 	public static final int MENU_CUM = 4203;
+	public static final int MENU_HD = 4204;
 
+	public static final int MENU_RATE = 4300;
 	public static final int MENU_RATE1 = 4301;
 	public static final int MENU_RATE2 = 4302;
 	public static final int MENU_RATE3 = 4303;

@@ -49,6 +49,7 @@ public class ThumbnailDownloaderThread extends Thread {
 	public void run() {
 		try {
 			boolean tryAgain = true;
+			boolean fastmode = true;
 			while (runIt && tryAgain) {
 				tryAgain = false;
 				
@@ -63,10 +64,9 @@ public class ThumbnailDownloaderThread extends Thread {
 					// The IHasThumbnail object will know what to do
 					if (s.getThumbnail() == null)
 					  try {
-						  s.populateThumbnail();
+						  s.populateThumbnail(fastmode);
 					  } catch (Exception e) {
 						  Log.d("thumb", "Thumbloading failed " + e.getMessage());
-						  // This is intentionally left blank. If thumbnail fetching fails... well... so be it, could be worse.
 					  }
 					
 					// If fetching of one thumbnail fails, we will try the whole list again
@@ -79,6 +79,7 @@ public class ThumbnailDownloaderThread extends Thread {
 						lastRefresh = System.currentTimeMillis();
 					}
 				}
+				fastmode = false;
 				triggerRefresh();
 			}
 		} catch (Exception e) {
