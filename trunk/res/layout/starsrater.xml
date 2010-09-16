@@ -9,7 +9,7 @@
 		<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/RatingBarTest" android:text="Please rate:"></TextView>
 	</LinearLayout>
     <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.5">
-		<RatingBar android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ArtRatingBar" android:stepSize="1" android:numStars="5"></RatingBar>
+		<RatingBar android:id="@+id/ArtRatingBar" android:stepSize="1" android:numStars="5" android:layout_width="wrap_content" android:layout_height="60dip" android:isIndicator="false" style="?android:attr/ratingBarStyleIndicator"></RatingBar>
 	</LinearLayout>
     <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.0">
 		<Button android:text="OK" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="0.5" android:id="@+id/RateOkButton"></Button>
