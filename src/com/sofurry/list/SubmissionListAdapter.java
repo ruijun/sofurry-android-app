@@ -34,7 +34,7 @@ public class SubmissionListAdapter extends ArrayAdapter<Submission> {
 		this.context = context;
 		
 		Resources res = context.getResources();
-		defaultImage = res.getDrawable(R.drawable.icon);
+		defaultImage = res.getDrawable(R.drawable.loadingicon);
 	}
 
 	@Override

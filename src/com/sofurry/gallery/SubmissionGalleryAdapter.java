@@ -26,7 +26,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
         context = c;
 
         Resources res = context.getResources();
-		defaultImage = res.getDrawable(R.drawable.icon);
+		defaultImage = res.getDrawable(R.drawable.loadingicon);
     }
 
     public int getCount() {
