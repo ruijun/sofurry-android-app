@@ -123,12 +123,14 @@ public class Submission implements Serializable, IHasThumbnail {
 	/**
 	 * Downloads the thumbnail for this submission
 	 */
-	public void populateThumbnail() throws Exception {
+	public void populateThumbnail(boolean fastmode) throws Exception {
 		if (getId() == -1) return;
 
 		
 		// See if we have the image in storage
 		loadIconFromStorage();
+		
+		if (fastmode) return; // In fastmode we will not try downloading the thumb.
 		
 		if (thumbnail == null) {
 		  Log.i("SF ThumbDownloader", "Downloading thumb for pid " + getId() + " from " + thumbnailUrl);

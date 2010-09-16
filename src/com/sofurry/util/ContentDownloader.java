@@ -1,5 +1,6 @@
 package com.sofurry.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -34,23 +35,35 @@ public class ContentDownloader {
 		HttpURLConnection connection = null;
 		InputStream is = null;
 		Bitmap bitmap = null;
+		ByteArrayOutputStream bos = null;
 		try {
 			connection = (HttpURLConnection) myImageURL.openConnection();
 			connection.setDoInput(true);
 			connection.connect();
 			is = connection.getInputStream();
+			Log.d("SF ContentDownloader", "Downloading...");
+			bos = new ByteArrayOutputStream();
+		    int readBytes;
+		    byte[] buffer = new byte[1024];
+		    while ((readBytes = is.read(buffer)) > 0) {
+		        bos.write(buffer, 0, readBytes);
+		    }
+		    bos.flush();
+		    bos.close();
 			//Log.d("SF ContentDownloader", is.available() + " bytes available to be read from server");
-			Log.d("SF ContentDownloader", "creating drawable...");
-			bitmap = BitmapFactory.decodeStream(is);
+			Log.d("SF ContentDownloader", "creating drawable... ("+bos.size()+" bytes)");
+			bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(),0,bos.size());
 		} catch (Exception e) {
 			throw e;
 		} finally {
-		  is.close();
+		  if (is != null)
+		    is.close();
+		  if (bos != null)
+			bos.close();
 		  connection.disconnect();
 		}
 		return bitmap;
 	}
-	
 	
 	/**
 	 * Downloads a file and signals the completed download to the request handler

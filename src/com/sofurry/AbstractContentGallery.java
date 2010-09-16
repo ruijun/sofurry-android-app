@@ -30,6 +30,7 @@ import com.sofurry.requests.AjaxRequest;
 public abstract class AbstractContentGallery<T> extends Activity implements IManagedActivity<T> {
 
 	protected ActivityManager<T> man = new ActivityManager<T>(this);
+	private boolean finished = false;
 	
 	protected GridView galleryView;
 	protected ListAdapter myAdapter;
@@ -60,7 +61,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	
 	@Override
 	protected void onPause() {
-		ManagerStore.store(this);
+		if (!finished) ManagerStore.store(this);
 		super.onPause();
 	}
 
@@ -174,6 +175,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	@Override
 	public void finish() {
 		super.finish();
+		finished = true;
 		man.stopThumbDownloader();
 		ManagerStore.retrieve(this); // Clean up manager store, so we don't have unused items laying aaround
 	}

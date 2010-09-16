@@ -17,35 +17,57 @@ public class FileStorage {
 	private static String pathroot = "/Android/data/com.sofurry/files/";
 	
 	/**
+	 * Liefert den Root des Pfades zurück
+	 * @return
+	 */
+	public static String getPathRoot() {
+		return Environment.getExternalStorageDirectory()+pathroot;
+	}
+	
+	/**
 	 * Returns the complete filename to the app storage
 	 * @param filename
 	 * The filename to complete with path
 	 * @return
 	 */
 	public static String getPath(String filename) {
-		return Environment.getExternalStorageDirectory()+pathroot+filename;
+		return getPathRoot()+filename;
 	}
 	
-	public static FileOutputStream getFileOutputStream(String filename) throws IOException {
+	/**
+	 * Returns a readymade fileoutput stream to store the file into
+	 * @param filename
+	 * @return
+	 * @throws Exception
+	 */
+	public static FileOutputStream getFileOutputStream(String filename) throws Exception {
 		checkExternalMedia();
 		if (!mExternalStorageWriteable) {
 			Log.i("FileStorage", "External storage not writeable");
 			return null;
 		}
-		
-		File d = new File(Environment.getExternalStorageDirectory()+pathroot);
-		d.mkdirs();
+
+		// Check if our datapath exists
+		File d = new File(getPath(filename));
+		ensureDirectory(d.getParent());
 				
 		File f = new File(getPath(filename));
-		if (f.createNewFile() && f.canWrite()) {
-			Log.i("FileStorage", "writing file "+filename);
+		//if (f.canWrite()) {
+		//	Log.i("FileStorage", "writing file "+filename);
 			FileOutputStream fo = new FileOutputStream(f);
 			return fo;
-		}
-		
-		
-		
-		return null;
+		//}
+		//throw new Exception("CanWrite is false, outputstream creation failed.");
+	}
+	
+	/**
+	 * Ensures that a Directory exists, and creates it, should it not
+	 * @param path
+	 * @throws Exception
+	 */
+	public static void ensureDirectory(String path) throws Exception {
+		File d = new File(path);
+		if (!d.exists()) d.mkdirs();
 	}
 	
 	/**
