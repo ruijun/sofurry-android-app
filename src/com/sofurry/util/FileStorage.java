@@ -191,7 +191,7 @@ public class FileStorage {
 	 * @return
 	 */
 	public static String getUserStoragePath(String type, String fname) throws Exception {
-		return FileStorage.getExternalMediaRoot() + "/SoFurry "+type+"/" + fname;
+		return FileStorage.getExternalMediaRoot() + "/SoFurry Files/"+type+"/" + fname;
 	}
 	
 }
