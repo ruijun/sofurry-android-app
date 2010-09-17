@@ -26,7 +26,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
         context = c;
 
         Resources res = context.getResources();
-		defaultImage = res.getDrawable(R.drawable.loadingicon);
+		defaultImage = res.getDrawable(android.R.drawable.ic_popup_sync);
     }
 
     public int getCount() {

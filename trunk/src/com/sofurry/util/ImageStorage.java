@@ -1,5 +1,6 @@
 package com.sofurry.util;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,8 +18,18 @@ import android.util.Log;
 public class ImageStorage {
 
 	
-	public static Bitmap loadSubmissionImage(int id) {
-		return loadIcon(getSubmissionImagePath(id));
+	public static String SUBMISSION_IMAGE_PATH = "image";
+	public static String THUMB_PATH = "thumb";
+	public static String AVATAR_PATH = "avatar";
+	
+	/**
+	 * Loads a submission image from storage
+	 * @param filename
+	 * The filename to load
+	 * @return
+	 */
+	public static Bitmap loadSubmissionImage(String filename) {
+		return loadBitmap(getSubmissionImagePath(filename));
 	}
 	
 	/**
@@ -28,32 +39,38 @@ public class ImageStorage {
 	 * The id of the image to show.
 	 * @return
 	 */
-	public static String getSubmissionImagePath(int id) {
-		return "image/i"+id;
+	public static String getSubmissionImagePath(String filename) {
+		return SUBMISSION_IMAGE_PATH + "/" + filename;
 	}
 
-	public static void saveSubmissionImage(int id, Bitmap icon) throws Exception  {
-		saveIcon(getSubmissionImagePath(id), icon);
-	}
+//	public static void saveSubmissionImage(int id, Bitmap icon) throws Exception  {
+//		saveBitmap(getSubmissionImagePath(id), icon);
+//	}
 	
 	public static Bitmap loadSubmissionIcon(int id) {
-		return loadIcon("thumb/t"+id);
+		return loadBitmap(THUMB_PATH +"/t"+id);
 	}
 
 	public static void saveSubmissionIcon(int id, Bitmap icon) throws Exception  {
-		saveIcon("thumb/t"+id, icon);
+		saveBitmap(THUMB_PATH +"/t"+id, icon);
 	}
 
 	public static Bitmap loadUserIcon(int uid) {
-		return loadIcon("avatar/a"+uid);
+		return loadBitmap(AVATAR_PATH + "/a"+uid);
 	}
 
 	public static void saveUserIcon(int uid, Bitmap icon) throws Exception {
-		saveIcon("avatar/a"+uid, icon);
+		saveBitmap(AVATAR_PATH + "/a"+uid, icon);
 	}
 	
 	
-	private static Bitmap loadIcon(String filename) {
+	/**
+	 * Attempts to load an icon from the specified place
+	 * @param filename
+	 * The filename of the icon e.g. avatars/a121212
+	 * @return
+	 */
+	private static Bitmap loadBitmap(String filename) {
 		FileInputStream is = null;
 		Bitmap bitmap = null;
 		try {
@@ -78,7 +95,14 @@ public class ImageStorage {
 		return bitmap;
 	}
 	
-	private static void saveIcon(String filename, Bitmap icon) throws Exception{
+	/**
+	 * Saves an icon into the specified path
+	 * @param filename
+	 * file name e.G. images/somedragon.jpg
+	 * @param icon
+	 * @throws Exception
+	 */
+	private static void saveBitmap(String filename, Bitmap icon) throws Exception{
 		if (icon == null) throw new Exception("Attempt to store null icon for " + filename);
 		FileOutputStream os = null;
 		try {
@@ -102,5 +126,14 @@ public class ImageStorage {
 		}
 		Log.d("soFurryApp", "icon saved " + filename);
 	}
+	
+	/**
+	 * Löscht alle in dem Ordner enthaltenen Dateien
+	 * @throws Exception
+	 */
+	public static void cleanupImages() throws Exception {
+		FileStorage.cleanup(SUBMISSION_IMAGE_PATH + "/");
+	}
+	
 	
 }

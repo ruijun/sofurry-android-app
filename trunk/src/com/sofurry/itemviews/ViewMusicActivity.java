@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.itemviews;
 
 import java.io.File;
 
@@ -8,11 +8,16 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.Toast;
 
-import com.sofurry.model.Submission;
+import com.sofurry.AppConstants;
+import com.sofurry.FavableActivity;
+import com.sofurry.R;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.AsyncFileDownloader;
 import com.sofurry.util.ContentDownloader;
@@ -23,10 +28,10 @@ import com.sofurry.util.FileStorage;
  *
  * Allows to download and play music
  */
-public class ViewMusicActivity extends ActivityWithRequests  {
+public class ViewMusicActivity extends FavableActivity  {
 	
-	private int pageID = 0;
 	private String playPath = null;
+	private String filename = null;
 	
 	private WebView webview;
 	private Button buttondownload;
@@ -35,6 +40,7 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 	private AsyncFileDownloader down = null; // Placeholder for the downloader thread if it would be used.
 
 	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);	
 		
 		setContentView(R.layout.musicdetails);
 		buttondownload = (Button) findViewById(R.id.MusicDownloadAndPlay);
@@ -45,22 +51,11 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 			}});
 
 
-	    super.onCreate(savedInstanceState);	
 	    webview = (WebView) findViewById(R.id.musictext);
-//	    setContentView(webview);
-	    Bundle extras = getIntent().getExtras() ;
-	    if( extras != null ){
-	        pageID = extras.getInt( "pageID" ) ;
-	        //String username = removeExtraChars(extras.getString( "username" )).toLowerCase();  
-	        //String name = removeExtraChars(extras.getString( "name" )).toLowerCase();  
-	        
-	        // Well this is not partciulary neat, but since there is currently no other way to obtain the URL that I am aware of...
-	        //fileurl = AppConstants.SITE_URL + "/art/music/" + username + "/" + username + "_" + name + ".mp3";
-	        
-			AjaxRequest req = getFetchParameters(pageID);
-			pbh.showProgressDialog("Fetching desc...");
-			req.execute(requesthandler);
-	    }
+
+		AjaxRequest req = getFetchParameters(pageID);
+		pbh.showProgressDialog("Fetching desc...");
+		req.execute(requesthandler);
 	}
 	
 	/**
@@ -97,7 +92,24 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 		pbh.showProgressDialog("Fetching song data...");
 		AjaxRequest req = getFilenameRequest(pageID);
 		req.execute(requesthandler);
-//		downloadFile(fileurl);
+	}
+	
+	
+	
+	@Override
+	public void createExtraMenuOptions(Menu menu) {
+		menu.add(0,AppConstants.MENU_PLAY   ,0,"Play").setIcon(android.R.drawable.ic_media_play);
+		super.createExtraMenuOptions(menu);
+	}
+
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case AppConstants.MENU_PLAY:
+			downloadAndPlay();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	/**
@@ -106,7 +118,8 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 	 */
 	public void downloadFile(String html) throws Exception {
 		//String url = obj.getString("filename");
-		
+		notwice = false;
+
 		// Find markers
 		int end = html.indexOf(AppConstants.MP3DownloadLinkEndMarker);
 		int beg = end;
@@ -123,18 +136,30 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 		beg += len;
 		
 		String tmp = html.substring(beg,end);
+		
+		//String tmp2 = html.substring(beg - 10, end + 10);
 
-		String fname = "music" + pageID + ".mp3";
-		playPath = FileStorage.getPath(fname);
+		beg = tmp.lastIndexOf("/");
+		filename = tmp.substring(beg + 1);
 
+		playPath = FileStorage.getExternalMediaRoot()+ "/" + FileStorage.MUSIC_PATH;
+		FileStorage.ensureDirectory(playPath);
+		playPath += getFname();
+		
 		File f = new File(playPath);
 		if (f.exists()) {
 			playmusic();
 			return;
 		}
 		
+		pbh.hideProgressDialog();
 		pbh.showProgressDialog("Downloading song...");
-		down = ContentDownloader.asyncDownload(tmp, fname, requesthandler);
+		down = ContentDownloader.asyncDownload(tmp, FileStorage.MUSIC_PATH + getFname(), requesthandler);
+		notwice = true;
+	}
+	
+	public String getFname() {
+		return "/m" + pageID + ".mp3";
 	}
 	
 	/* (non-Javadoc)
@@ -180,18 +205,27 @@ public class ViewMusicActivity extends ActivityWithRequests  {
 		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
 		  String content = obj.getString("content");
 		  webview.loadData(content, "text/html", "utf-8");
+		  pbh.hideProgressDialog();
 		}
-//		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
-//			downloadFile(obj);
-//		}
 	}
 
 
 	@Override
-	public void sonError(int id, Exception e) {
-		down = null;
-		pbh.hideProgressDialog();
-		super.sonError(id, e);
+	public void save() {
+		try {
+			File f = new File(playPath);
+			if (!f.exists()) return; // Until that file exists, there is nothing we can do really.
+			
+			String targetPath = FileStorage.getUserStoragePath("Music", filename);
+
+			File tf = new File(targetPath);
+			FileStorage.ensureDirectory(tf.getParent());
+			FileStorage.copyFile(f, tf);
+			
+			Toast.makeText(getApplicationContext(), "File saved to:\n" + targetPath, Toast.LENGTH_LONG).show();
+		} catch (Exception e) {
+			sonError(-1, e);
+		}
 	}
 	
 	

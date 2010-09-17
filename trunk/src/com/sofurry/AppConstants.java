@@ -35,6 +35,7 @@ public class AppConstants {
 	public static final int MENU_REMFAV = 4202;
 	public static final int MENU_CUM = 4203;
 	public static final int MENU_HD = 4204;
+	public static final int MENU_PLAY = 4205;
 
 	public static final int MENU_RATE = 4300;
 	public static final int MENU_RATE1 = 4301;
@@ -42,6 +43,7 @@ public class AppConstants {
 	public static final int MENU_RATE3 = 4303;
 	public static final int MENU_RATE4 = 4304;
 	public static final int MENU_RATE5 = 4305;
+	public static final int MENU_SAVE = 4306;
 
 	public static final int MENU_CHGROOM = 4401;
 	public static final int MENU_USERS = 4402;

@@ -10,8 +10,8 @@ import android.widget.BaseAdapter;
 import com.sofurry.AbstractContentList;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
-import com.sofurry.ViewMusicActivity;
 import com.sofurry.gallery.GalleryArt;
+import com.sofurry.itemviews.ViewMusicActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
@@ -37,6 +37,8 @@ public class ListMusic extends AbstractContentList<Submission> {
 		Log.i("ListMusic", "Viewing music ID: " + s.getId());
 		Intent i = new Intent(this, ViewMusicActivity.class);
 		i.putExtra("pageID", s.getId());
+		i.putExtra("name", s.getName());
+
 //		i.putExtra("username", s.getAuthorName());
 //		i.putExtra("name", s.getName());
 		startActivity(i);
@@ -50,6 +52,14 @@ public class ListMusic extends AbstractContentList<Submission> {
 	public void resetViewSourceExtra(int newViewSource) {
 	}
 
+
+	@Override
+	public void finish() {
+		
+		super.finish();
+	}
+
+	
 	
 
 }

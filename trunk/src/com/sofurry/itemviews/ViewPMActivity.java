@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.itemviews;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.os.Bundle;
 import android.webkit.WebView;
 
+import com.sofurry.ActivityWithRequests;
 import com.sofurry.requests.AjaxRequest;
 
 public class ViewPMActivity extends ActivityWithRequests {

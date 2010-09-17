@@ -10,8 +10,8 @@ import android.widget.BaseAdapter;
 import com.sofurry.AbstractContentList;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
-import com.sofurry.ViewStoryActivity;
 import com.sofurry.gallery.GalleryArt;
+import com.sofurry.itemviews.ViewJournalActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
@@ -55,8 +55,9 @@ public class ListJournals extends AbstractContentList<Submission> {
 		Submission s = getDataItem(selectedIndex);
 		//int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
 		Log.i("ListJournals", "Viewing journal ID: " + s.getId());
-		Intent i = new Intent(this, ViewStoryActivity.class);
+		Intent i = new Intent(this, ViewJournalActivity.class);
 		i.putExtra("pageID", s.getId());
+		i.putExtra("name", s.getName());
 		//i.putExtra("useAuthentication", useAuthentication());
 		startActivity(i);
 		

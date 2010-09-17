@@ -28,7 +28,6 @@ public class ContentDownloader {
 	 * @throws Exception
 	 */
 	public static Bitmap downloadBitmap(String url) throws Exception {
-		if (url.startsWith("images/")) url = AppConstants.SITE_URL + "/" + url;
 		Log.d("SF ContentDownloader", "Fetching image...");
 		
 		URL myImageURL = new URL(HttpRequest.encodeURL(url));
@@ -97,7 +96,7 @@ public class ContentDownloader {
 			byte[] buf = new byte[1024];
 			int l;
 	        while ((l = is.read(buf)) != -1) {
-		            os.write(buf, 0, l);
+		      os.write(buf, 0, l);
 		    }
 		} catch (Exception e) {
 			throw e;
