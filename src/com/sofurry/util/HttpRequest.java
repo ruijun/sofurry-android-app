@@ -17,6 +17,8 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.sofurry.AppConstants;
+
 import android.text.Html;
 import android.util.Log;
 
@@ -60,8 +62,24 @@ public class HttpRequest {
 	 * @return
 	 */
 	public static String encodeURL(String url) {
+		if (url.startsWith("content/")) url = AppConstants.SITE_URL + "/page/" + url;
+		if (url.startsWith("images/")) url = AppConstants.SITE_URL + "/" + url;
+
 		// since URLEncoder.encode(url, "UTF-8") is not the right way to do this, this will have to suffice:
 		return url.replaceAll(" ", "%20");
+	}
+	
+	/**
+	 * Extracts the extension off an url
+	 * @param url
+	 * The URL to extract the extension from
+	 * @return
+	 * Returns the extension e.G. .jpg
+	 */
+	public static String extractExtension(String url) {
+		int idx = url.lastIndexOf('.');
+		if (idx == -1) return null;
+		return url.substring(idx);
 	}
 
 }

@@ -10,8 +10,8 @@ import android.widget.BaseAdapter;
 import com.sofurry.AbstractContentList;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
-import com.sofurry.ViewStoryActivity;
 import com.sofurry.gallery.GalleryArt;
+import com.sofurry.itemviews.ViewStoryActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
@@ -44,6 +44,8 @@ public class ListStories extends AbstractContentList<Submission> {
 		Log.i("ListStories", "Viewing story ID: " + s.getId());
 		Intent i = new Intent(this, ViewStoryActivity.class);
 		i.putExtra("pageID", s.getId());
+		i.putExtra("name", s.getName());
+
 		//i.putExtra("useAuthentication", useAuthentication());
 		startActivity(i);
 	}

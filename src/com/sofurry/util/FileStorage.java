@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 import android.os.Environment;
 import android.util.Log;
@@ -15,6 +16,8 @@ public class FileStorage {
 	private static boolean mExternalStorageWriteable = false;
 	
 	private static String pathroot = "/Android/data/com.sofurry/files/";
+	
+	public static String MUSIC_PATH = "music";
 	
 	/**
 	 * Liefert den Root des Pfades zurück
@@ -54,8 +57,10 @@ public class FileStorage {
 		File f = new File(getPath(filename));
 		//if (f.canWrite()) {
 		//	Log.i("FileStorage", "writing file "+filename);
-			FileOutputStream fo = new FileOutputStream(f);
-			return fo;
+		FileOutputStream fo = new FileOutputStream(f);
+		if (fo == null)
+			Log.d("FO",f.getName() + " null");
+		return fo;
 		//}
 		//throw new Exception("CanWrite is false, outputstream creation failed.");
 	}
@@ -83,7 +88,7 @@ public class FileStorage {
 		return f.exists();
 	}
 
-	public static FileInputStream getFileInputStream(String filename) throws FileNotFoundException {
+	public static FileInputStream getFileInputStream(String filename) throws Exception {
 		checkExternalMedia();
 		if (!mExternalStorageAvailable) {
 			Log.i("FileStorage", "External storage not readable");
@@ -100,7 +105,10 @@ public class FileStorage {
 	}
 		
 	
-	private static void checkExternalMedia() {
+	/**
+	 * Checks if the external media is available
+	 */
+	private static void checkExternalMedia() throws Exception {
 		String state = Environment.getExternalStorageState();
 
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -110,11 +118,80 @@ public class FileStorage {
 			// We can only read the media
 			mExternalStorageAvailable = true;
 			mExternalStorageWriteable = false;
+			throw new Exception("External Storage not Available. (read only)");
 		} else {
 			// Something else is wrong. It may be one of many other states, but
 			// all we need
 			// to know is we can neither read nor write
 			mExternalStorageAvailable = mExternalStorageWriteable = false;
+			throw new Exception("External Storage not Available.");
 		}
 	}
+	
+	/**
+	 * Returns the root directory of the storage card. Only to be used in exceptions
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getExternalMediaRoot() throws Exception {
+		checkExternalMedia();
+		return "" + Environment.getExternalStorageDirectory();
+	}
+	
+    /**
+     * Copies one file from source to destination
+     * @param in
+     * The file going in
+     * @param out
+     * The file going out
+     * @throws IOException
+     */
+    public static void copyFile(File in, File out) throws IOException 
+    {
+    	FileChannel inChannel = new FileInputStream(in).getChannel();
+    	FileChannel outChannel = new FileOutputStream(out).getChannel();
+    	try {
+    		inChannel.transferTo(0, inChannel.size(), outChannel);
+    	} 
+    	catch (IOException e) {
+    		throw e;
+    	}
+    	finally {
+    		if (inChannel != null) inChannel.close();
+    		if (outChannel != null) outChannel.close();
+    	}
+    }
+	
+	/**
+	 * Deletes all contained files in indicated path
+	 * @param path
+	 * The path to clean e.g. images/
+	 * @throws Exception
+	 */
+	public static void cleanup(String path) throws Exception {
+		String abspath = FileStorage.getPath(path);
+		
+		File f = new File(abspath);
+		for (File kill : f.listFiles()) {
+			if (kill.isDirectory()) continue;
+			kill.delete();
+		}
+	}
+	
+	public static void cleanMusic() throws Exception {
+		cleanup(MUSIC_PATH);
+	}
+	
+	/**
+	 * Returns the path that userfiles are saved to.
+	 * @param type
+	 * The type of files to be saved
+	 * @param fname
+	 * The filename to be saved
+	 * @return
+	 */
+	public static String getUserStoragePath(String type, String fname) throws Exception {
+		return FileStorage.getExternalMediaRoot() + "/SoFurry "+type+"/" + fname;
+	}
+	
 }

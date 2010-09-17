@@ -12,9 +12,11 @@ import android.widget.BaseAdapter;
 import com.sofurry.AbstractContentGallery;
 import com.sofurry.ActivityManager;
 import com.sofurry.AppConstants;
+import com.sofurry.itemviews.PreviewArtActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.util.ImageStorage;
 
 public class GalleryArt extends AbstractContentGallery<Submission> {
 
@@ -89,6 +91,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		Log.i("GalleryArt", "Viewing art ID: " + s.getId());
 		Intent i = new Intent(this, PreviewArtActivity.class);
 		i.putExtra("pageID", s.getId());
+		i.putExtra("name", s.getName());
 		man.getResultList().get(selectedIndex).feedIntent(i);
 		startActivity(i);
 	}
@@ -101,5 +104,18 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 
 	public void resetViewSourceExtra(int newViewSource) {
 	}
+
+	@Override
+	public void finish() {
+		// Cleans up the image storage, so we will not clutter the device with unwanted images
+		try {
+			ImageStorage.cleanupImages();
+		} catch (Exception e) {
+			Log.d("PreviewArt", e.getMessage());
+		}
+		super.finish();
+	}
+	
+	
 
 }
