@@ -5,15 +5,11 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-
-import org.apache.http.client.utils.URLEncodedUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.sofurry.AppConstants;
 import com.sofurry.requests.AsyncFileDownloader;
 import com.sofurry.requests.IRequestHandler;
 
@@ -39,6 +35,7 @@ public class ContentDownloader {
 			connection = (HttpURLConnection) myImageURL.openConnection();
 			connection.setDoInput(true);
 			connection.connect();
+			if (connection.getContentType().toLowerCase().startsWith("text")) throw new Exception("Unable to download image. (text answer where binary expected)");
 			is = connection.getInputStream();
 			Log.d("SF ContentDownloader", "Downloading...");
 			bos = new ByteArrayOutputStream();
@@ -90,6 +87,8 @@ public class ContentDownloader {
 		HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
 		connection.setDoInput(true);
 		connection.connect();
+		if (connection.getContentType().toLowerCase().startsWith("text")) throw new Exception("Unable to download file. (text answer where binary expected)");
+		//Log.d("contDown", "contentType" + connection.getContentType() + " / " + connection.getContentLength());
 		InputStream is = connection.getInputStream();
 		FileOutputStream os = FileStorage.getFileOutputStream(filename);
 		try {
