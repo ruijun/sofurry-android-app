@@ -111,7 +111,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		try {
 			ImageStorage.cleanupImages();
 		} catch (Exception e) {
-			Log.d("PreviewArt", e.getMessage());
+			Log.d("PreviewArt", "Exception: "+e.getMessage());
 		}
 		super.finish();
 	}
