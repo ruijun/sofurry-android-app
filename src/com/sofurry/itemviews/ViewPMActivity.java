@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.webkit.WebView;
 
 import com.sofurry.ActivityWithRequests;
+import com.sofurry.AppConstants;
 import com.sofurry.requests.AjaxRequest;
 
 public class ViewPMActivity extends ActivityWithRequests {
@@ -33,16 +34,20 @@ public class ViewPMActivity extends ActivityWithRequests {
 
 		req.addParameter("f", "pmcontent");
 		req.addParameter("id", "" + id);
+		req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
 		return req;
 	}
 
 
 	@Override
 	public void sonData(int id, JSONObject obj) throws Exception {
-		JSONArray items = new JSONArray(obj.getString("items"));
-		JSONObject jsonItem = items.getJSONObject(0);
-		String content = jsonItem.getString("message");
-		webview.loadData(content, "text/html", "utf-8");
+		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
+			JSONArray items = new JSONArray(obj.getString("items"));
+			JSONObject jsonItem = items.getJSONObject(0);
+			String content = jsonItem.getString("message");
+			webview.loadData(content, "text/html", "utf-8");
+		} else 
+			super.sonData(id, obj);// Handle inherited events
 	}
 
 

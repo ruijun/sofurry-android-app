@@ -1,8 +1,9 @@
 package com.sofurry;
 
+import org.json.JSONObject;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -57,6 +58,7 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "addfav");
 		request.addParameter("pid", "" + pageID);
+		request.setRequestID(AppConstants.REQUEST_ID_FAV);
 		request.execute(requesthandler);
 	}
 	
@@ -69,6 +71,7 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "remfav");
 		request.addParameter("pid", "" + pageID);
+		request.setRequestID(AppConstants.REQUEST_ID_UNFAV);
 		request.execute(requesthandler);
 	}
 	
@@ -101,6 +104,7 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		request.addParameter("f", "vote");
 		request.addParameter("pid", "" + pageID);
 		request.addParameter("votevalue", "" + stars);
+		request.setRequestID(AppConstants.REQUEST_ID_RATE);
 		request.execute(requesthandler);
 	}
 
@@ -112,7 +116,30 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		AjaxRequest request = new AjaxRequest();
 		request.addParameter("f", "cum");
 		request.addParameter("pid", "" + pageID);
+		request.setRequestID(AppConstants.REQUEST_ID_CUM);
 		request.execute(requesthandler);
 	}
+
+	@Override
+	public void sonData(int id, JSONObject obj) throws Exception {
+		switch (id) {
+		case AppConstants.REQUEST_ID_CUM:
+			pbh.hideProgressDialog();
+			return;
+		case AppConstants.REQUEST_ID_FAV:
+			pbh.hideProgressDialog();
+			return;
+		case AppConstants.REQUEST_ID_UNFAV:
+			pbh.hideProgressDialog();
+			return;
+		case AppConstants.REQUEST_ID_RATE:
+			pbh.hideProgressDialog();
+			return;
+		}
+		super.sonData(id, obj);
+		
+	}
+	
+	
 	
 }

@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import com.sofurry.AppConstants;
 import com.sofurry.SubmissionViewActivity;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.util.FileStorage;
@@ -45,15 +46,19 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 		AjaxRequest req = new AjaxRequest();
 		req.addParameter("f", "getpagecontent");
 		req.addParameter("pid", "" + pageID);
+		req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
 		return req;
 	}
 
 	
 	@Override
 	public void sonData(int id, JSONObject obj) throws Exception {
-		pbh.hideProgressDialog();
-		content = obj.getString("content");
-		webview.loadData(content, "text/html", "utf-8");
+		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
+			pbh.hideProgressDialog();
+			content = obj.getString("content");
+			webview.loadData(content, "text/html", "utf-8");
+		} else
+			super.sonData(id, obj);// Handle inherited events
 	}
 
 	@Override

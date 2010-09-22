@@ -31,6 +31,10 @@ public abstract class RequestHandler implements IRequestHandler {
 					onData(msg.arg1,(JSONObject)msg.obj);
 					return;
 				}
+				if (msg.obj instanceof ProgressSignal) {
+					onProgress(msg.arg1,(ProgressSignal)msg.obj);
+					return;
+				}
 				onOther(msg.arg1,msg.obj);
 				//onError(new Exception("Unknown return value on requestHandler ("+msg.obj.getClass().getName()+")"));
 				
@@ -64,6 +68,13 @@ public abstract class RequestHandler implements IRequestHandler {
 	 * Ajax Request ID
 	 */
 	public abstract void onData(int id,JSONObject obj);
+	
+	/**
+	 * This is called when some process signals some progress
+	 * @param id
+	 * @param prg
+	 */
+	public abstract void onProgress(int id, ProgressSignal prg);
 	
 	/**
 	 * Method that is called when a refresh is called

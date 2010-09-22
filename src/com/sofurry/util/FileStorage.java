@@ -18,6 +18,7 @@ public class FileStorage {
 	private static String pathroot = "/Android/data/com.sofurry/files/";
 	
 	public static String MUSIC_PATH = "music";
+	public static String unusable = "*+~|<>";
 	
 	/**
 	 * Liefert den Root des Pfades zurück
@@ -191,7 +192,24 @@ public class FileStorage {
 	 * @return
 	 */
 	public static String getUserStoragePath(String type, String fname) throws Exception {
-		return FileStorage.getExternalMediaRoot() + "/SoFurry Files/"+type+"/" + fname;
+		return FileStorage.getExternalMediaRoot() + "/SoFurry Files/"+type+"/" + sanitize(fname);
+	}
+	
+	/**
+	 * Removes Extra characters that will not work well with a filename
+	 * @param toSanitize
+	 * The string to remove extra characters from
+	 * @return
+	 */
+	public static String sanitize(String toSanitize) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < toSanitize.length(); i++) {
+			if (unusable.indexOf(toSanitize.charAt(i)) > -1)
+				sb.append("_");
+			else
+				sb.append(toSanitize.charAt(i));
+		}
+		return sb.toString();
 	}
 	
 }

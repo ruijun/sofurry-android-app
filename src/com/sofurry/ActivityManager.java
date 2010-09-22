@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.sofurry.model.IHasThumbnail;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.util.ErrorHandler;
@@ -176,6 +177,11 @@ public class ActivityManager<T> {
 		public void refresh() {
 			myAct.updateView();
 			hideProgressDialog();
+		}
+
+		@Override
+		public void onProgress(int id, ProgressSignal prg) {
+			// Progress is ignored in these activities
 		}
 		
 	};

@@ -57,7 +57,8 @@ public class ViewStoryActivity extends FavableActivity  {
 		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
 			content = obj.getString("content");
 			webview.loadData(content, "text/html", "utf-8");
-		}
+		} else
+			super.sonData(id, obj); // Handle inherited events
 	}
 
 	@Override

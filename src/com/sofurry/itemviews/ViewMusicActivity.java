@@ -20,6 +20,7 @@ import com.sofurry.FavableActivity;
 import com.sofurry.R;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.AsyncFileDownloader;
+import com.sofurry.requests.ProgressSignal;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.FileStorage;
 
@@ -38,6 +39,10 @@ public class ViewMusicActivity extends FavableActivity  {
 	private boolean notwice = false;
 	
 	private AsyncFileDownloader down = null; // Placeholder for the downloader thread if it would be used.
+	private int downloadandplaymode = 1;
+	private static int downmode_play = 1;
+	private static int downmode_save = 2;
+	
 
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);	
@@ -47,7 +52,7 @@ public class ViewMusicActivity extends FavableActivity  {
 		
 		buttondownload.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
-				downloadAndPlay();
+				downloadAndDo(downmode_play);
 			}});
 
 
@@ -85,9 +90,10 @@ public class ViewMusicActivity extends FavableActivity  {
 	/**
 	 * Downloads the music file, and replays it
 	 */
-	public void downloadAndPlay() {
+	public void downloadAndDo(int mode) {
 		if (notwice) return;
 		notwice = true;
+		downloadandplaymode = mode;
 		
 		pbh.showProgressDialog("Fetching song data...");
 		AjaxRequest req = getFilenameRequest(pageID);
@@ -105,7 +111,7 @@ public class ViewMusicActivity extends FavableActivity  {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case AppConstants.MENU_PLAY:
-			downloadAndPlay();
+			downloadAndDo(downmode_play);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -118,8 +124,6 @@ public class ViewMusicActivity extends FavableActivity  {
 	 */
 	public void downloadFile(String html) throws Exception {
 		//String url = obj.getString("filename");
-		notwice = false;
-
 		// Find markers
 		int end = html.indexOf(AppConstants.MP3DownloadLinkEndMarker);
 		int beg = end;
@@ -142,26 +146,45 @@ public class ViewMusicActivity extends FavableActivity  {
 		beg = tmp.lastIndexOf("/");
 		filename = tmp.substring(beg + 1);
 
-		playPath = FileStorage.getExternalMediaRoot()+ "/" + FileStorage.MUSIC_PATH;
+		playPath = FileStorage.getPathRoot() + FileStorage.MUSIC_PATH;
 		FileStorage.ensureDirectory(playPath);
 		playPath += getFname();
 		
 		File f = new File(playPath);
 		if (f.exists()) {
-			playmusic();
+			handlemusic();
 			return;
 		}
 		
 		pbh.hideProgressDialog();
-		pbh.showProgressDialog("Downloading song...");
+		pbh.showProgressDialog("Downloading Song...");
 		down = ContentDownloader.asyncDownload(tmp, FileStorage.MUSIC_PATH + getFname(), requesthandler);
-		notwice = true;
 	}
 	
+	/**
+	 * Decides what to do with the music, now that it is available
+	 */
+	public void handlemusic() {
+		pbh.hideProgressDialog();
+		if (downloadandplaymode == downmode_play)
+		  playmusic();
+		if (downloadandplaymode == downmode_save)
+		  save();
+	}
+	
+	/**
+	 * Returns the filename of the mp3 file as it resides on device
+	 * @return
+	 */
 	public String getFname() {
 		return "/m" + pageID + ".mp3";
 	}
 	
+	@Override
+	public void sonProgress(int id, ProgressSignal prg) {
+		pbh.setMessage("Downloaded " + prg.progress / 1024 + " kbyte...");
+	}
+
 	/* (non-Javadoc)
 	 * @see com.sofurry.ActivityWithRequests#sonOther(int, java.lang.Object)
 	 * 
@@ -177,7 +200,7 @@ public class ViewMusicActivity extends FavableActivity  {
 		
 		// Filedownload is finished, the the android play the file
 		if (obj.getClass().equals(AsyncFileDownloader.class)) {
-			playmusic();
+			handlemusic();
 			return;
 		}
 		super.sonOther(id, obj);
@@ -202,19 +225,23 @@ public class ViewMusicActivity extends FavableActivity  {
 
 	@Override
 	public void sonData(int id, JSONObject obj) throws Exception {
+		pbh.hideProgressDialog();
 		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
 		  String content = obj.getString("content");
 		  webview.loadData(content, "text/html", "utf-8");
-		  pbh.hideProgressDialog();
-		}
+		} else
+			super.sonData(id, obj);// Handle inherited events
 	}
-
-
+	
 	@Override
 	public void save() {
+		if (playPath == null) {
+			downloadAndDo(downmode_save); // If the file has not been downloaded yet, download will be triggered here
+			return;
+		}
 		try {
 			File f = new File(playPath);
-			if (!f.exists()) return; // Until that file exists, there is nothing we can do really.
+			if (!f.exists()) throw new Exception("File does not exist, try to download again.");
 			
 			String targetPath = FileStorage.getUserStoragePath("Music", filename);
 
@@ -227,6 +254,14 @@ public class ViewMusicActivity extends FavableActivity  {
 			sonError(-1, e);
 		}
 	}
+
+	@Override
+	public void sonError(int id, Exception e) {
+		notwice = false; // Just in case
+		super.sonError(id, e);
+	}
+	
+	
 	
 	
 
