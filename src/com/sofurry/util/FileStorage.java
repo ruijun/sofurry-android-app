@@ -173,7 +173,9 @@ public class FileStorage {
 		String abspath = FileStorage.getPath(path);
 		
 		File f = new File(abspath);
-		for (File kill : f.listFiles()) {
+		File[] tokill = f.listFiles();
+		if (tokill == null) throw new Exception("Directory to be cleared is not accessible.");
+		for (File kill : tokill) {
 			if (kill.isDirectory()) continue;
 			kill.delete();
 		}

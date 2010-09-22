@@ -16,6 +16,7 @@ import com.sofurry.itemviews.PreviewArtActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.util.ErrorHandler;
 import com.sofurry.util.ImageStorage;
 
 public class GalleryArt extends AbstractContentGallery<Submission> {
@@ -111,7 +112,8 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		try {
 			ImageStorage.cleanupImages();
 		} catch (Exception e) {
-			Log.d("PreviewArt", "Exception: "+e.getMessage());
+			// If this fails, its no biggie, but something might be interesting
+			ErrorHandler.justLogError(e);
 		}
 		super.finish();
 	}
