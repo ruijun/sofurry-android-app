@@ -13,9 +13,14 @@ import android.widget.Toast;
  * Ok, so far only one
  */
 public class ErrorHandler {
-	public static void showError(Activity act, Exception e) {
+	public static void justLogError(Exception e) {
 		if (e.getClass().equals(NullPointerException.class)) e= new Exception("NullPointerException");
 		Log.d("Exception", e.getMessage());
+	}
+
+	
+	public static void showError(Activity act, Exception e) {
+		justLogError(e);
     	Toast.makeText(act.getApplicationContext(), "Error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
 	}
 
