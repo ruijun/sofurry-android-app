@@ -26,7 +26,6 @@ import com.sofurry.util.ImageStorage;
 
 public class PreviewArtActivity extends FavableActivity implements Runnable {
 
-	private ProgressBarHelper pbh = new ProgressBarHelper(this);
 	private ImageView image;
 	private TextView imageartisttext;
 	
@@ -67,6 +66,7 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 				image.setImageBitmap(thumb);
 			
 			filename = name + HttpRequest.extractExtension(thumbnailUrl);
+			filename = FileStorage.sanitize(filename);
 			
 			imageartisttext.setText(name + "\n" + authorName);
 	    }
@@ -92,7 +92,7 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 				// 1. extract extension
 				String ext = HttpRequest.extractExtension(url);
 				// 2. download file
-				ContentDownloader.downloadFile(url, ImageStorage.getSubmissionImagePath(filename) );
+				ContentDownloader.downloadFile(url, ImageStorage.getSubmissionImagePath(filename) , null);
 				// 3. read file
 				b = ImageStorage.loadSubmissionImage(filename);
 				//b = ContentDownloader.downloadBitmap(url);
@@ -103,7 +103,7 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 			// Send bitmap to our hungry thread
 			requesthandler.postMessage(0,b);
 		} catch (Exception e) {
-			requesthandler.postMessage(e);
+			requesthandler.postMessage(0,e);
 		}
 	}
 
@@ -129,9 +129,9 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 	 */
 	public void save() {
 		try {
-			
+			if (filename == null) throw new Exception("File has not downloaded properly yet. Filename is null.");
 			File f = new File(FileStorage.getPath(ImageStorage.getSubmissionImagePath(filename)));
-			if (!f.exists()) return; // Until that file exists, there is nothing we can do really.
+			if (!f.exists()) throw new Exception("File has not downloaded properly yet. File does not exist.");
 			
 			String targetPath = FileStorage.getUserStoragePath("Images", filename);
 			File tf = new File(targetPath);
@@ -173,6 +173,13 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 		else
 		  super.sonOther(id, obj);
 	}
+	
+	
+
+	@Override
+	public void sonError(int id, Exception e) {
+		super.sonError(id, e);
+	}
 
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#finish()
@@ -181,5 +188,7 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 	public void finish() {
 		super.finish();
 	}
+	
+	
 	
 }

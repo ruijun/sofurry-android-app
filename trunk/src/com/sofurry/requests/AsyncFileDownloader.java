@@ -45,7 +45,7 @@ public class AsyncFileDownloader extends Thread {
 	 */
 	public void run() {
 		try {
-			ContentDownloader.downloadFile(url, filename);
+			ContentDownloader.downloadFile(url, filename,req);
 			req.postMessage(id, this);
 		} catch (Exception e) {
 			req.postMessage(id, e);

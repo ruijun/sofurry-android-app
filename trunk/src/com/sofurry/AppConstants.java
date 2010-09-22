@@ -61,6 +61,11 @@ public class AppConstants {
 	public static final int REQUEST_ID_FETCHCONTENT = 4503;
 	public static final int REQUEST_ID_FETCHSUBMISSIONDATA = 4504;
 	public static final int REQUEST_ID_FETCHDATA = 4505;
+	
+	public static final int REQUEST_ID_FAV = 4506;
+	public static final int REQUEST_ID_UNFAV = 4507;
+	public static final int REQUEST_ID_CUM = 4508;
+	public static final int REQUEST_ID_RATE = 4509;
 
 	public static final String PREFS_NAME = "SoFurryPreferences";
 	public static final String SITE_URL = "http://chat.sofurry.com";

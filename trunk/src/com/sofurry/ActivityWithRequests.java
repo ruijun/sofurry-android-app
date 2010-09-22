@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.util.ErrorHandler;
 
@@ -52,6 +53,13 @@ public abstract class ActivityWithRequests extends Activity {
 				sonError(id, e);
 			}
 		}
+
+		@Override
+		public void onProgress(int id, ProgressSignal prg) {
+			sonProgress(id, prg);
+		}
+		
+		
 	};
 	
 	public void sonError(int id,Exception e) {
@@ -60,6 +68,17 @@ public abstract class ActivityWithRequests extends Activity {
 	
 	public void sonData(int id,JSONObject obj) throws Exception{
 		throw new Exception("JSONObject received, but no handler implemented.");
+	}
+	
+	/**
+	 * Is signaled when some progress is indicated
+	 * @param id
+	 * The id the progress originates from
+	 * @param prg
+	 * The progressIndikator value
+	 */
+	public void sonProgress(int id, ProgressSignal prg) {
+		pbh.setProgress(prg);
 	}
 
 	public void refresh() {
