@@ -58,9 +58,9 @@ public abstract class SubmissionViewActivity extends ActivityWithRequests {
 
 	
 	@Override
-	public void sonError(int id, Exception e) {
+	public void onError(int id, Exception e) {
 		pbh.hideProgressDialog();
-		super.sonError(id, e);
+		super.onError(id, e);
 	}
 	
 	public abstract void save();

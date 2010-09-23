@@ -29,7 +29,7 @@ public class ListStories extends AbstractContentList<Submission> {
 		try {
 			GalleryArt.jsonToResultlist(obj, man, SUBMISSION_TYPE.STORY);
 		} catch (Exception e) {
-			man.ronError(e);
+			man.onError(-1,e);
 		}
 		// Start downloading the thumbnails
 		man.startThumbnailDownloader();

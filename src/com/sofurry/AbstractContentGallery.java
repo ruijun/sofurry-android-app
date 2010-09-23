@@ -19,6 +19,7 @@ import android.widget.GridView;
 import android.widget.ListAdapter;
 
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.tempstorage.ManagerStore;
 
 /**
  * @author SoFurry

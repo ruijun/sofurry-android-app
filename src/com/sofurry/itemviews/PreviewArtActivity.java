@@ -143,7 +143,7 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 			Toast.makeText(getApplicationContext(), "File saved to:\n" + targetPath, Toast.LENGTH_LONG).show();
 			
 		} catch (Exception e) {
-			sonError(-1, e);
+			onError(-1, e);
 		}
 		
 	}
@@ -163,7 +163,7 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 	}
 	
 	@Override
-	public void sonOther(int id, Object obj) throws Exception {
+	public void onOther(int id, Object obj) throws Exception {
 		pbh.hideProgressDialog();
 		// If the returntype is bitmap, we know what to do with it
 		if (Bitmap.class.isAssignableFrom(obj.getClass())) {
@@ -171,14 +171,14 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 		  hdButton.setEnabled(true);
 		}
 		else
-		  super.sonOther(id, obj);
+		  super.onOther(id, obj);
 	}
 	
 	
 
 	@Override
-	public void sonError(int id, Exception e) {
-		super.sonError(id, e);
+	public void onError(int id, Exception e) {
+		super.onError(id, e);
 	}
 
 	/* (non-Javadoc)

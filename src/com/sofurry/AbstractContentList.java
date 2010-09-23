@@ -25,6 +25,7 @@ import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.RequestThread;
 import com.sofurry.requests.ThumbnailDownloaderThread;
+import com.sofurry.tempstorage.ManagerStore;
 import com.sofurry.util.ErrorHandler;
 
 /**

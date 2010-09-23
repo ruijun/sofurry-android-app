@@ -61,7 +61,7 @@ public class ChatActivity extends ActivityWithRequests {
 	private static String MESSAGETYPE_WHISPER = "whisper";
 		
 	@Override
-	public void sonData(int id, JSONObject obj) throws Exception {
+	public void onData(int id, JSONObject obj) throws Exception {
 		if (id == AppConstants.REQUEST_ID_ROOMLIST) {
 			populateRoomList(obj);
 		}
@@ -71,12 +71,12 @@ public class ChatActivity extends ActivityWithRequests {
 	}
 
 	@Override
-	public void sonOther(int id, Object obj) throws Exception {
+	public void onOther(int id, Object obj) throws Exception {
 		// If the object is text, it will be handled by the texthandler
 		if (String.class.isAssignableFrom(obj.getClass())) {
 			addTextToChatLog((String)obj);
 		} else
-		    super.sonOther(id,obj);
+		    super.onOther(id,obj);
 	}
 	
 	/* (non-Javadoc)
@@ -181,7 +181,7 @@ public class ChatActivity extends ActivityWithRequests {
         	try {
      		   changeRoom(roomIdToIdx(roomId));
 			} catch (Exception e) {
-				sonError(-1, e);
+			   onError(-1, e);
 			}
 		}
 	}

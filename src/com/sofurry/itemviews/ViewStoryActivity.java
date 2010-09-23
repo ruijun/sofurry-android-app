@@ -52,13 +52,13 @@ public class ViewStoryActivity extends FavableActivity  {
 
 	
 	@Override
-	public void sonData(int id, JSONObject obj) throws Exception {
+	public void onData(int id, JSONObject obj) throws Exception {
 		pbh.hideProgressDialog();
 		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
 			content = obj.getString("content");
 			webview.loadData(content, "text/html", "utf-8");
 		} else
-			super.sonData(id, obj); // Handle inherited events
+			super.onData(id, obj); // Handle inherited events
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class ViewStoryActivity extends FavableActivity  {
 			
 			Toast.makeText(getApplicationContext(), "File saved to:\n" + targetPath, Toast.LENGTH_LONG).show();
 		} catch (Exception e) {
-			sonError(-1, e);
+			onError(-1, e);
 		}
 	}
 

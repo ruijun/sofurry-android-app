@@ -5,9 +5,12 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 
+import com.sofurry.requests.CanHandleFeedback;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
+import com.sofurry.tempstorage.ItemStorage;
 import com.sofurry.util.ErrorHandler;
 
 /**
@@ -15,79 +18,60 @@ import com.sofurry.util.ErrorHandler;
  *
  * The base for an Activity with request handler, and a convinient progressbar handler
  */
-public abstract class ActivityWithRequests extends Activity {
+public abstract class ActivityWithRequests extends Activity implements CanHandleFeedback {
 	
 	protected ProgressBarHelper pbh = new ProgressBarHelper(this);
+	protected long uniquestoragekey = System.nanoTime();
 	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		if (savedInstanceState == null) 
+			uniquestoragekey = System.nanoTime();
+		else
+			uniquestoragekey = savedInstanceState.getLong("unique");
+		
+		requesthandler = new RequestHandler(this);
+		super.onCreate(savedInstanceState);
+	}
+	
+	
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putLong("unique", uniquestoragekey);
+		super.onSaveInstanceState(outState);
+	}
+
+
+
 	/**
 	 * The request handler to be used to handle the feedback from the AjaxRequest
 	 */
-	protected RequestHandler requesthandler = new RequestHandler() {
-		
-		@Override
-		public void onError(int id,Exception e) {
-			pbh.hideProgressDialog();
-			sonError(id,e);
-		}
-		
-		@Override
-		public void onData(int id, JSONObject obj) {
-			pbh.hideProgressDialog();
-			try {
-				sonData(id,obj);
-			} catch (Exception e) {
-				sonError(id, e);
-			}
-		}
-		
-		@Override
-		public void refresh() {
-			refresh();
-		}
+	protected RequestHandler requesthandler = null;
 
-		@Override
-		public void onOther(int id,Object obj) throws Exception {
-			try {
-				sonOther(id,obj);
-			} catch (Exception e) {
-				sonError(id, e);
-			}
-		}
-
-		@Override
-		public void onProgress(int id, ProgressSignal prg) {
-			sonProgress(id, prg);
-		}
-		
-		
-	};
 	
-	public void sonError(int id,Exception e) {
+	public void onError(int id, Exception e) {
+		pbh.hideProgressDialog();
 		ErrorHandler.showError(this, e);
 	}
-	
-	public void sonData(int id,JSONObject obj) throws Exception{
+
+	public void onData(int id, JSONObject obj) throws Exception {
+		pbh.hideProgressDialog();
 		throw new Exception("JSONObject received, but no handler implemented.");
 	}
-	
-	/**
-	 * Is signaled when some progress is indicated
-	 * @param id
-	 * The id the progress originates from
-	 * @param prg
-	 * The progressIndikator value
-	 */
-	public void sonProgress(int id, ProgressSignal prg) {
+
+	public void onProgress(int id, ProgressSignal prg) throws Exception {
 		pbh.setProgress(prg);
 	}
 
-	public void refresh() {
+	public void onOther(int id, Object obj) throws Exception {
+		  throw new Exception("Unexpected object type "+obj.getClass().getName()+" received.");
 	}
 	
-	public void sonOther(int id, Object obj) throws Exception {
-	  throw new Exception("Unexpected object type "+obj.getClass().getName()+" received.");
+	public void refresh() throws Exception {
+		// Intentionally left blank
 	}
-	
+
 	// Goes back to the story list
 	protected void closeList() {
 		Bundle bundle = new Bundle();
@@ -95,6 +79,35 @@ public abstract class ActivityWithRequests extends Activity {
 		mIntent.putExtras(bundle);
 		setResult(RESULT_OK, mIntent);
 		finish();
+	}
+	
+	/**
+	 * Stores an item in the global ItemStorage for later retrieval
+	 * @param key
+	 * The key to store the item under
+	 * @param obj
+	 * The object to store
+	 */
+	protected void storeObject(String key, Object obj) {
+		ItemStorage.get().store(uniquestoragekey, key, obj);
+	}
+	
+	/**
+	 * Retrieves an object from the global ItemStroage
+	 * @param key
+	 * The key of the object to retrieve
+	 * @return
+	 * The object that was stored, or null if the object does not exist
+	 */
+	protected Object retrieveObject(String key) {
+		return ItemStorage.get().retrieve(uniquestoragekey, key);
+	}
+	
+	/**
+	 * Clears all stored objects for this activity
+	 */
+	protected void clearStorage() {
+		ItemStorage.get().remove(uniquestoragekey);
 	}
 
 

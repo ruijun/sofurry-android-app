@@ -40,14 +40,14 @@ public class ViewPMActivity extends ActivityWithRequests {
 
 
 	@Override
-	public void sonData(int id, JSONObject obj) throws Exception {
+	public void onData(int id, JSONObject obj) throws Exception {
 		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
 			JSONArray items = new JSONArray(obj.getString("items"));
 			JSONObject jsonItem = items.getJSONObject(0);
 			String content = jsonItem.getString("message");
 			webview.loadData(content, "text/html", "utf-8");
 		} else 
-			super.sonData(id, obj);// Handle inherited events
+			super.onData(id, obj);// Handle inherited events
 	}
 
 

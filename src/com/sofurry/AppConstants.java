@@ -67,6 +67,9 @@ public class AppConstants {
 	public static final int REQUEST_ID_CUM = 4508;
 	public static final int REQUEST_ID_RATE = 4509;
 
+	public static final int REQUEST_ID_DOWNLOADFILE = 4510;
+
+	
 	public static final String PREFS_NAME = "SoFurryPreferences";
 	public static final String SITE_URL = "http://chat.sofurry.com";
 //	public static final String SITE_URL = "http://10.0.2.2";

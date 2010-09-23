@@ -79,7 +79,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		try {
 			jsonToResultlist(obj, man, SUBMISSION_TYPE.ARTWORK);
 		} catch (Exception e) {
-			man.ronError(e);
+			man.onError(-1,e);
 		}
 		// Start downloading the thumbnails
 		man.startThumbnailDownloader();
