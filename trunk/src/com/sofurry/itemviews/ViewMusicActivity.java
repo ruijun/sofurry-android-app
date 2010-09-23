@@ -74,8 +74,6 @@ public class ViewMusicActivity extends FavableActivity  {
 		    	notwice = (Boolean) retrieveObject("notwice");
 		    	down = (AsyncFileDownloader) retrieveObject("down");
 		    	downloadandplaymode = (Integer) retrieveObject("downloadandplaymode");
-		    	requesthandler = (RequestHandler) retrieveObject("handler");
-		    	requesthandler.setFeedbackReceive(this);
 		    	showContent();
 		    	
 		    	if (down != null) pbh.showProgressDialog("Downloading Song...");
@@ -108,8 +106,6 @@ public class ViewMusicActivity extends FavableActivity  {
 		super.onRestoreInstanceState(savedInstanceState);
 	}
 
-
-
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		storeObject("content", content);
@@ -118,7 +114,7 @@ public class ViewMusicActivity extends FavableActivity  {
 		storeObject("notwice", notwice);
 		storeObject("down", down);
 		storeObject("downloadandplaymode", downloadandplaymode);
-		storeObject("handler", requesthandler);
+		//storeObject("handler", requesthandler);
 
 		super.onSaveInstanceState(outState);
 	}
