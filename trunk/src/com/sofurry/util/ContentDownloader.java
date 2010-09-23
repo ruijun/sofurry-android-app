@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.sofurry.AppConstants;
 import com.sofurry.requests.AsyncFileDownloader;
 import com.sofurry.requests.IRequestHandler;
 import com.sofurry.requests.ProgressSignal;
@@ -77,7 +78,7 @@ public class ContentDownloader {
 	 * The request handler to signal arrival to
 	 */
 	public static AsyncFileDownloader asyncDownload(String url, String filename, IRequestHandler req) {
-		return AsyncFileDownloader.doRequest(req, url, filename, -1);
+		return AsyncFileDownloader.doRequest(req, url, filename, AppConstants.REQUEST_ID_DOWNLOADFILE);
 	}
 	
 	/**

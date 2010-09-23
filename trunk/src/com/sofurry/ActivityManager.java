@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.sofurry.model.IHasThumbnail;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.requests.CanHandleFeedback;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.ThumbnailDownloaderThread;
@@ -27,7 +28,7 @@ import com.sofurry.util.ErrorHandler;
  *
  * Yet another attempt to standartize the Gallery And the List Activity.
  */
-public class ActivityManager<T> {
+public class ActivityManager<T> implements CanHandleFeedback {
 	
 	private ProgressBarHelper progh = null; 
 
@@ -53,6 +54,7 @@ public class ActivityManager<T> {
 	public void setActivity(IManagedActivity<T> myAct) {
 		this.myAct = myAct;
 		progh = new ProgressBarHelper(getAct());
+		requesthandler = new RequestHandler(this);
 	}
 	
 	/**
@@ -146,57 +148,55 @@ public class ActivityManager<T> {
 	/**
 	 * The request handler to be used to handle the feedback from the AjaxRequest
 	 */
-	protected RequestHandler requesthandler = new RequestHandler() {
-		
-		@Override
-		public void onError(int id,Exception e) {
-			if (id == AppConstants.REQUEST_ID_FETCHDATA) currentlyFetching = false; // Fetching failed, give the user a chance to try again
-			//closeList();
-			ronError(e);
-		}
-		
-		@Override
-		public void onData(int id,JSONObject obj) {
-			if (id == AppConstants.REQUEST_ID_FETCHDATA) {
-				currentlyFetching = false; // Fetching was successful, new pages may be fetched
-				// Interpret the feedback data
-				try {
-					myAct.parseResponse(obj);
-				} catch (Exception e) {
-					ronError(e);
-				}
-				Log.d("ONDATA", "OnData Received" + resultList.size());
-				// Reset the adapter, so new entries are shown
-				myAct.plugInAdapter();
-			}
-		    //myAct.updateView();
-			hideProgressDialog();
-		}
-
-		@Override
-		public void refresh() {
-			myAct.updateView();
-			hideProgressDialog();
-		}
-
-		@Override
-		public void onProgress(int id, ProgressSignal prg) {
-			// Progress is ignored in these activities
-		}
-		
-	};
+	protected RequestHandler requesthandler = null;
 	
-	
-	/**
-	 * Is called when an error occurs in the asyncronus thread
-	 * @param e
+	/* (non-Javadoc)
+	 * @see com.sofurry.requests.CanHandleFeedback#onError(int, java.lang.Exception)
 	 */
-	public void ronError(Exception e) {
+	public void onError(int id, Exception e) {
+		if (id == AppConstants.REQUEST_ID_FETCHDATA) currentlyFetching = false; // Fetching failed, give the user a chance to try again
 		hideProgressDialog();
 		ErrorHandler.showError(getAct(), e);
 	}
 
-	
+	/* (non-Javadoc)
+	 * @see com.sofurry.requests.CanHandleFeedback#onData(int, org.json.JSONObject)
+	 * Handles data send back from the feedback handler
+	 */
+	public void onData(int id, JSONObject obj) {
+		if (id == AppConstants.REQUEST_ID_FETCHDATA) {
+			currentlyFetching = false; // Fetching was successful, new pages may be fetched
+			// Interpret the feedback data
+			try {
+				myAct.parseResponse(obj);
+			} catch (Exception e) {
+				onError(id, e);
+			}
+			Log.d("ONDATA", "OnData Received" + resultList.size());
+			// Reset the adapter, so new entries are shown
+			myAct.plugInAdapter();
+		}
+	    //myAct.updateView();
+		hideProgressDialog();
+		
+	}
+
+	public void onProgress(int id, ProgressSignal prg) {
+	}
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.requests.CanHandleFeedback#refresh()
+	 * 
+	 * Handles refresh Requests
+	 */
+	public void refresh() {
+		myAct.updateView();
+		hideProgressDialog();
+	}
+
+	public void onOther(int id, Object obj) throws Exception {
+	}
+
 	/**
 	 * Creates a menu that can be used for all kinds of browsable lists. Used for Gallerys and lists alike here.
 	 * @param menu

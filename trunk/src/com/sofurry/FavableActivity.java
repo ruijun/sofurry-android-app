@@ -121,7 +121,7 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	}
 
 	@Override
-	public void sonData(int id, JSONObject obj) throws Exception {
+	public void onData(int id, JSONObject obj) throws Exception {
 		switch (id) {
 		case AppConstants.REQUEST_ID_CUM:
 			pbh.hideProgressDialog();
@@ -136,7 +136,7 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 			pbh.hideProgressDialog();
 			return;
 		}
-		super.sonData(id, obj);
+		super.onData(id, obj);
 		
 	}
 	

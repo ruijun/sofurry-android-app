@@ -52,7 +52,7 @@ public class ListPM extends AbstractContentList<PrivateMessage> {
 				//man.getPageIDs().add("" + m.getId());
 			}
 		} catch (Exception e) {
-			man.ronError(e);
+			man.onError(-1,e);
 		}
 	}
 

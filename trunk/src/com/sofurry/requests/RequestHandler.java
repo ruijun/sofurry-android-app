@@ -7,7 +7,26 @@ import android.os.Message;
 
 import com.sofurry.RefreshRequest;
 
-public abstract class RequestHandler implements IRequestHandler {
+/**
+ * @author Rangarig
+ *
+ * A Request handler class handles all feedback coming from request threads
+ */
+public class RequestHandler implements IRequestHandler {
+	
+	private CanHandleFeedback feedback = null;
+	
+	/**
+	 * Constructor that will allow the request handler to be joined with an activity that know how to handle the feedback (implemented CanHandleFeedback interface) 
+	 * @param feedback
+	 */
+	public RequestHandler(CanHandleFeedback feedback) {
+		setFeedbackReceive(feedback);
+	}
+	
+	public void setFeedbackReceive(CanHandleFeedback feedback) {
+		this.feedback = feedback;
+	}
 	
 	/**
 	 * Handler to handle AjaxRequestFeedback
@@ -53,44 +72,55 @@ public abstract class RequestHandler implements IRequestHandler {
 		return requesthandler;
 	}
 	
-	/**
-	 * Method that is called when an error occurs
-	 * @param e
-	 * @param id
-	 * Ajax Request ID
+	/* (non-Javadoc)
+	 * @see com.sofurry.requests.CanHandleFeedback#onError(int, java.lang.Exception)
 	 */
-	public abstract void onError(int id,Exception e);
+	public void onError(int id,Exception e) {
+		feedback.onError(id, e);
+	}
 	
-	/**
-	 * Method that is called when data is returned
-	 * @param obj
-	 * @param id
-	 * Ajax Request ID
+	/* (non-Javadoc)
+	 * @see com.sofurry.requests.CanHandleFeedback#onData(int, org.json.JSONObject)
 	 */
-	public abstract void onData(int id,JSONObject obj);
+	public void onData(int id,JSONObject obj) {
+		try {
+			feedback.onData(id, obj);
+		} catch (Exception e) {
+			feedback.onError(id, e);
+		}
+	}
 	
-	/**
-	 * This is called when some process signals some progress
-	 * @param id
-	 * @param prg
+	/* (non-Javadoc)
+	 * @see com.sofurry.requests.CanHandleFeedback#onProgress(int, com.sofurry.requests.ProgressSignal)
 	 */
-	public abstract void onProgress(int id, ProgressSignal prg);
+	public void onProgress(int id, ProgressSignal prg) {
+		try {
+			feedback.onProgress(id, prg);
+		} catch (Exception e) {
+			feedback.onError(id, e);
+		}
+	}
 	
-	/**
-	 * Method that is called when a refresh is called
+	/* (non-Javadoc)
+	 * @see com.sofurry.requests.CanHandleFeedback#refresh()
 	 */
-	public abstract void refresh();
+	public void refresh() {
+		try {
+			feedback.refresh();
+		} catch (Exception e) {
+			feedback.onError(-1, e);
+		}
+	}
 	
-	/**
-	 * This method is called whenever none of the other events apply 
-	 * @param obj
-	 * The data returned via the message handler, the object is never null
-	 * @param id
-	 * Ajax Request ID
-	 * @throws Exception
+	/* (non-Javadoc)
+	 * @see com.sofurry.requests.CanHandleFeedback#onOther(int, java.lang.Object)
 	 */
 	public void onOther(int id, Object obj) throws Exception {
-		throw new Exception("No handler for "+obj.getClass().getName()+" implemented.");
+		try {
+			feedback.onOther(id, obj);
+		} catch (Exception e) {
+			feedback.onError(id, e);
+		}
 	}
 	
 	/**

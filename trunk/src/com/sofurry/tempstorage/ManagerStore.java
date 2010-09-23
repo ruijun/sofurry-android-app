@@ -1,7 +1,10 @@
-package com.sofurry;
+package com.sofurry.tempstorage;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.sofurry.ActivityManager;
+import com.sofurry.IManagedActivity;
 
 /**
  * @author Rangarig

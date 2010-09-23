@@ -43,7 +43,7 @@ public class ListJournals extends AbstractContentList<Submission> {
 //				pageIDs.add("" + s.getId());
 //			}
 		} catch (Exception e) {
-			man.ronError(e);
+			man.onError(-1,e);
 		}
 
 		// Start downloading the thumbnails

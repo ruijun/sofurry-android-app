@@ -21,6 +21,8 @@ import com.sofurry.R;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.AsyncFileDownloader;
 import com.sofurry.requests.ProgressSignal;
+import com.sofurry.requests.RequestHandler;
+import com.sofurry.tempstorage.ItemStorage;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.FileStorage;
 
@@ -30,16 +32,18 @@ import com.sofurry.util.FileStorage;
  * Allows to download and play music
  */
 public class ViewMusicActivity extends FavableActivity  {
-	
+
+	// Variables to store, in case of orientation change
 	private String playPath = null;
 	private String filename = null;
+	private String content = null;
+	private boolean notwice = false;
+	private AsyncFileDownloader down = null; // Placeholder for the downloader thread if it would be used.
+	private int downloadandplaymode = 1;
 	
 	private WebView webview;
 	private Button buttondownload;
-	private boolean notwice = false;
 	
-	private AsyncFileDownloader down = null; // Placeholder for the downloader thread if it would be used.
-	private int downloadandplaymode = 1;
 	private static int downmode_play = 1;
 	private static int downmode_save = 2;
 	
@@ -58,11 +62,69 @@ public class ViewMusicActivity extends FavableActivity  {
 
 	    webview = (WebView) findViewById(R.id.musictext);
 
-		AjaxRequest req = getFetchParameters(pageID);
-		pbh.showProgressDialog("Fetching desc...");
-		req.execute(requesthandler);
+	    if (savedInstanceState == null) {
+			AjaxRequest req = getFetchParameters(pageID);
+			pbh.showProgressDialog("Fetching desc...");
+			req.execute(requesthandler);
+	    } else {
+	    	try {
+		    	content = (String) retrieveObject("content");
+		    	playPath = (String) retrieveObject("playPath");
+		    	filename = (String) retrieveObject("filename");
+		    	notwice = (Boolean) retrieveObject("notwice");
+		    	down = (AsyncFileDownloader) retrieveObject("down");
+		    	downloadandplaymode = (Integer) retrieveObject("downloadandplaymode");
+		    	requesthandler = (RequestHandler) retrieveObject("handler");
+		    	requesthandler.setFeedbackReceive(this);
+		    	showContent();
+		    	
+		    	if (down != null) pbh.showProgressDialog("Downloading Song...");
+			} catch (Exception e) {
+				onError(-1, e);
+			}
+	    }
 	}
 	
+	@Override
+	public void onData(int id, JSONObject obj) throws Exception {
+		pbh.hideProgressDialog();
+		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
+		  content = obj.getString("content");
+		  showContent();
+		} else
+			super.onData(id, obj);// Handle inherited events
+	}
+	
+	/**
+	 * Shows the content in the webview :)
+	 */
+	public void showContent() {
+		  webview.loadData(content, "text/html", "utf-8");
+	}
+	
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		storeObject("content", content);
+		storeObject("playPath", playPath);
+		storeObject("filename", filename);
+		storeObject("notwice", notwice);
+		storeObject("down", down);
+		storeObject("downloadandplaymode", downloadandplaymode);
+		storeObject("handler", requesthandler);
+
+		super.onSaveInstanceState(outState);
+	}
+
+
+
 	/**
 	 * Returns a story request
 	 * @param pageID
@@ -181,7 +243,7 @@ public class ViewMusicActivity extends FavableActivity  {
 	}
 	
 	@Override
-	public void sonProgress(int id, ProgressSignal prg) {
+	public void onProgress(int id, ProgressSignal prg) {
 		pbh.setMessage("Downloaded " + prg.progress / 1024 + " kbyte...");
 	}
 
@@ -191,7 +253,7 @@ public class ViewMusicActivity extends FavableActivity  {
 	 * Step Three 
 	 */
 	@Override
-	public void sonOther(int id, Object obj) throws Exception {
+	public void onOther(int id, Object obj) throws Exception {
 		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
 			String str = (String)obj;
 			downloadFile(str);
@@ -203,7 +265,7 @@ public class ViewMusicActivity extends FavableActivity  {
 			handlemusic();
 			return;
 		}
-		super.sonOther(id, obj);
+		super.onOther(id, obj);
 	}
 	
 	/**
@@ -218,20 +280,11 @@ public class ViewMusicActivity extends FavableActivity  {
         try { 
            startActivity(intent); 
         } catch (ActivityNotFoundException e) { 
-           sonError(-1, e);
+           onError(-1, e);
         } 	
 		notwice = false;
 	}
 
-	@Override
-	public void sonData(int id, JSONObject obj) throws Exception {
-		pbh.hideProgressDialog();
-		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
-		  String content = obj.getString("content");
-		  webview.loadData(content, "text/html", "utf-8");
-		} else
-			super.sonData(id, obj);// Handle inherited events
-	}
 	
 	@Override
 	public void save() {
@@ -251,14 +304,16 @@ public class ViewMusicActivity extends FavableActivity  {
 			
 			Toast.makeText(getApplicationContext(), "File saved to:\n" + targetPath, Toast.LENGTH_LONG).show();
 		} catch (Exception e) {
-			sonError(-1, e);
+			onError(-1, e);
 		}
 	}
 
 	@Override
-	public void sonError(int id, Exception e) {
-		notwice = false; // Just in case
-		super.sonError(id, e);
+	public void onError(int id, Exception e) {
+		if ((id == AppConstants.REQUEST_ID_DOWNLOADFILE) || (id == AppConstants.REQUEST_ID_FETCHCONTENT)) {
+			notwice = false; // Just in case
+		}
+		super.onError(id, e);
 	}
 	
 	
