@@ -25,12 +25,15 @@ public abstract class ActivityWithRequests extends Activity implements CanHandle
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		if (savedInstanceState == null) 
+		if (savedInstanceState == null) { 
 			uniquestoragekey = System.nanoTime();
-		else
+			requesthandler = new RequestHandler(this);
+		} else {
 			uniquestoragekey = savedInstanceState.getLong("unique");
+	    	requesthandler = (RequestHandler) retrieveObject("handler");
+	    	requesthandler.setFeedbackReceive(this);
+		}
 		
-		requesthandler = new RequestHandler(this);
 		super.onCreate(savedInstanceState);
 	}
 	
@@ -39,10 +42,14 @@ public abstract class ActivityWithRequests extends Activity implements CanHandle
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putLong("unique", uniquestoragekey);
+		storeObject("handler", requesthandler);
 		super.onSaveInstanceState(outState);
 	}
 
-
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+	}
 
 	/**
 	 * The request handler to be used to handle the feedback from the AjaxRequest

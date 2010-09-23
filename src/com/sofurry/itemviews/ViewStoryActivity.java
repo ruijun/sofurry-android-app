@@ -22,19 +22,32 @@ import com.sofurry.util.FileStorage;
  * Activity that shows a single story
  */
 public class ViewStoryActivity extends FavableActivity  {
+
+	private String content;
 	
 	private WebView webview;
-	private String content;
 
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);	
 	    webview = new WebView(this);
 	    setContentView(webview);
 	        
-		AjaxRequest req = getFetchParameters(pageID);
-		pbh.showProgressDialog("Fetching story...");
-		req.execute(requesthandler);
+	    if (savedInstanceState == null) {
+			AjaxRequest req = getFetchParameters(pageID);
+			pbh.showProgressDialog("Fetching story...");
+			req.execute(requesthandler);
+	    } else {
+	    	content = (String) retrieveObject("content");
+	    	showContent();
+	    }
 	}
+	
+	protected void onSaveInstanceState(Bundle outState) {
+		storeObject("content", content);
+		super.onSaveInstanceState(outState);
+	}
+
+	
 
 	/**
 	 * Returns a story request
@@ -56,9 +69,16 @@ public class ViewStoryActivity extends FavableActivity  {
 		pbh.hideProgressDialog();
 		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
 			content = obj.getString("content");
-			webview.loadData(content, "text/html", "utf-8");
+			showContent();
 		} else
 			super.onData(id, obj); // Handle inherited events
+	}
+
+	/**
+	 * Displays the content
+	 */
+	public void showContent() {
+		webview.loadData(content, "text/html", "utf-8");
 	}
 
 	@Override
