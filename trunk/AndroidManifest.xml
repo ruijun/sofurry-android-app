@@ -41,7 +41,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".itemviews.PreviewArtActivity"
+        <activity android:name=".itemviews.ViewArtActivity"
         		  android:screenOrientation="sensor"
         		  android:label="@string/app_name_viewart">
             <intent-filter>

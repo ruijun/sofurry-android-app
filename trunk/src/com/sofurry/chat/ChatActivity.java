@@ -174,16 +174,18 @@ public class ChatActivity extends ActivityWithRequests {
             }
         });
         
-        if (roomId == -1) // This might be called for the first time in the app's lifecycle
-          getRoomList(); // Get Room list will populate the room list, and start the room selection
-        else
-        {  // The data is already available
-        	try {
-     		   changeRoom(roomIdToIdx(roomId));
-			} catch (Exception e) {
-			   onError(-1, e);
+        if (savedInstanceState == null) {
+	        if (roomId == -1) // This might be called for the first time in the app's lifecycle
+	          getRoomList(); // Get Room list will populate the room list, and start the room selection
+	        else
+	        {  // The data is already available
+	        	try {
+	     		   changeRoom(roomIdToIdx(roomId));
+				} catch (Exception e) {
+				   onError(-1, e);
+				}
 			}
-		}
+        }
 	}
 
 	/**

@@ -12,6 +12,7 @@ import com.sofurry.requests.AjaxRequest;
 
 public class ViewPMActivity extends ActivityWithRequests {
 
+	private String content = null;
 	private int PMID;
 	private WebView webview;
 
@@ -19,35 +20,51 @@ public class ViewPMActivity extends ActivityWithRequests {
 		super.onCreate(savedInstanceState);
 		webview = new WebView(this);
 		setContentView(webview);
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {
-			PMID = extras.getInt("PMID");
-			
-			AjaxRequest req = getFetchParameters(PMID);
-			pbh.showProgressDialog("Fetching data...");
-			req.execute(requesthandler);
+		
+		if (savedInstanceState == null) {
+			Bundle extras = getIntent().getExtras();
+			if (extras != null) {
+				PMID = extras.getInt("PMID");
+				
+				AjaxRequest req = getFetchParameters(PMID);
+				pbh.showProgressDialog("Fetching data...");
+				req.execute(requesthandler);
+			}
+		} else {
+			content = (String) retrieveObject("content");
+			showContent();
 		}
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		storeObject("content", content);
 	}
 
 	protected AjaxRequest getFetchParameters(int id) {
 		AjaxRequest req = new AjaxRequest();
-
 		req.addParameter("f", "pmcontent");
 		req.addParameter("id", "" + id);
 		req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
 		return req;
 	}
 
-
 	@Override
 	public void onData(int id, JSONObject obj) throws Exception {
 		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
 			JSONArray items = new JSONArray(obj.getString("items"));
 			JSONObject jsonItem = items.getJSONObject(0);
-			String content = jsonItem.getString("message");
-			webview.loadData(content, "text/html", "utf-8");
+			content = jsonItem.getString("message");
 		} else 
 			super.onData(id, obj);// Handle inherited events
+	}
+	
+	/**
+	 * Shows the content
+	 */
+	public void showContent() {
+		webview.loadData(content, "text/html", "utf-8");
 	}
 
 
