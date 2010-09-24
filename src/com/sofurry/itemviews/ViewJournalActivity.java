@@ -30,10 +30,21 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 	    super.onCreate(savedInstanceState);	
 	    webview = new WebView(this);
 	    setContentView(webview);
-	        
-		AjaxRequest req = getFetchParameters(pageID);
-		pbh.showProgressDialog("Fetching story...");
-		req.execute(requesthandler);
+	    
+	    if (savedInstanceState == null) {
+			pbh.showProgressDialog("Fetching journal...");
+			AjaxRequest req = getFetchParameters(pageID);
+			req.execute(requesthandler);
+	    } else {
+			content = (String) retrieveObject("content");
+			viewContent();
+	    }
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		storeObject("content", content);
 	}
 
 	/**
@@ -56,9 +67,13 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
 			pbh.hideProgressDialog();
 			content = obj.getString("content");
-			webview.loadData(content, "text/html", "utf-8");
+			viewContent();
 		} else
 			super.onData(id, obj);// Handle inherited events
+	}
+	
+	public void viewContent() {
+		webview.loadData(content, "text/html", "utf-8");
 	}
 
 	@Override

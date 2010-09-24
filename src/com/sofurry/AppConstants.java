@@ -68,6 +68,7 @@ public class AppConstants {
 	public static final int REQUEST_ID_RATE = 4509;
 
 	public static final int REQUEST_ID_DOWNLOADFILE = 4510;
+	public static final int REQUEST_ID_DOWNLOADIMAGE = 4511;
 
 	
 	public static final String PREFS_NAME = "SoFurryPreferences";

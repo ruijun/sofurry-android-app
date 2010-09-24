@@ -12,7 +12,7 @@ import android.widget.BaseAdapter;
 import com.sofurry.AbstractContentGallery;
 import com.sofurry.ActivityManager;
 import com.sofurry.AppConstants;
-import com.sofurry.itemviews.PreviewArtActivity;
+import com.sofurry.itemviews.ViewArtActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
@@ -90,7 +90,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		Submission s = getDataItem(selectedIndex);
 //		int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
 		Log.i("GalleryArt", "Viewing art ID: " + s.getId());
-		Intent i = new Intent(this, PreviewArtActivity.class);
+		Intent i = new Intent(this, ViewArtActivity.class);
 		i.putExtra("pageID", s.getId());
 		i.putExtra("name", s.getName());
 		man.getResultList().get(selectedIndex).feedIntent(i);

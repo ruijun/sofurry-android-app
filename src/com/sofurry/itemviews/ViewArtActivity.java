@@ -17,24 +17,25 @@ import android.widget.Toast;
 
 import com.sofurry.AppConstants;
 import com.sofurry.FavableActivity;
-import com.sofurry.ProgressBarHelper;
 import com.sofurry.R;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.FileStorage;
 import com.sofurry.util.HttpRequest;
 import com.sofurry.util.ImageStorage;
 
-public class PreviewArtActivity extends FavableActivity implements Runnable {
+public class ViewArtActivity extends FavableActivity implements Runnable {
 
 	private ImageView image;
 	private TextView imageartisttext;
-	
+	private Thread imageFetcher = null;
 	private Button hdButton = null;
-    
-    String tags;
-    String authorName;
-    int authorId;
-    String thumbnailUrl;
+    private String content = null;
+	
+    private String tags;
+    private String authorName;
+    private int authorId;
+    private String thumbnailUrl;
+    private Bitmap imageBitmap = null;
     
     private String filename = null;
 
@@ -53,28 +54,49 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 			}});
 	    hdButton.setEnabled(false);
 
-		Bundle extras = getIntent().getExtras() ;
-	    if( extras != null ) {
-	        name = extras.getString("name");
-	        tags = extras.getString("tags");
-	        authorName = extras.getString("authorName");
-	        authorId = extras.getInt("authorId");
-	        thumbnailUrl = extras.getString("thumbnail");
-	        
-			Bitmap thumb = ImageStorage.loadSubmissionIcon(pageID);
-			if (thumb != null)
-				image.setImageBitmap(thumb);
-			
-			filename = name + HttpRequest.extractExtension(thumbnailUrl);
-			filename = FileStorage.sanitize(filename);
-			
-			imageartisttext.setText(name + "\n" + authorName);
+	    if (savedInstanceState == null) {
+			Bundle extras = getIntent().getExtras() ;
+		    if( extras != null ) {
+		        name = extras.getString("name");
+		        tags = extras.getString("tags");
+		        authorName = extras.getString("authorName");
+		        authorId = extras.getInt("authorId");
+		        thumbnailUrl = extras.getString("thumbnail");
+		        
+				Bitmap thumb = ImageStorage.loadSubmissionIcon(pageID);
+				if (thumb != null)
+					image.setImageBitmap(thumb);
+				
+				filename = name + HttpRequest.extractExtension(thumbnailUrl);
+				filename = FileStorage.sanitize(filename);
+				
+				content = name + "\n" + authorName;
+		    }
+	
+			imageFetcher = new Thread(this);
+			imageFetcher.start();
+	    } else {
+	    	content = (String) retrieveObject("content");
+	    	filename = (String) retrieveObject("filename");
+	    	imageBitmap = (Bitmap) retrieveObject("image");
+	    	imageFetcher = (Thread) retrieveObject("thread"); 
 	    }
-
-	    pbh.showProgressDialog("Fetching image...");
-		Thread thread = new Thread(this);
-		thread.start();
+    	if (imageFetcher != null)
+	      pbh.showProgressDialog("Fetching image...");
+    	if (imageBitmap != null) 
+    	  showImage();
+		imageartisttext.setText(content);
 	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		storeObject("content", content);
+		storeObject("filename", filename);
+		storeObject("image", imageBitmap);
+		storeObject("thread", imageFetcher);
+		super.onSaveInstanceState(outState);
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
@@ -101,9 +123,9 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 			}
 
 			// Send bitmap to our hungry thread
-			requesthandler.postMessage(0,b);
+			requesthandler.postMessage(AppConstants.REQUEST_ID_DOWNLOADIMAGE,b);
 		} catch (Exception e) {
-			requesthandler.postMessage(0,e);
+			requesthandler.postMessage(AppConstants.REQUEST_ID_DOWNLOADIMAGE,e);
 		}
 	}
 
@@ -166,18 +188,26 @@ public class PreviewArtActivity extends FavableActivity implements Runnable {
 	public void onOther(int id, Object obj) throws Exception {
 		pbh.hideProgressDialog();
 		// If the returntype is bitmap, we know what to do with it
-		if (Bitmap.class.isAssignableFrom(obj.getClass())) {
-		  image.setImageBitmap((Bitmap)obj);
-		  hdButton.setEnabled(true);
+		if (id == AppConstants.REQUEST_ID_DOWNLOADIMAGE) {
+			imageBitmap = (Bitmap)obj;
+			showImage();
+		  imageFetcher = null;
 		}
 		else
 		  super.onOther(id, obj);
 	}
 	
+	/**
+	 * Shows the image
+	 */
+	public void showImage() {
+		  image.setImageBitmap(imageBitmap);
+		  hdButton.setEnabled(true);
+	}
 	
-
 	@Override
 	public void onError(int id, Exception e) {
+		if (id == AppConstants.REQUEST_ID_DOWNLOADIMAGE) imageFetcher = null;
 		super.onError(id, e);
 	}
 
