@@ -11,8 +11,7 @@ import android.view.MenuItem;
  * A class that contains all the tools for an item that is favable, ratable and you know. 
  * 
  */
-public abstract class SubmissionViewActivity extends ActivityWithRequests {
-	protected ProgressBarHelper pbh = new ProgressBarHelper(this);
+public abstract class SubmissionViewActivity extends ActivityWithRequests implements ICanCancel {
 	
 	protected int pageID;
 	protected String name;
@@ -81,6 +80,9 @@ public abstract class SubmissionViewActivity extends ActivityWithRequests {
 
         return super.onKeyDown(keyCode, event);
     }
+
+    
+    
 
 }
 

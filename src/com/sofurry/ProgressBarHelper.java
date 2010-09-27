@@ -1,9 +1,11 @@
 package com.sofurry;
 
-import com.sofurry.requests.ProgressSignal;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+
+import com.sofurry.requests.ProgressSignal;
 
 /**
  * @author Rangarig
@@ -14,9 +16,18 @@ public class ProgressBarHelper {
 	
 	private ProgressDialog pd;  // The progress dialog to use
 	private Activity act;		// Connection to the activity this helper is for
+	private ICanCancel cancelReceiver = null; // The object to be called if the progress bar is canceled
 		
-	public ProgressBarHelper(Activity act) {
+	/**
+	 * Creates a progressbar helper
+	 * @param act
+	 * The activity to use as context
+	 * @param cancelReceiver
+	 * The class to call when a cancel request is made
+	 */
+	public ProgressBarHelper(Activity act, ICanCancel cancelReceiver) {
 		this.act = act;
+		this.cancelReceiver = cancelReceiver;
 	}
 	
 	/**
@@ -24,7 +35,21 @@ public class ProgressBarHelper {
 	 * @param msg
 	 */
 	public void showProgressDialog(String msg) {
-		pd = ProgressDialog.show(act, msg, "Please wait", true, false);
+		pd = ProgressDialog.show(act, msg, "Please wait", true, true);
+		setCancelListener();
+	}
+	
+	/**
+	 * Sets the listener that is called when the Progress dialog is canceled
+	 */
+	private void setCancelListener() {
+		pd.setOnCancelListener(new OnCancelListener() {
+			
+			public void onCancel(DialogInterface dialog) {
+				if (cancelReceiver != null)
+					cancelReceiver.cancel();
+			}
+		});
 	}
 	
 	/**
@@ -32,21 +57,20 @@ public class ProgressBarHelper {
 	 * @param msg
 	 */
 	public void showAsProgressBar(String msg) {
-		ProgressDialog pbarDialog;
-
-		pbarDialog = new ProgressDialog( act );
+		pd = new ProgressDialog( act );
 
 		//After that, just set the Progress Style to STYLE_HORIZONTAL,
-
-		pbarDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 
 		//Also enter the dialog message text to whatever you want and whether it is cancelable or not.
+		pd.setMessage(msg);
 
-		pbarDialog.setMessage(msg);
+		pd.setCancelable(true);
+		setCancelListener();
 
-		pbarDialog.setCancelable(false);
+		// Will allow the application to react to cancel reqeusts
 		
-		pbarDialog.show();
+		pd.show();
 
 		//Read more: http://www.brighthub.com/mobile/google-android/articles/43168.aspx#ixzz10FQ3en3x
 	}

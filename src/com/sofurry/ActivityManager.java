@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.sofurry.model.IHasThumbnail;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.CanHandleFeedback;
+import com.sofurry.requests.ICanHandleFeedback;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.ThumbnailDownloaderThread;
@@ -28,7 +28,7 @@ import com.sofurry.util.ErrorHandler;
  *
  * Yet another attempt to standartize the Gallery And the List Activity.
  */
-public class ActivityManager<T> implements CanHandleFeedback {
+public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	
 	private ProgressBarHelper progh = null; 
 
@@ -53,7 +53,7 @@ public class ActivityManager<T> implements CanHandleFeedback {
 	 */
 	public void setActivity(IManagedActivity<T> myAct) {
 		this.myAct = myAct;
-		progh = new ProgressBarHelper(getAct());
+		progh = new ProgressBarHelper(getAct(),this);
 		requesthandler = new RequestHandler(this);
 	}
 	
@@ -347,6 +347,13 @@ public class ActivityManager<T> implements CanHandleFeedback {
 	public void hideProgressDialog() {
 		progh.hideProgressDialog();
 	}
+
+	public void cancel() {
+		requesthandler.killThreads(); // We instruct all running threads to terminate
+		myAct.finish(); // We instruct the Activity to close
+	}
+	
+	
 
 
 	

@@ -15,6 +15,7 @@ import com.sofurry.AppConstants;
 import com.sofurry.requests.AsyncFileDownloader;
 import com.sofurry.requests.IRequestHandler;
 import com.sofurry.requests.ProgressSignal;
+import com.sofurry.requests.RequestHandler;
 
 public class ContentDownloader {
 
@@ -89,6 +90,8 @@ public class ContentDownloader {
 	 * The filename to store the file to
 	 * @param feedback
 	 * A Request handler that will be bombarded with ProgressSignal objects, to signal the progress of things.
+	 * @param parent
+	 * The Thread this is called from. If it exists, it can be checked for cancelation requests
 	 * @throws Exception
 	 */
 	public static void downloadFile(String url, String filename, IRequestHandler feedback) throws Exception {
@@ -119,6 +122,8 @@ public class ContentDownloader {
 		    		  feedback.postMessage(new ProgressSignal(t,0));
 		    		  cnt = 0;
 		    	  }
+		    	  
+		    	  if (feedback.isKilled()) throw new Exception("Transferthread was terminated by request handler.");
 		      }
 		      
 		    }
