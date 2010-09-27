@@ -2,7 +2,7 @@ package com.sofurry.requests;
 
 import org.json.JSONObject;
 
-public interface CanHandleFeedback {
+public interface ICanHandleFeedback {
 
 	/**
 	 * Method that is called when an error occurs

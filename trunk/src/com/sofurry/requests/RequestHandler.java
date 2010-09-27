@@ -14,17 +14,18 @@ import com.sofurry.RefreshRequest;
  */
 public class RequestHandler implements IRequestHandler {
 	
-	private CanHandleFeedback feedback = null;
+	private ICanHandleFeedback feedback = null;
+	private boolean killed = false;
 	
 	/**
 	 * Constructor that will allow the request handler to be joined with an activity that know how to handle the feedback (implemented CanHandleFeedback interface) 
 	 * @param feedback
 	 */
-	public RequestHandler(CanHandleFeedback feedback) {
+	public RequestHandler(ICanHandleFeedback feedback) {
 		setFeedbackReceive(feedback);
 	}
 	
-	public void setFeedbackReceive(CanHandleFeedback feedback) {
+	public void setFeedbackReceive(ICanHandleFeedback feedback) {
 		this.feedback = feedback;
 	}
 	
@@ -145,5 +146,23 @@ public class RequestHandler implements IRequestHandler {
 	public void postMessage(Object obj) {
 		postMessage(-1, obj);
 	}
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.requests.IRequestHandler#isKilled()
+	 * 
+	 * Is called by running threads to see if they should terminate
+	 */
+	public boolean isKilled() {
+		return killed;
+	}
+	
+	/**
+	 * Sets the "killed" boolean to true, which is polled by running threads and instructs them to terminate.
+	 */
+	public void killThreads() {
+		killed = true;
+	}
+	
+	
 
 }

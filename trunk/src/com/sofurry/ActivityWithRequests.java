@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 
-import com.sofurry.requests.CanHandleFeedback;
+import com.sofurry.requests.ICanHandleFeedback;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.tempstorage.ItemStorage;
@@ -18,9 +18,9 @@ import com.sofurry.util.ErrorHandler;
  *
  * The base for an Activity with request handler, and a convinient progressbar handler
  */
-public abstract class ActivityWithRequests extends Activity implements CanHandleFeedback {
+public abstract class ActivityWithRequests extends Activity implements ICanHandleFeedback,ICanCancel {
 	
-	protected ProgressBarHelper pbh = new ProgressBarHelper(this);
+	protected ProgressBarHelper pbh = new ProgressBarHelper(this,this);
 	protected long uniquestoragekey = System.nanoTime();
 	
 	@Override
@@ -118,4 +118,17 @@ public abstract class ActivityWithRequests extends Activity implements CanHandle
 	}
 
 
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.ICanCancel#cancel()
+	 * 
+	 * Is called when the progress bar is canceled
+	 */
+	public void cancel() {
+		requesthandler.killThreads();
+		finish();
+	}
+
+	
+	
 }
