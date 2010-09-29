@@ -53,9 +53,11 @@ public class ViewPMActivity extends ActivityWithRequests {
 	@Override
 	public void onData(int id, JSONObject obj) throws Exception {
 		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
+			pbh.hideProgressDialog();
 			JSONArray items = new JSONArray(obj.getString("items"));
 			JSONObject jsonItem = items.getJSONObject(0);
 			content = jsonItem.getString("message");
+			showContent();
 		} else 
 			super.onData(id, obj);// Handle inherited events
 	}
