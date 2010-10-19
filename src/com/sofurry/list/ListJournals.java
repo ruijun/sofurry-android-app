@@ -56,8 +56,9 @@ public class ListJournals extends AbstractContentList<Submission> {
 		//int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
 		Log.i("ListJournals", "Viewing journal ID: " + s.getId());
 		Intent i = new Intent(this, ViewJournalActivity.class);
-		i.putExtra("pageID", s.getId());
-		i.putExtra("name", s.getName());
+		s.feedIntent(i);
+//		i.putExtra("pageID", s.getId());
+//		i.putExtra("name", s.getName());
 		//i.putExtra("useAuthentication", useAuthentication());
 		startActivity(i);
 		

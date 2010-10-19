@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.sofurry.SubmissionViewActivity;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.ImageStorage;
 
@@ -175,14 +176,12 @@ public class Submission implements Serializable, IHasThumbnail {
 	 * @param intent
 	 */
 	public void feedIntent(Intent intent) {
+		intent.putExtra("pageID", getId());
 		intent.putExtra("name", getName());
 		intent.putExtra("tags", getTags());
 		intent.putExtra("authorName", getAuthorName());
 		intent.putExtra("authorId", getAuthorID());
 		intent.putExtra("thumbnail", thumbnailUrl);
 	}
-	
-	
-
 	
 }

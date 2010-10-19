@@ -39,12 +39,32 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 
 	protected ActivityManager<T> man = null;
 	private boolean finished = false;
+	
+	protected long uniqueKey = 0;  // The key to be used by the storage manager to recognize this particular activity
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.IManagedActivity#getUniqueKey()
+	 */
+	public long getUniqueKey() {
+		return uniqueKey;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.IManagedActivity#setUniqueKey(long)
+	 */
+	public void setUniqueKey(long key) {
+		uniqueKey = key;
+	}
 
 	// Get parameters and initiate data fetch thread
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// See if the UID needs restoring
+		ActivityManager.onCreateRefresh(this, savedInstanceState);
+		
 		if (ManagerStore.isStored(this)) {
 		    man = ManagerStore.retrieve(this);
 		    plugInAdapter();
@@ -53,6 +73,12 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 			man.onActCreate();
 		}
 		
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		man.onSaveInstanceState(outState);
+		super.onSaveInstanceState(outState);
 	}
 	
 	public ActivityManager<T> getActivityManager() {

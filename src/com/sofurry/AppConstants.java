@@ -36,6 +36,11 @@ public class AppConstants {
 	public static final int MENU_CUM = 4203;
 	public static final int MENU_HD = 4204;
 	public static final int MENU_PLAY = 4205;
+	public static final int MENU_WATCH = 4206;
+	public static final int MENU_UNWATCH = 4207;
+	public static final int MENU_USERSSTORIES = 4210;
+	public static final int MENU_USERSART = 4211;
+	public static final int MENU_USERSMUSIK = 4212;
 
 	public static final int MENU_RATE = 4300;
 	public static final int MENU_RATE1 = 4301;
@@ -50,6 +55,7 @@ public class AppConstants {
 	
 	public static final int VIEWSOURCE_ALL = 0;	
 	public static final int VIEWSOURCE_FEATURED = 8;	
+	public static final int VIEWSOURCE_USER = 7;	
 	public static final int VIEWSOURCE_FAVORITES = 1;	
 	public static final int VIEWSOURCE_WATCHLIST = 2;	
 	public static final int VIEWSOURCE_GROUP = 10;	
@@ -66,6 +72,7 @@ public class AppConstants {
 	public static final int REQUEST_ID_UNFAV = 4507;
 	public static final int REQUEST_ID_CUM = 4508;
 	public static final int REQUEST_ID_RATE = 4509;
+	public static final int REQUEST_ID_WATCH = 4512;
 
 	public static final int REQUEST_ID_DOWNLOADFILE = 4510;
 	public static final int REQUEST_ID_DOWNLOADIMAGE = 4511;

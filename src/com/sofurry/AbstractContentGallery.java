@@ -30,6 +30,22 @@ import com.sofurry.tempstorage.ManagerStore;
  */
 public abstract class AbstractContentGallery<T> extends Activity implements IManagedActivity<T> {
 
+	protected long uniqueKey = 0;  // The key to be used by the storage manager to recognize this particular activity
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.IManagedActivity#getUniqueKey()
+	 */
+	public long getUniqueKey() {
+		return uniqueKey;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.IManagedActivity#setUniqueKey(long)
+	 */
+	public void setUniqueKey(long key) {
+		uniqueKey = key;
+	}
+
 	protected ActivityManager<T> man = new ActivityManager<T>(this);
 	private boolean finished = false;
 	
@@ -39,7 +55,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	public ActivityManager<T> getActivityManager() {
 		return man;
 	}
-
+	
 	// Get parameters and initiate data fetch thread
 	@SuppressWarnings("unchecked")
 	/* (non-Javadoc)
@@ -51,6 +67,9 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		setContentView(R.layout.gallerylayout);
 		galleryView = (GridView) findViewById(R.id.galleryview);
 		
+		// See if the UID needs restoring
+		ActivityManager.onCreateRefresh(this, savedInstanceState);
+		
 		if (ManagerStore.isStored(this)) {
 		    man = ManagerStore.retrieve(this);
 		    plugInAdapter();
@@ -60,6 +79,12 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		}
 	}
 	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		man.onSaveInstanceState(outState);
+		super.onSaveInstanceState(outState);
+	}
+
 	@Override
 	protected void onPause() {
 		if (!finished) ManagerStore.store(this);

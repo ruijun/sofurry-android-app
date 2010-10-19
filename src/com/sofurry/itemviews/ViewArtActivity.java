@@ -33,7 +33,6 @@ public class ViewArtActivity extends FavableActivity implements Runnable {
 	
     private String tags;
     private String authorName;
-    private int authorId;
     private String thumbnailUrl;
     private Bitmap imageBitmap = null;
     
@@ -60,7 +59,6 @@ public class ViewArtActivity extends FavableActivity implements Runnable {
 		        name = extras.getString("name");
 		        tags = extras.getString("tags");
 		        authorName = extras.getString("authorName");
-		        authorId = extras.getInt("authorId");
 		        thumbnailUrl = extras.getString("thumbnail");
 		        
 				Bitmap thumb = ImageStorage.loadSubmissionIcon(pageID);

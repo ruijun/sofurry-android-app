@@ -21,7 +21,7 @@ public class ManagerStore {
 	 */
 	public static void store(IManagedActivity act) {
 		ActivityManager man = act.getActivityManager();
-		String key = act.getClass().getName();
+		String key = "" + act.getUniqueKey();
 		
 		storage.put(key, man);
 	}
@@ -32,7 +32,7 @@ public class ManagerStore {
 	 * @return
 	 */
 	public static boolean isStored(IManagedActivity act) {
-		String key = act.getClass().getName();
+		String key = "" + act.getUniqueKey();
 		ActivityManager man = storage.get(key);
 		if (man != null) return true;
 		return false;
@@ -44,7 +44,7 @@ public class ManagerStore {
 	 * @return
 	 */
 	public static ActivityManager retrieve(IManagedActivity act) {
-		String key = act.getClass().getName();
+		String key = "" + act.getUniqueKey();
 		ActivityManager man = storage.get(key);
 		if (man != null)
 		  man.setActivity(act); // Important! The activity object at this point is likely brand new!

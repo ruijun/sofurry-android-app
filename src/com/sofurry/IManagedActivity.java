@@ -36,5 +36,10 @@ public interface IManagedActivity<T> {
 	
 	public abstract ActivityManager<T> getActivityManager();
 	
+	public abstract long getUniqueKey();
+	
+	public abstract void setUniqueKey(long key);
+	
+	public abstract void onSaveInstanceState(Bundle outState);
 	
 }
