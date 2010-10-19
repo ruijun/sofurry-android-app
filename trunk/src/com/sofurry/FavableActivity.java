@@ -6,8 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 
+import com.sofurry.gallery.GalleryArt;
+import com.sofurry.list.ListMusic;
+import com.sofurry.list.ListStories;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.tempstorage.ManagerStore;
 
 /**
  * @author Rangarig
@@ -17,16 +22,24 @@ import com.sofurry.requests.AjaxRequest;
  */
 public abstract class FavableActivity extends SubmissionViewActivity {
 
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
 	
 	@Override
 	public void createExtraMenuOptions(Menu menu) {
-		menu.add(0,AppConstants.MENU_ADDFAV ,0,"Add Fav").setIcon(android.R.drawable.ic_menu_add);
-		menu.add(0,AppConstants.MENU_REMFAV ,0,"Remove Fav").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-		menu.add(0,AppConstants.MENU_RATE   ,0,"Rate").setIcon(android.R.drawable.btn_star_big_off);
-		menu.add(0, AppConstants.MENU_CUM   ,0,"Cum!").setIcon(android.R.drawable.ic_menu_compass);
+		SubMenu favsmenu = menu.addSubMenu("Favs & More").setIcon(android.R.drawable.ic_menu_add);
+		favsmenu.add(0,AppConstants.MENU_ADDFAV ,0,"Add Fav").setIcon(android.R.drawable.ic_menu_add);
+		favsmenu.add(0,AppConstants.MENU_REMFAV ,0,"Remove Fav").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		favsmenu.add(0,AppConstants.MENU_RATE   ,0,"Rate").setIcon(android.R.drawable.btn_star_big_off);
+		favsmenu.add(0, AppConstants.MENU_CUM   ,0,"Cum!").setIcon(android.R.drawable.ic_menu_compass);
+		SubMenu usermenu = menu.addSubMenu("Author").setIcon(android.R.drawable.ic_menu_more);
+		usermenu.add(0, AppConstants.MENU_WATCH   ,0,"Watch").setIcon(android.R.drawable.ic_menu_search);
+		usermenu.add(0, AppConstants.MENU_UNWATCH   ,0,"Unwatch").setIcon(android.R.drawable.ic_menu_delete);
+		usermenu.add(0,AppConstants.MENU_USERSSTORIES,0,"Author's Stories").setIcon(android.R.drawable.ic_menu_slideshow);
+		usermenu.add(0,AppConstants.MENU_USERSART,0,"Author's Art").setIcon(android.R.drawable.ic_menu_slideshow);
+		usermenu.add(0,AppConstants.MENU_USERSMUSIK,0,"Author's Music").setIcon(android.R.drawable.ic_menu_slideshow);
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -43,6 +56,21 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 			return true;
 		case AppConstants.MENU_CUM:
 			cum();
+			return true;
+		case AppConstants.MENU_WATCH:
+			watch();
+			return true;
+		case AppConstants.MENU_UNWATCH:
+			unwatch();
+			return true;
+		case AppConstants.MENU_USERSSTORIES:
+			morefromuser(ListStories.class,AppConstants.ACTIVITY_STORIESLIST);
+			return true;
+		case AppConstants.MENU_USERSART:
+			morefromuser(GalleryArt.class,AppConstants.ACTIVITY_GALLERYART);
+			return true;
+		case AppConstants.MENU_USERSMUSIK:
+			morefromuser(ListMusic.class,AppConstants.ACTIVITY_MUSICLIST);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -120,6 +148,37 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		request.execute(requesthandler);
 	}
 
+	/**
+	 * Watches the current user
+	 */
+	public void watch() {
+		pbh.showProgressDialog("Watching ...");
+		AjaxRequest request = new AjaxRequest(AppConstants.SITE_URL + "/addwatch?favid=" + authorId );
+		//request.addParameter("favid", "" + authorId);
+		request.setRequestID(AppConstants.REQUEST_ID_WATCH);
+		request.execute(requesthandler);
+	}
+	/**
+	 * Watches the current user
+	 */
+	public void unwatch() {
+		pbh.showProgressDialog("Unwatching ...");
+		AjaxRequest request = new AjaxRequest(AppConstants.SITE_URL + "/removewatch?favid=" + authorId );
+		//request.addParameter("favid", "" + authorId);
+		request.setRequestID(AppConstants.REQUEST_ID_WATCH);
+		request.execute(requesthandler);
+	}
+
+	/**
+	 * Shows more work by the specific user
+	 */
+	public void morefromuser(Class activity, int ActivityID) {
+		Intent intent = new Intent(this, activity);
+		intent.putExtra("viewSource", AppConstants.VIEWSOURCE_USER);
+		intent.putExtra("viewSearch", "" + authorId  );
+		startActivityForResult(intent, ActivityID);
+	}
+
 	@Override
 	public void onData(int id, JSONObject obj) throws Exception {
 		switch (id) {
@@ -135,10 +194,14 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		case AppConstants.REQUEST_ID_RATE:
 			pbh.hideProgressDialog();
 			return;
+		case AppConstants.REQUEST_ID_WATCH:
+			pbh.hideProgressDialog();
+			return;
 		}
 		super.onData(id, obj);
 		
 	}
+		
 	
 	
 	

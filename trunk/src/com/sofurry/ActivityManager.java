@@ -122,10 +122,40 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	 */
 	public void onActCreate() {
 	    resultList = new ArrayList<T>();
+	    
+	    myAct.setUniqueKey(System.currentTimeMillis());
+	    
+	    Bundle extras = getAct().getIntent().getExtras();
+	    if (extras != null) {
+	    	viewSource = extras.getInt("viewSource");
+	    	viewSearch = extras.getString("viewSearch");
+	    }
 	    //pageIDs = new ArrayList<String>();
 	    myAct.plugInAdapter();
+	    
 		loadPage(true);
 	}
+
+	
+	/**
+	 * Used for Unique ID storage
+	 * @param savedInstanceState
+	 */
+	public static void onCreateRefresh(IManagedActivity act, Bundle savedInstanceState) {
+		if (savedInstanceState != null)
+		  act.setUniqueKey(savedInstanceState.getLong("unique"));
+	}
+	
+	
+	
+	/**
+	 * Used for Unique ID storage
+	 * @param outState
+	 */
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putLong("unique", myAct.getUniqueKey());
+	}
+
 	
 	/**
 	 * Called when a scrolling event occurs

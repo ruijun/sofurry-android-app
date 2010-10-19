@@ -42,6 +42,8 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 		req.addParameter("viewSource", ""+source);
 		if (source == AppConstants.VIEWSOURCE_SEARCH)
 		  req.addParameter("search", viewSearch);
+		if (source == AppConstants.VIEWSOURCE_USER)
+		  req.addParameter("authorid", viewSearch);
 		req.addParameter("contentType", "" + contentType);
 		req.addParameter("entriesPerPage", "" + entries);
 		req.addParameter("page", "" + page);
@@ -91,8 +93,9 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 //		int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
 		Log.i("GalleryArt", "Viewing art ID: " + s.getId());
 		Intent i = new Intent(this, ViewArtActivity.class);
-		i.putExtra("pageID", s.getId());
-		i.putExtra("name", s.getName());
+		s.feedIntent(i);
+//		i.putExtra("pageID", s.getId());
+//		i.putExtra("name", s.getName());
 		man.getResultList().get(selectedIndex).feedIntent(i);
 		startActivity(i);
 	}

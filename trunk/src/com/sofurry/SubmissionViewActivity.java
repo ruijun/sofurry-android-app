@@ -15,6 +15,9 @@ public abstract class SubmissionViewActivity extends ActivityWithRequests implem
 	
 	protected int pageID;
 	protected String name;
+	protected int authorId;
+	protected String authorName;
+	protected String thumbURL;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -22,6 +25,9 @@ public abstract class SubmissionViewActivity extends ActivityWithRequests implem
 	    if( extras != null ) {
 	        pageID = extras.getInt("pageID");
 	        name = extras.getString("name");
+	        authorId = extras.getInt("authorId");
+	        authorName = extras.getString("authorName");
+	        thumbURL = extras.getString("thumbnail");
 	    }
 	}
 	
