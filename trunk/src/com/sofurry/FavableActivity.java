@@ -153,8 +153,9 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	 */
 	public void watch() {
 		pbh.showProgressDialog("Watching ...");
-		AjaxRequest request = new AjaxRequest(AppConstants.SITE_URL + "/addwatch?favid=" + authorId );
-		//request.addParameter("favid", "" + authorId);
+		AjaxRequest request = new AjaxRequest();
+		request.addParameter("f", "addwatch");
+		request.addParameter("authorid", "" + authorId);
 		request.setRequestID(AppConstants.REQUEST_ID_WATCH);
 		request.execute(requesthandler);
 	}
@@ -163,8 +164,9 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	 */
 	public void unwatch() {
 		pbh.showProgressDialog("Unwatching ...");
-		AjaxRequest request = new AjaxRequest(AppConstants.SITE_URL + "/removewatch?favid=" + authorId );
-		//request.addParameter("favid", "" + authorId);
+		AjaxRequest request = new AjaxRequest();
+		request.addParameter("f", "remwatch");
+		request.addParameter("authorid", "" + authorId);
 		request.setRequestID(AppConstants.REQUEST_ID_WATCH);
 		request.execute(requesthandler);
 	}

@@ -232,7 +232,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	 * @param menu
 	 */
 	public void createBrowsableMenu(Menu menu) {
-		SubMenu viewSourceMenu = menu.addSubMenu("Filter").setIcon(android.R.drawable.ic_menu_search);
+		SubMenu viewSourceMenu = menu.addSubMenu("Filter & Search").setIcon(android.R.drawable.ic_menu_search);
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_KEYWORDS, 0, "Keywords");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_ALL, 0, "All Submissions");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FEATURED, 0, "Featured");
