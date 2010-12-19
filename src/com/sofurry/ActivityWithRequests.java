@@ -21,6 +21,10 @@ public abstract class ActivityWithRequests extends Activity implements ICanHandl
 	
 	protected ProgressBarHelper pbh = new ProgressBarHelper(this,this);
 	protected long uniquestoragekey = System.nanoTime();
+	/**
+	 * The request handler to be used to handle the feedback from the AjaxRequest
+	 */
+	protected RequestHandler requesthandler = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +53,6 @@ public abstract class ActivityWithRequests extends Activity implements ICanHandl
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 	}
-
-	/**
-	 * The request handler to be used to handle the feedback from the AjaxRequest
-	 */
-	protected RequestHandler requesthandler = null;
-
 	
 	public void onError(int id, Exception e) {
 		pbh.hideProgressDialog();

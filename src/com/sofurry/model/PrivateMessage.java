@@ -91,6 +91,7 @@ public class PrivateMessage implements Serializable, IHasThumbnail {
 		String date = obj.getString("date");
 		String subject = obj.getString("subject");
 		String status = obj.getString("status");
+		
 		setFromUser(fromUserName);
 		setId(Integer.parseInt(id));
 		setDate(date);

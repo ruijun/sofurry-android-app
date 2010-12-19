@@ -18,7 +18,9 @@ public class ViewPMActivity extends ActivityWithRequests {
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		webview = new WebView(this);
+		webview.setBackgroundColor(0);
 		setContentView(webview);
 		
 		if (savedInstanceState == null) {
@@ -53,10 +55,22 @@ public class ViewPMActivity extends ActivityWithRequests {
 	@Override
 	public void onData(int id, JSONObject obj) throws Exception {
 		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
+			JSONArray items;
+			JSONObject jsonItem;
+			StringBuilder contentBuilder;
+			
+			// Hide the progress dialog
 			pbh.hideProgressDialog();
-			JSONArray items = new JSONArray(obj.getString("items"));
-			JSONObject jsonItem = items.getJSONObject(0);
-			content = jsonItem.getString("message");
+			
+			// Parse message from retrieved array
+			items = new JSONArray(obj.getString("items"));
+			jsonItem = items.getJSONObject(0);
+			
+			// Generate and show contents
+			contentBuilder = new StringBuilder(jsonItem.getString("message"));
+			contentBuilder.insert(0, "<p style=\"color: #FFFFFF\">");
+			contentBuilder.append("</p>");
+			content = contentBuilder.toString().replace("\n", "<br/>");
 			showContent();
 		} else 
 			super.onData(id, obj);// Handle inherited events
