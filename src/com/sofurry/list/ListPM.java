@@ -12,6 +12,7 @@ import android.widget.BaseAdapter;
 import com.sofurry.AbstractContentList;
 import com.sofurry.R;
 import com.sofurry.itemviews.ViewPMActivity;
+import com.sofurry.listadapters.PrivateMessageAdapter;
 import com.sofurry.model.PrivateMessage;
 import com.sofurry.requests.AjaxRequest;
 
