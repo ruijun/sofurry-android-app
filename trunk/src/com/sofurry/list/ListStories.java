@@ -12,6 +12,7 @@ import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.gallery.GalleryArt;
 import com.sofurry.itemviews.ViewStoryActivity;
+import com.sofurry.listadapters.SubmissionListAdapter;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.requests.AjaxRequest;
