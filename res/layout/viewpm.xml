@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:paddingBottom="45px"
+	>
+		<WebView
+			android:id="@+id/browser"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent" />
+	</LinearLayout>
+	<SlidingDrawer
+		android:id="@+id/drawer"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:handle="@+id/handle"
+		android:content="@+id/content"
+	>
+		<ImageView
+			android:id="@id/handle"
+			android:src="@drawable/reply"
+			android:layout_width="95px"
+			android:layout_height="43px" />
+		<LinearLayout
+			android:id="@id/content"
+			android:orientation="vertical"
+			android:background="#d333"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+		>
+			<LinearLayout
+				android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="top"
+			>
+				<EditText
+					android:id="@+id/subject"
+					android:hint="Subject"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:layout_weight="1" />
+				<Button
+					android:id="@+id/reply"
+					android:text="Send"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:layout_weight="4" />
+			</LinearLayout>
+			<EditText
+				android:id="@+id/message_text"
+				android:hint="Message text"
+				android:gravity="top"
+				android:inputType="text|textMultiLine|textCapSentences"
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent" />
+		</LinearLayout>
+	</SlidingDrawer>
+</FrameLayout>
