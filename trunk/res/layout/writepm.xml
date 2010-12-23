@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+>
+	<TableLayout
+		android:stretchColumns="1"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="3dp"
+		android:paddingRight="3dp"
+		android:paddingTop="3dp"
+	>
+		<TableRow>
+			<TextView
+				android:gravity="right"
+				android:text="To:"
+				android:textSize="18sp"
+				android:textStyle="bold" />
+			<EditText
+				android:id="@+id/send_to"
+				android:text="" />
+		</TableRow>
+		<TableRow>
+			<TextView
+				android:gravity="right"
+				android:text="Subject:"
+				android:textSize="18sp"
+				android:textStyle="bold" />
+			<EditText
+				android:id="@+id/subject"
+				android:text="" />
+		</TableRow>
+		<TableRow>
+			<TextView
+				android:text="Message Text"
+				android:textSize="18sp"
+				android:textStyle="bold"
+				android:layout_span="2" />
+		</TableRow>
+	</TableLayout>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:paddingLeft="3dp"
+		android:paddingRight="3dp"
+	>
+		<EditText
+			android:id="@+id/message_text"
+			android:inputType="text|textMultiLine|textCapSentences"
+			android:scrollbars="vertical"
+			android:scrollbarStyle="insideOverlay"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1" />
+		<Button
+			android:id="@+id/send"
+			android:text="Send"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="6" />
+	</LinearLayout>
+</LinearLayout>

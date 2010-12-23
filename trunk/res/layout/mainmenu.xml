@@ -1,112 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-
-    <LinearLayout
-	android:orientation="horizontal"
-    android:gravity="center_horizontal"
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
-	android:layout_weight="1">
-	
-    <Button
-        android:id="@+id/stories"
-	    android:gravity="center_horizontal"
-        android:layout_width="75px"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dip"
-        android:text="Stories" 
-        android:drawableTop="@drawable/menustories"/>
-    <Button
-        android:id="@+id/art"
-	    android:gravity="center_horizontal"
-        android:layout_width="75px"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dip"
-        android:text="Art" 
-        android:drawableTop="@drawable/menuart"/>
-    <Button
-        android:id="@+id/music"
-	    android:gravity="center_horizontal"
-        android:layout_width="75px"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dip"
-        android:text="Music" 
-        android:drawableTop="@drawable/menumusic"/>
-
-    <Button
-        android:id="@+id/journals"
-	    android:gravity="center_horizontal"
-        android:layout_width="75px"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dip"
-        android:text="Journals" 
-        android:drawableTop="@drawable/menujournals"/>
-		
-    </LinearLayout>
-	
-    <LinearLayout
-	android:orientation="horizontal"
-    android:gravity="center_horizontal"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:layout_weight="1">
-	
-
-    <Button
-        android:id="@+id/chat"
-	    android:gravity="center_horizontal"
-        android:layout_width="75px"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dip"
-        android:text="Chat"
-        android:drawableTop="@drawable/menuchat"/>
-
-    <Button
-        android:id="@+id/forums"
-	    android:gravity="center_horizontal"
-        android:layout_width="75px"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dip"
-        android:text="Forums"
-        android:drawableTop="@drawable/menuforums"/>
-
-    <Button
-        android:id="@+id/logbook"
-	    android:gravity="center_horizontal"
-        android:layout_width="75px"
-        android:layout_marginTop="20dip"
-        android:layout_height="wrap_content"
-        android:text="Notes"
-        android:drawableTop="@drawable/menumessages"/>
-
-    <Button
-        android:id="@+id/pms"
-	    android:gravity="center_horizontal"
-        android:layout_width="75px"
-        android:layout_marginTop="20dip"
-        android:layout_height="wrap_content"
-        android:text="PMs"
-        android:drawableTop="@drawable/menumessages"/>
-
-        
-    </LinearLayout>
-
-    <LinearLayout
-	android:orientation="horizontal"
-    android:gravity="center_horizontal"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:layout_weight="1">
-	
-    <Button
-        android:id="@+id/settings"
-	    android:layout_width="95px"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dip"
-        android:text="Settings" android:gravity="center"/>
-        
-    </LinearLayout>        
+>
+	<LinearLayout
+		android:orientation="horizontal"
+		android:gravity="center_horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+	>
+		<Button
+			android:id="@+id/stories"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Stories"
+			android:drawableTop="@drawable/menustories" />
+		<Button
+			android:id="@+id/art"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Art"
+			android:drawableTop="@drawable/menuart" />
+		<Button
+			android:id="@+id/music"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Music"
+			android:drawableTop="@drawable/menumusic" />
+		<Button
+			android:id="@+id/journals"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Journals"
+			android:drawableTop="@drawable/menujournals" />
+	</LinearLayout>
+	<LinearLayout
+		android:orientation="horizontal"
+		android:gravity="center_horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+	>
+		<Button
+			android:id="@+id/chat"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Chat"
+			android:drawableTop="@drawable/menuchat" />
+		<Button
+			android:id="@+id/forums"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Forums"
+			android:drawableTop="@drawable/menuforums" />
+		<Button
+			android:id="@+id/logbook"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Notes"
+			android:drawableTop="@drawable/menumessages" />
+		<Button
+			android:id="@+id/pms"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="PMs"
+			android:drawableTop="@drawable/menumessages" />
+	</LinearLayout>
+	<LinearLayout
+		android:orientation="horizontal"
+		android:gravity="center_horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+	>
+		<Button
+			android:id="@+id/settings"
+			android:layout_width="95px"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dip"
+			android:text="Settings"
+			android:gravity="center" />
+	</LinearLayout>
 </LinearLayout>
