@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.base.classes;
 
 import org.json.JSONObject;
 
@@ -8,6 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 
+import com.sofurry.AppConstants;
+import com.sofurry.RateActivity;
+import com.sofurry.SubmissionViewActivity;
 import com.sofurry.gallery.GalleryArt;
 import com.sofurry.list.ListMusic;
 import com.sofurry.list.ListStories;

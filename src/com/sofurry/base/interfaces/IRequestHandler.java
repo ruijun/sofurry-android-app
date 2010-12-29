@@ -1,4 +1,4 @@
-package com.sofurry.requests;
+package com.sofurry.base.interfaces;
 
 import android.os.Handler;
 

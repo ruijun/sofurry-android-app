@@ -12,8 +12,8 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.sofurry.AppConstants;
+import com.sofurry.base.interfaces.IRequestHandler;
 import com.sofurry.requests.AsyncFileDownloader;
-import com.sofurry.requests.IRequestHandler;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 

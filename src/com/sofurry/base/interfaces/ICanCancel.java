@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.base.interfaces;
 
 /**
  * @author Rangarig

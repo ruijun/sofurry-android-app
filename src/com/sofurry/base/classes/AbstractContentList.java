@@ -1,8 +1,11 @@
-package com.sofurry;
+package com.sofurry.base.classes;
+
+import java.util.ArrayList;
 
 import org.json.JSONObject;
 
-import android.app.Activity;
+import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,21 +18,29 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.ListAdapter;
+import android.widget.Toast;
 
+import com.sofurry.base.interfaces.IHasThumbnail;
+import com.sofurry.base.interfaces.IManagedActivity;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.requests.RequestHandler;
+import com.sofurry.requests.RequestThread;
+import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.tempstorage.ManagerStore;
+import com.sofurry.util.ErrorHandler;
 
 /**
  * @author SoFurry
  *
- * Class that is used as a base for all GalleryViews
- *
+ * Class that is used as a base for all ListViews
+ * 
  * @param <T>
  */
-public abstract class AbstractContentGallery<T> extends Activity implements IManagedActivity<T> {
+public abstract class AbstractContentList<T> extends ListActivity implements IManagedActivity<T> {
 
+	protected ActivityManager<T> man = null;
+	private boolean finished = false;
+	
 	protected long uniqueKey = 0;  // The key to be used by the storage manager to recognize this particular activity
 
 	/* (non-Javadoc)
@@ -46,26 +57,11 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		uniqueKey = key;
 	}
 
-	protected ActivityManager<T> man = new ActivityManager<T>(this);
-	private boolean finished = false;
-	
-	protected GridView galleryView;
-	protected ListAdapter myAdapter;
-	
-	public ActivityManager<T> getActivityManager() {
-		return man;
-	}
-	
 	// Get parameters and initiate data fetch thread
 	@SuppressWarnings("unchecked")
-	/* (non-Javadoc)
-	 * @see com.sofurry.IManagedActivity#onCreate(android.os.Bundle)
-	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.gallerylayout);
-		galleryView = (GridView) findViewById(R.id.galleryview);
 		
 		// See if the UID needs restoring
 		ActivityManager.onCreateRefresh(this, savedInstanceState);
@@ -77,6 +73,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 			man = new ActivityManager<T>(this);
 			man.onActCreate();
 		}
+		
 	}
 	
 	@Override
@@ -84,43 +81,24 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		man.onSaveInstanceState(outState);
 		super.onSaveInstanceState(outState);
 	}
-
+	
+	public ActivityManager<T> getActivityManager() {
+		return man;
+	}
+	
 	@Override
 	protected void onPause() {
 		if (!finished) ManagerStore.store(this);
 		super.onPause();
 	}
-
-	/**
-	 * Creates a new adapter and plugs it into the gridview
-	 */
-	public void plugInAdapter() {
-		int lastScrollY = galleryView.getFirstVisiblePosition();
-		myAdapter = getAdapter(this);
-		galleryView.setAdapter(myAdapter);
-		galleryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			public void onItemClick(AdapterView parentView, View childView, int position, long id) {
-				setSelectedIndex(position);
-			}
-		});
-		galleryView.setOnScrollListener(new OnScrollListener() {
-			public void onScroll(final AbsListView view, final int first, final int visible, final int total) {
-				man.onScroll(view, first, visible, total);
-			}
-
-			public void onScrollStateChanged(AbsListView view, int arg1) {
-			}
-		});
-		
-		galleryView.setSelection(lastScrollY);
-	    man.hideProgressDialog();
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
 	}
 
-
 	/* Creates the menu items */
-	/* (non-Javadoc)
-	 * @see com.sofurry.IManagedActivity#onCreateOptionsMenu(android.view.Menu)
-	 */
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		man.createBrowsableMenu(menu);
@@ -142,23 +120,60 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		if (man.onActivityResult(requestCode, resultCode, data)) return;
 		super.onActivityResult(requestCode, resultCode, data);
 	}
-	
 
-	/**
-	 * Closes this list and returns to the main menu
-	 */
+	// Goes back to the main menu
 	private void closeList() {
 		man.closeList();
 	}
-
-	/**
-	 * Displays the list on screen
+	
+	/* (non-Javadoc)
+	 * @see com.sofurry.IManagedActivity#plugInAdapter()
+	 * 
+	 * Creates the plugin adapter
 	 */
+	public void plugInAdapter() {
+		int lastScrollY = getListView().getFirstVisiblePosition();
+		Log.i("SF AbstractContentList", "updateView called, last scrollpos: "+lastScrollY);
+
+		setListAdapter(getAdapter(this));
+		getListView().setTextFilterEnabled(true);
+		// bind a selection listener to the view
+		getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			public void onItemClick(AdapterView parentView, View childView, int position, long id) {
+				man.stopThumbDownloader();
+				setSelectedIndex(position);
+			}
+		});
+	    getListView().setOnScrollListener(new OnScrollListener() {
+	        public void onScroll(final AbsListView view, final int first,final int visible, final int total) {
+	        	man.onScroll(view, first, visible, total);
+	        }
+
+			public void onScrollStateChanged(AbsListView view, int arg1) {
+			}
+	    }); 
+	    getListView().setSelection(lastScrollY);
+	    getListView().invalidateViews();
+	    man.hideProgressDialog();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.IManagedActivity#resetViewSourceExtra(int)
+	 * 
+	 * Everything that needs to be done, but is not done by the ActivityManager
+	 */
+	public void resetViewSourceExtra(int newViewSource) {
+		// Intentionally left blank
+	}
+
+	// Sets the resulting list on the screen
 	public void updateView() {
-		galleryView.invalidateViews();
+		//plugInAdapter();
+		getListView().invalidateViews();
+		
 		Log.i("SF", "Refresh");
 	}
-	
+
 	/**
 	 * Returns an item of the resultlist at the specified index
 	 * @param idx
@@ -170,40 +185,17 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		T temp = man.getResultList().get(idx);
 		return temp;
 	}
-
-
-	/* (non-Javadoc)
-	 * @see com.sofurry.IManagedActivity#setSelectedIndex(int)
-	 */
+	
 	public abstract void setSelectedIndex(int selectedIndex);
 
-	/* (non-Javadoc)
-	 * @see com.sofurry.IManagedActivity#getFetchParameters(int, int)
-	 */
 	public abstract AjaxRequest getFetchParameters(int page, int source);
 
-	/* (non-Javadoc)
-	 * @see com.sofurry.IManagedActivity#getAdapter(android.content.Context)
-	 */
 	public abstract BaseAdapter getAdapter(Context context);
 
-	
-	/* (non-Javadoc)
-	 * @see com.sofurry.IManagedActivity#parseResponse(org.json.JSONObject)
-	 */
 	public abstract void parseResponse(JSONObject obj) throws Exception;
-	
-	public abstract void resetViewSourceExtra(int newViewSource);
 
-	/* (non-Javadoc)
-	 * @see com.sofurry.IManagedActivity#finish()
-	 */
-	@Override
-	public void finish() {
-		super.finish();
-		finished = true;
-		man.stopThumbDownloader();
-		ManagerStore.retrieve(this); // Clean up manager store, so we don't have unused items laying aaround
+	protected void updateContentList() {
+		updateView();
 	}
 	
     @Override
@@ -217,4 +209,12 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
     }
 
 
+	@Override
+	public void finish() {
+		super.finish();
+		finished = true;
+		man.stopThumbDownloader();
+		ManagerStore.retrieve(this); // Clean up manager store, so we don't have unused items laying aaround
+	}
+	
 }

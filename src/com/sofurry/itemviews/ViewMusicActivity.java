@@ -16,8 +16,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.sofurry.AppConstants;
-import com.sofurry.FavableActivity;
 import com.sofurry.R;
+import com.sofurry.base.classes.FavableActivity;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.AsyncFileDownloader;
 import com.sofurry.requests.ProgressSignal;
@@ -183,14 +183,14 @@ public class ViewMusicActivity extends FavableActivity  {
 	public void downloadFile(String html) throws Exception {
 		//String url = obj.getString("filename");
 		// Find markers
-		int end = html.indexOf(AppConstants.MP3DownloadLinkEndMarker);
+		int end = html.indexOf(AppConstants.MP3_DOWNLOAD_LINK_END_MARKER);
 		int beg = end;
-		int len = AppConstants.MP3DownloadLinkStartMarker.length();
+		int len = AppConstants.MP3_DOWNLOAD_LINK_START_MARKER.length();
 		boolean found = false;
 		// Okay, this might suck, but right now I cant remember the correct phrase. It will work though.
 		while ((beg > 0) && (!found)) {
 			beg--;
-			if (html.substring(beg, beg + len).equals(AppConstants.MP3DownloadLinkStartMarker))
+			if (html.substring(beg, beg + len).equals(AppConstants.MP3_DOWNLOAD_LINK_START_MARKER))
 				found = true;
 		}
 		if (beg == 0) throw new Exception("URL Extract failed");

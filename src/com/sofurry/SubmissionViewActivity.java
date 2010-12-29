@@ -1,5 +1,8 @@
 package com.sofurry;
 
+import com.sofurry.base.classes.ActivityWithRequests;
+import com.sofurry.base.interfaces.ICanCancel;
+
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;

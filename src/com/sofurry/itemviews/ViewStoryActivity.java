@@ -12,7 +12,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.sofurry.AppConstants;
-import com.sofurry.FavableActivity;
+import com.sofurry.base.classes.FavableActivity;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.util.FileStorage;
 

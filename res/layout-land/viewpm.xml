@@ -8,7 +8,7 @@
 		android:orientation="vertical"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:paddingRight="45dp"
+		android:paddingRight="@dimen/reply_handle_padding"
 	>
 		<WebView
 			android:id="@+id/browser"
@@ -26,8 +26,8 @@
 		<ImageView
 			android:id="@id/handle"
 			android:src="@drawable/reply_land"
-			android:layout_width="43px"
-			android:layout_height="95px" />
+			android:layout_width="@dimen/reply_handle_graphics_height"
+			android:layout_height="@dimen/reply_handle_graphics_width" />
 		<LinearLayout
 			android:id="@id/content"
 			android:orientation="vertical"
@@ -50,6 +50,7 @@
 				<Button
 					android:id="@+id/reply"
 					android:text="Send"
+					android:onClick="buttonClick"
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:layout_weight="4" />

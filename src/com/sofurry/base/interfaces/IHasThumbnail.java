@@ -1,4 +1,4 @@
-package com.sofurry.model;
+package com.sofurry.base.interfaces;
 
 import android.graphics.Bitmap;
 

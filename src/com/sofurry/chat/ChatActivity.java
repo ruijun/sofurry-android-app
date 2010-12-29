@@ -28,9 +28,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sofurry.ActivityWithRequests;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
+import com.sofurry.base.classes.ActivityWithRequests;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestThread;
 import com.sofurry.util.Authentication;

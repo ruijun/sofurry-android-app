@@ -7,9 +7,9 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.BaseAdapter;
 
-import com.sofurry.AbstractContentList;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
+import com.sofurry.base.classes.AbstractContentList;
 import com.sofurry.gallery.GalleryArt;
 import com.sofurry.itemviews.ViewMusicActivity;
 import com.sofurry.listadapters.SubmissionListAdapter;

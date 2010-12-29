@@ -73,6 +73,7 @@ public class AppConstants {
 	public static final int REQUEST_ID_CUM = 4508;
 	public static final int REQUEST_ID_RATE = 4509;
 	public static final int REQUEST_ID_WATCH = 4512;
+	public static final int REQUEST_ID_SEND = 4513;
 
 	public static final int REQUEST_ID_DOWNLOADFILE = 4510;
 	public static final int REQUEST_ID_DOWNLOADIMAGE = 4511;
@@ -83,9 +84,17 @@ public class AppConstants {
 //	public static final String SITE_URL = "http://10.0.2.2";
 	public static final String SITE_REQUEST_SCRIPT = "/ajaxfetch.php";
 	
-	public static final String MP3DownloadLinkEndMarker = "\">Download as MP3</a>";
-	public static final String MP3DownloadLinkStartMarker = "<a href=\"";
+	public static final String MP3_DOWNLOAD_LINK_END_MARKER = "\">Download as MP3</a>";
+	public static final String MP3_DOWNLOAD_LINK_START_MARKER = "<a href=\"";
 	
+	public static final String PM_CONTENTS_PREFIX = "<p style=\"color: #FFFFFF\">";
+	public static final String PM_CONTENTS_POSTFIX = "</p>";
+	
+	/**
+	 * Combines the site URL with the path to the request script
+	 * 
+	 * @return The fully qualified fetch URL
+	 */
 	public static String getFetchUrl() {
 		return AppConstants.SITE_URL + AppConstants.SITE_REQUEST_SCRIPT;
 	}

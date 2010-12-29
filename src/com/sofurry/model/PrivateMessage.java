@@ -5,6 +5,8 @@ import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.sofurry.base.interfaces.IHasThumbnail;
+
 import android.graphics.Bitmap;
 
 

@@ -3,8 +3,8 @@ package com.sofurry.tempstorage;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sofurry.ActivityManager;
-import com.sofurry.IManagedActivity;
+import com.sofurry.base.classes.ActivityManager;
+import com.sofurry.base.interfaces.IManagedActivity;
 
 /**
  * @author Rangarig

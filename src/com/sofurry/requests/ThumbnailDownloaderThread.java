@@ -6,7 +6,8 @@ import java.util.Iterator;
 import android.util.Log;
 
 import com.sofurry.RefreshRequest;
-import com.sofurry.model.IHasThumbnail;
+import com.sofurry.base.interfaces.IHasThumbnail;
+import com.sofurry.base.interfaces.IRequestHandler;
 
 /**
  * @author SoFurry
