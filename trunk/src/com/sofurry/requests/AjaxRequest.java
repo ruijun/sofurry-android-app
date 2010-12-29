@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sofurry.AppConstants;
+import com.sofurry.base.interfaces.IRequestHandler;
 import com.sofurry.util.Authentication;
 
 /**

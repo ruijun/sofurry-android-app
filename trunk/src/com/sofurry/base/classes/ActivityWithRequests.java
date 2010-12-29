@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.base.classes;
 
 import org.json.JSONObject;
 
@@ -6,7 +6,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.sofurry.requests.ICanHandleFeedback;
+import com.sofurry.ProgressBarHelper;
+import com.sofurry.base.interfaces.ICanCancel;
+import com.sofurry.base.interfaces.ICanHandleFeedback;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.tempstorage.ItemStorage;
@@ -127,5 +129,10 @@ public abstract class ActivityWithRequests extends Activity implements ICanHandl
 	}
 
 	
-	
+	public boolean isOrientationLandscape() {
+		int width = getWindowManager().getDefaultDisplay().getWidth();
+		int height = getWindowManager().getDefaultDisplay().getHeight();
+		
+		return (width > height);
+	}
 }

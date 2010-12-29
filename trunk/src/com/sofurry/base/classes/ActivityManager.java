@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.base.classes;
 
 import java.util.ArrayList;
 
@@ -14,9 +14,14 @@ import android.view.SubMenu;
 import android.widget.AbsListView;
 import android.widget.Toast;
 
-import com.sofurry.model.IHasThumbnail;
+import com.sofurry.AppConstants;
+import com.sofurry.ProgressBarHelper;
+import com.sofurry.TagEditor;
+import com.sofurry.base.interfaces.ICanCancel;
+import com.sofurry.base.interfaces.ICanHandleFeedback;
+import com.sofurry.base.interfaces.IHasThumbnail;
+import com.sofurry.base.interfaces.IManagedActivity;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.ICanHandleFeedback;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.ThumbnailDownloaderThread;

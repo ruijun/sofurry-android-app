@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.sofurry.SubmissionViewActivity;
+import com.sofurry.base.interfaces.IHasThumbnail;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.ImageStorage;
 

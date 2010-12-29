@@ -1,4 +1,4 @@
-package com.sofurry;
+package com.sofurry.base.interfaces;
 
 import org.json.JSONObject;
 
@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.BaseAdapter;
 
+import com.sofurry.base.classes.ActivityManager;
 import com.sofurry.requests.AjaxRequest;
 
 public interface IManagedActivity<T> {

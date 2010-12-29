@@ -1,6 +1,8 @@
-package com.sofurry.requests;
+package com.sofurry.base.interfaces;
 
 import org.json.JSONObject;
+
+import com.sofurry.requests.ProgressSignal;
 
 public interface ICanHandleFeedback {
 

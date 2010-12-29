@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 
+import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.requests.ProgressSignal;
 
 /**

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.sofurry.AccountActivity;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.chat.ChatActivity;

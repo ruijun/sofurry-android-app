@@ -9,9 +9,9 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.BaseAdapter;
 
-import com.sofurry.AbstractContentGallery;
-import com.sofurry.ActivityManager;
 import com.sofurry.AppConstants;
+import com.sofurry.base.classes.AbstractContentGallery;
+import com.sofurry.base.classes.ActivityManager;
 import com.sofurry.itemviews.ViewArtActivity;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;

@@ -16,8 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sofurry.AppConstants;
-import com.sofurry.FavableActivity;
 import com.sofurry.R;
+import com.sofurry.base.classes.FavableActivity;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.FileStorage;
 import com.sofurry.util.HttpRequest;
