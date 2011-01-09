@@ -10,7 +10,7 @@ This is a howto on getting the sofurry android app project running in eclipse.
 
 Prerequisites:
   * Latest version of Eclipse
-  * Latest Android SDK with 1.5, 1.6, 2.0, 2.1 and 2.2 support
+  * Latest Android SDK with 1.6, 2.1, 2.2 and 2.3 support
   * Android SDK set up and running in eclipse.
   * Subversive SVN plugin for Eclipse (Add http://community.polarion.com/projects/subversive/download/eclipse/2.0/update-site/ to sources and install the SVN Connector and dependencies with subversion 1.6 compatibility)
 
@@ -42,7 +42,7 @@ On the next window, select "Check out as project configured using New Project Wi
 
 <img src="http://hoxdna.org/svn/06.png">
 
-On the next dialog enter the following: "SoFurry Android App" as project name, select "Create new project in workspace", select "Android 1.5" as target, Application name is "SoFurry Mobile", and package name is "com.sofurry". Uncheck "Create Activity"!
+On the next dialog enter the following: "SoFurry Android App" as project name, select "Create new project in workspace", select "Android 1.6" as target, Application name is "SoFurry Mobile", and package name is "com.sofurry". Uncheck "Create Activity"!
 
 <img src="http://hoxdna.org/svn/07.png">
 
