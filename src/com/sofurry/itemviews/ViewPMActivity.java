@@ -4,6 +4,7 @@ import android.content.Context;
 
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -170,6 +171,17 @@ public class ViewPMActivity
             content_ = contentBuilder.toString().replace("\n", "<br/>");
 
             showContent();
+            
+            // Also set the subject if need be
+            if (subject_.getText().length() == 0) {
+            	// If there's no 'Re:' in front of the subject, add one
+            	Log.i("[ViewPMActivity:onData]", "'" + msgSubject_.substring(0, 3).toLowerCase() + "'");
+            	if (!msgSubject_.substring(0, 3).equalsIgnoreCase("re:")) {
+            		subject_.setText("Re: " + msgSubject_);
+            	} else {
+            		subject_.setText(msgSubject_);
+            	}
+            }
         } else if (id == AppConstants.REQUEST_ID_SEND) {
         	// Hide progress dialog
         	pbh.hideProgressDialog();
