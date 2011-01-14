@@ -87,8 +87,10 @@ public class AppConstants {
 	public static final String MP3_DOWNLOAD_LINK_END_MARKER = "\">Download as MP3</a>";
 	public static final String MP3_DOWNLOAD_LINK_START_MARKER = "<a href=\"";
 	
-	public static final String PM_CONTENTS_PREFIX = "<p style=\"color: #FFFFFF\">";
-	public static final String PM_CONTENTS_POSTFIX = "</p>";
+	public static final String PM_CONTENTS_PREFIX = "<html><head><style>A:link {color: #3BB9FF} A:visited {color: #3BB9FF}</style></head><body><p style=\"color: #FFFFFF\">";
+	public static final String PM_CONTENTS_POSTFIX = "</p></body></html>";
+	public static final String PM_CONTENTS_URL_TEMPLATE = "$1<a href=\"$2\">$2</a>";
+	public static final String PM_CONTENTS_URL_REGEX = "(?i)([^\"\\>])(https?://[^\\s<>\"`{}\\[\\]\\\\]+)";
 	
 	/**
 	 * Combines the site URL with the path to the request script

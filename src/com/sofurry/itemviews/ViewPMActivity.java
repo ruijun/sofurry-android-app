@@ -72,6 +72,30 @@ public class ViewPMActivity
      * Method description
      *
      *
+     * @param contents
+     *
+     * @return
+     */
+    protected String formatContents(String contents) {
+        StringBuilder contentBuilder;
+
+        contents = contents.replaceAll(AppConstants.PM_CONTENTS_URL_REGEX, AppConstants.PM_CONTENTS_URL_TEMPLATE);
+
+        // Create object
+        contentBuilder = new StringBuilder(contents);
+
+        // Insert prefix and postfix information to get the right colour
+        contentBuilder.insert(0, AppConstants.PM_CONTENTS_PREFIX);
+        contentBuilder.append(AppConstants.PM_CONTENTS_POSTFIX);
+        
+        // Return result, replacing line breaks
+        return contentBuilder.toString().replace("\n", "<br/>");
+    }
+
+    /**
+     * Method description
+     *
+     *
      * @param savedInstanceState
      */
     public void onCreate(Bundle savedInstanceState) {
@@ -139,15 +163,11 @@ public class ViewPMActivity
      *
      * @throws Exception
      */
-    /* (non-Javadoc)
-     * @see com.sofurry.base.classes.ActivityWithRequests#onData(int, org.json.JSONObject)
-     */
     @Override
     public void onData(int id, JSONObject obj) throws Exception {
         if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
-            JSONArray     items;
-            JSONObject    jsonItem;
-            StringBuilder contentBuilder;
+            JSONArray  items;
+            JSONObject jsonItem;
 
             // Hide the progress dialog
             pbh.hideProgressDialog();
@@ -163,30 +183,25 @@ public class ViewPMActivity
             msgDate_      = jsonItem.getString("date");
 
             // Generate and show contents
-            contentBuilder = new StringBuilder(jsonItem.getString("message"));
-
-            contentBuilder.insert(0, AppConstants.PM_CONTENTS_PREFIX);
-            contentBuilder.append(AppConstants.PM_CONTENTS_POSTFIX);
-
-            content_ = contentBuilder.toString().replace("\n", "<br/>");
+            content_ = formatContents(jsonItem.getString("message"));
 
             showContent();
-            
+
             // Also set the subject if need be
             if (subject_.getText().length() == 0) {
-            	// If there's no 'Re:' in front of the subject, add one
-            	Log.i("[ViewPMActivity:onData]", "'" + msgSubject_.substring(0, 3).toLowerCase() + "'");
-            	if (!msgSubject_.substring(0, 3).equalsIgnoreCase("re:")) {
-            		subject_.setText("Re: " + msgSubject_);
-            	} else {
-            		subject_.setText(msgSubject_);
-            	}
+
+                // If there's no 'Re:' in front of the subject, add one
+                if (!msgSubject_.substring(0, 3).equalsIgnoreCase("re:")) {
+                    subject_.setText("Re: " + msgSubject_);
+                } else {
+                    subject_.setText(msgSubject_);
+                }
             }
         } else if (id == AppConstants.REQUEST_ID_SEND) {
-        	// Hide progress dialog
-        	pbh.hideProgressDialog();
-        }
-        else {
+
+            // Hide progress dialog
+            pbh.hideProgressDialog();
+        } else {
             super.onData(id, obj);    // Handle inherited events
         }
     }
@@ -234,14 +249,19 @@ public class ViewPMActivity
         super.onSaveInstanceState(outState);
 
         // Save various contents so we can restore it again
+        // Starting with returned data
         storeObject("content", content_);
-        storeObject("drawerOpened", (Boolean) replyDrawer_.isOpened());
         storeObject("fromUserId", fromUserId_);
         storeObject("fromUserName", fromUserName_);
-        storeObject("messageText", messageText_.getText());
         storeObject("msgDate", msgDate_);
         storeObject("msgSubject", msgSubject_);
         storeObject("pmId", (Integer) pmId_);
+
+        // And the state of the drawer
+        storeObject("drawerOpened", (Boolean) replyDrawer_.isOpened());
+
+        // And of course the various views
+        storeObject("messageText", messageText_.getText());
         storeObject("subject", subject_.getText());
     }
 
@@ -277,9 +297,6 @@ public class ViewPMActivity
      *
      *
      * @return A filled-out AjaxRequest object, ready to be executed
-     */
-    /**
-     * @return
      */
     protected AjaxRequest getReplyParameters() {
         AjaxRequest req = new AjaxRequest();
