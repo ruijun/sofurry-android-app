@@ -1,28 +1,23 @@
 package com.sofurry.itemviews;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.content.Context;
-
 import android.os.Bundle;
-
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-
 import android.webkit.WebView;
-
 import android.widget.ImageView;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
 import com.sofurry.requests.AjaxRequest;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.net.URLEncoder;
 
 
 /**
@@ -53,10 +48,6 @@ public class ViewPMActivity
      * Method description
      *
      *
-     * @param v
-     */
-
-    /**
      * @param v
      */
     public void buttonClick(View v) {
@@ -158,8 +149,8 @@ public class ViewPMActivity
      * Method description
      *
      *
-     * @param id
-     * @param obj
+     * @param id Request ID
+     * @param obj Parsed JSON object
      *
      * @throws Exception
      */
@@ -198,9 +189,22 @@ public class ViewPMActivity
                 }
             }
         } else if (id == AppConstants.REQUEST_ID_SEND) {
-
+        	Boolean hadSuccess;
+        	
             // Hide progress dialog
             pbh.hideProgressDialog();
+            
+            // Figure out if we were successful in sending
+            hadSuccess = obj.getBoolean("success");
+            
+            // Now act on it
+            if (hadSuccess) {
+            	Toast.makeText(this, "Message sent!", Toast.LENGTH_LONG).show();
+            	this.finish();
+            } else {
+            	// TODO: Make it display a dialog here
+            	Toast.makeText(this, "Message sending failed.", Toast.LENGTH_LONG).show();
+            }
         } else {
             super.onData(id, obj);    // Handle inherited events
         }
@@ -285,8 +289,11 @@ public class ViewPMActivity
     protected AjaxRequest getFetchParameters(int id) {
         AjaxRequest req = new AjaxRequest();
 
+        // Set request parameters
         req.addParameter("f", "pmcontent");
         req.addParameter("id", "" + id);
+        
+        // Set the request ID, so we know which request we're managing later
         req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
 
         return req;
@@ -300,19 +307,20 @@ public class ViewPMActivity
      */
     protected AjaxRequest getReplyParameters() {
         AjaxRequest req = new AjaxRequest();
+        String messageText = messageText_.getText().toString();
+        
+        // Prepare message text, because line-breaks aren't transmitted correctly
+        messageText = messageText.replaceAll("\n", "<br />").replaceAll("\r", "");
 
+        // Set request parameters
         req.addParameter("f", "sendpm");
         req.addParameter("toUserId", fromUserId_);
         req.addParameter("toUserName", fromUserName_);
         req.addParameter("parentId", "" + pmId_);
-
-        // Since UTF-8 should always be supported, there shouldn't be an issue here.
-        // It still requires a try-statement, though.
-        try {
-            req.addParameter("subject", URLEncoder.encode(subject_.getText().toString(), "UTF-8"));
-            req.addParameter("message", URLEncoder.encode(messageText_.getText().toString(), "UTF-8"));
-        } catch (Exception exception) {}
-
+        req.addParameter("subject", subject_.getText().toString());
+        req.addParameter("message", messageText);
+        
+        // Set the request ID, so we know which request we're managing later
         req.setRequestID(AppConstants.REQUEST_ID_SEND);
 
         return req;
