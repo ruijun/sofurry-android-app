@@ -48,7 +48,7 @@ public class HttpRequest {
 					nameValuePairs.add(new BasicNameValuePair(k, v));
 				}
 			}
-			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 		}
 		HttpResponse response;
 		response = httpclient.execute(httppost);
