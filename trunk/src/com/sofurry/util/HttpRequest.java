@@ -16,6 +16,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 
 import com.sofurry.AppConstants;
 
@@ -48,7 +49,7 @@ public class HttpRequest {
 					nameValuePairs.add(new BasicNameValuePair(k, v));
 				}
 			}
-			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
 		}
 		HttpResponse response;
 		response = httpclient.execute(httppost);
