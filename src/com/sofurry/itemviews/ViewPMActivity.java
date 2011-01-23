@@ -5,7 +5,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
@@ -202,8 +201,9 @@ public class ViewPMActivity
             	Toast.makeText(this, "Message sent!", Toast.LENGTH_LONG).show();
             	this.finish();
             } else {
-            	// TODO: Make it display a dialog here
-            	Toast.makeText(this, "Message sending failed.", Toast.LENGTH_LONG).show();
+            	errorTitle_ = "Error";
+            	errorMessage_ = obj.getString("message");
+            	showDialog(AppConstants.DIALOG_ERROR_ID);
             }
         } else {
             super.onData(id, obj);    // Handle inherited events

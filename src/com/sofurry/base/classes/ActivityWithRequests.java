@@ -3,15 +3,19 @@ package com.sofurry.base.classes;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.sofurry.AppConstants;
 import com.sofurry.ProgressBarHelper;
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.base.interfaces.ICanHandleFeedback;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.tempstorage.ItemStorage;
+import com.sofurry.util.DialogFactory;
 import com.sofurry.util.ErrorHandler;
 
 /**
@@ -27,6 +31,14 @@ public abstract class ActivityWithRequests extends Activity implements ICanHandl
 	 * The request handler to be used to handle the feedback from the AjaxRequest
 	 */
 	protected RequestHandler requesthandler = null;
+	/**
+	 * When displaying an error dialog, this will be used as the title
+	 */
+	protected String errorTitle_;
+	/**
+	 * When displaying an error dialog, this will be used as the message
+	 */
+	protected String errorMessage_;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -128,11 +140,36 @@ public abstract class ActivityWithRequests extends Activity implements ICanHandl
 		finish();
 	}
 
-	
+	/**
+	 * A quick hack to determine if the device is in landscape or portrait mode
+	 * 
+	 * @return True if the device is in landscape mode, false otherwise
+	 */
 	public boolean isOrientationLandscape() {
 		int width = getWindowManager().getDefaultDisplay().getWidth();
 		int height = getWindowManager().getDefaultDisplay().getHeight();
 		
 		return (width > height);
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog = null;
+		
+		switch (id) {
+		case AppConstants.DIALOG_ERROR_ID:
+			dialog = DialogFactory.createErrorDialog(this, errorTitle_, errorMessage_);
+		}
+		
+		return dialog;
+	}
+	
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		switch (id) {
+		case AppConstants.DIALOG_ERROR_ID:
+			((AlertDialog) dialog).setTitle(errorTitle_);
+			((AlertDialog) dialog).setMessage(errorMessage_);
+		}
 	}
 }
