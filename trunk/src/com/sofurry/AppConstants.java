@@ -19,6 +19,9 @@ public class AppConstants {
 	public static final int CONTENTTYPE_JOURNALS = 3;
 	public static final int CONTENTTYPE_ART = 1;
 	
+	// Dialog types
+	public static final int DIALOG_ERROR_ID = 0;
+	
 	//Ajax message types
 	public static final int AJAXTYPE_APIERROR = 5;
 	public static final int AJAXTYPE_OTPAUTH = 6;
