@@ -127,6 +127,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        
+        <activity android:label="@string/app_name_sendpm"
+        		  android:name=".submits.SendPMActivity">
+        	<intent-filter>
+        		<action android:name="android.intent.action.SENDPM" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        	</intent-filter>
+        </activity>
     </application>
 
     <uses-sdk android:minSdkVersion="4"/>

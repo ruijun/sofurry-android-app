@@ -22,6 +22,10 @@
 			<EditText
 				android:id="@+id/send_to"
 				android:text="" />
+			<Button
+				android:id="@+id/send"
+				android:text="Send"
+				android:onClick="buttonClick" />
 		</TableRow>
 		<TableRow>
 			<TextView
@@ -31,38 +35,25 @@
 				android:textStyle="bold" />
 			<EditText
 				android:id="@+id/subject"
-				android:text="" />
+				android:text=""
+				android:layout_span="2" />
 		</TableRow>
 		<TableRow>
 			<TextView
 				android:text="Message Text"
 				android:textSize="18sp"
 				android:textStyle="bold"
-				android:layout_span="2" />
+				android:layout_span="3" />
 		</TableRow>
 	</TableLayout>
-	<LinearLayout
-		android:orientation="vertical"
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
+	<EditText
+		android:id="@+id/message_text"
+		android:gravity="top"
+		android:inputType="text|textMultiLine|textCapSentences"
+		android:scrollbars="vertical"
+		android:scrollbarStyle="insideOverlay"
 		android:paddingLeft="3dp"
-		android:paddingRight="3dp"
-	>
-		<EditText
-			android:id="@+id/message_text"
-			android:gravity="top"
-			android:inputType="text|textMultiLine|textCapSentences"
-			android:scrollbars="vertical"
-			android:scrollbarStyle="insideOverlay"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_weight="1" />
-		<Button
-			android:id="@+id/send"
-			android:text="Send"
-			android:onClick="buttonClick"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_weight="5" />
-	</LinearLayout>
+		android:paddingTop="3dp"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent" />
 </LinearLayout>
