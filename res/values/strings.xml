@@ -15,5 +15,6 @@
 	<string name="app_name_settings">SoFurry | Account Settings</string>
 	<string name="app_name_chat">SoFurry | Online Chat</string>
 	<string name="app_name_rater">SoFurry | Rating</string>
-<string name="app_name_tageditor">SoFurry | TagEditor</string>
+	<string name="app_name_tageditor">SoFurry | TagEditor</string>
+	<string name="app_name_sendpm">SoFurry | Send PM</string>
 </resources>
