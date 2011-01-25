@@ -21,7 +21,9 @@
 				android:textStyle="bold" />
 			<EditText
 				android:id="@+id/send_to"
-				android:text="" />
+				android:text=""
+				android:inputType="text|textWebEditText"
+				android:singleLine="true" />
 			<Button
 				android:id="@+id/send"
 				android:text="Send"
@@ -36,6 +38,8 @@
 			<EditText
 				android:id="@+id/subject"
 				android:text=""
+				android:inputType="text|textCapSentences"
+				android:singleLine="true"
 				android:layout_span="2" />
 		</TableRow>
 		<TableRow>
