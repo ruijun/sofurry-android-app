@@ -19,7 +19,7 @@
 				android:text="To:"
 				android:textSize="18sp"
 				android:textStyle="bold" />
-			<EditText
+			<AutoCompleteTextView
 				android:id="@+id/send_to"
 				android:text=""
 				android:inputType="text|textWebEditText"
