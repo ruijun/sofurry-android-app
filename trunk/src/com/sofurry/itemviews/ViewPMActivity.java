@@ -1,13 +1,14 @@
 package com.sofurry.itemviews;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import android.content.Context;
+
 import android.os.Bundle;
+
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
 import android.webkit.WebView;
+
 import android.widget.ImageView;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
@@ -16,8 +17,14 @@ import android.widget.Toast;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
+import com.sofurry.database.NamesAcDbAdapter;
 import com.sofurry.requests.AjaxRequest;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Class description
@@ -77,7 +84,7 @@ public class ViewPMActivity
         // Insert prefix and postfix information to get the right colour
         contentBuilder.insert(0, AppConstants.PM_CONTENTS_PREFIX);
         contentBuilder.append(AppConstants.PM_CONTENTS_POSTFIX);
-        
+
         // Return result, replacing line breaks
         return contentBuilder.toString().replace("\n", "<br/>");
     }
@@ -188,22 +195,32 @@ public class ViewPMActivity
                 }
             }
         } else if (id == AppConstants.REQUEST_ID_SEND) {
-        	Boolean hadSuccess;
-        	
+            Boolean hadSuccess;
+
             // Hide progress dialog
             pbh.hideProgressDialog();
-            
+
             // Figure out if we were successful in sending
             hadSuccess = obj.getBoolean("success");
-            
+
             // Now act on it
             if (hadSuccess) {
-            	Toast.makeText(this, "Message sent!", Toast.LENGTH_LONG).show();
-            	this.finish();
+            	
+            	// Add the name to the name cache, because well.. Why not?
+            	NamesAcDbAdapter dbHelper = new NamesAcDbAdapter(this).open();
+            	dbHelper.names_.addName(fromUserName_);
+            	dbHelper.close();
+
+                // Display 'toast' message about the success
+                Toast.makeText(this, "Message sent!", Toast.LENGTH_LONG).show();
+
+                // Close the activity
+                this.finish();
             } else {
-            	errorTitle_ = "Error";
-            	errorMessage_ = obj.getString("message");
-            	showDialog(AppConstants.DIALOG_ERROR_ID);
+                errorTitle_   = "Error";
+                errorMessage_ = obj.getString("message");
+
+                showDialog(AppConstants.DIALOG_ERROR_ID);
             }
         } else {
             super.onData(id, obj);    // Handle inherited events
@@ -292,7 +309,7 @@ public class ViewPMActivity
         // Set request parameters
         req.addParameter("f", "pmcontent");
         req.addParameter("id", "" + id);
-        
+
         // Set the request ID, so we know which request we're managing later
         req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
 
@@ -306,9 +323,9 @@ public class ViewPMActivity
      * @return A filled-out AjaxRequest object, ready to be executed
      */
     protected AjaxRequest getReplyParameters() {
-        AjaxRequest req = new AjaxRequest();
-        String messageText = messageText_.getText().toString();
-        
+        AjaxRequest req         = new AjaxRequest();
+        String      messageText = messageText_.getText().toString();
+
         // Prepare message text, because line-breaks aren't transmitted correctly
         messageText = messageText.replaceAll("\n", "<br />").replaceAll("\r", "");
 
@@ -319,7 +336,7 @@ public class ViewPMActivity
         req.addParameter("parentId", "" + pmId_);
         req.addParameter("subject", subject_.getText().toString());
         req.addParameter("message", messageText);
-        
+
         // Set the request ID, so we know which request we're managing later
         req.setRequestID(AppConstants.REQUEST_ID_SEND);
 

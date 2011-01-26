@@ -1,15 +1,20 @@
 package com.sofurry.submits;
 
+import android.database.Cursor;
+
 import android.os.Bundle;
 
 import android.view.View;
 
+import android.widget.AutoCompleteTextView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
+import com.sofurry.database.NamesAcDbAdapter;
 import com.sofurry.requests.AjaxRequest;
 
 import org.json.JSONObject;
@@ -25,12 +30,13 @@ import org.json.JSONObject;
  */
 public class SendPMActivity
         extends ActivityWithRequests {
-    private String   msgSubject_;
-    private String   toUserId_ = null;
-    private String   toUserName_;
-    private TextView messageText_;
-    private TextView sendTo_;
-    private TextView subject_;
+    private AutoCompleteTextView sendTo_;
+    private NamesAcDbAdapter     dbHelper_;
+    private String               msgSubject_;
+    private String               toUserId_ = null;
+    private String               toUserName_;
+    private TextView             messageText_;
+    private TextView             subject_;
 
 
     //~--- methods ------------------------------------------------------------
@@ -49,7 +55,7 @@ public class SendPMActivity
                 pbh.showProgressDialog("Sending PM...");
                 req.execute(requesthandler);
             } else {
-            	Toast.makeText(this, "You need to specify a recipient.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "You need to specify a recipient.", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -61,13 +67,38 @@ public class SendPMActivity
      * @param savedInstanceState
      */
     public void onCreate(Bundle savedInstanceState) {
+        Cursor cursor;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.writepm);
 
         // Find the needed views
         messageText_ = (TextView) findViewById(R.id.message_text);
         subject_     = (TextView) findViewById(R.id.subject);
-        sendTo_      = (TextView) findViewById(R.id.send_to);
+        sendTo_      = (AutoCompleteTextView) findViewById(R.id.send_to);
+
+        // Instantiate the DB helper object
+        if (dbHelper_ == null) {
+            dbHelper_ = new NamesAcDbAdapter(this).open();
+        }
+
+        // Fetch all the names as a Cursor and tell the activity to manage it
+        cursor = dbHelper_.names_.getNames();
+
+        startManagingCursor(cursor);
+
+        // Create the CursorAdapter needed to bind data to the UI
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
+                                                              R.layout.nameac_list_item,
+                                                              cursor,
+                                                              new String[] { "name" },
+                                                              new int[] { R.id.name });
+
+        // Tell the system we want to use the 'name' column as our string representation
+        adapter.setStringConversionColumn(1);
+
+        // Finally, set the adapter for the AutoCompleteTextView field
+        sendTo_.setAdapter(adapter);
 
         // Check if we have a saved instance
         if (savedInstanceState == null) {
@@ -118,7 +149,14 @@ public class SendPMActivity
 
             // Now act on it
             if (hadSuccess) {
+
+                // Add the name to the name cache
+                dbHelper_.names_.addName(sendTo_.getText().toString());
+
+                // Display 'toast' message about the success
                 Toast.makeText(this, "Message sent!", Toast.LENGTH_LONG).show();
+                
+                // Close the activity
                 this.finish();
             } else {
                 errorTitle_   = "Error";
@@ -129,6 +167,20 @@ public class SendPMActivity
         } else {
             super.onData(id, obj);    // Handle inherited events
         }
+    }
+
+    /**
+     * Currently just used to make sure we at least -try- to clean up after ourselves in
+     * regards to the database access
+     *
+     */
+    @Override
+    protected void onDestroy() {
+        if (dbHelper_ != null) {
+            dbHelper_.close();
+        }
+
+        super.onDestroy();
     }
 
     /**
