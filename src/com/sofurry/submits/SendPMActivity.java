@@ -226,6 +226,7 @@ public class SendPMActivity
         req.addParameter("toUserName", sendTo_.getText().toString());
         req.addParameter("subject", subject_.getText().toString());
         req.addParameter("message", messageText);
+        req.addParameter("parendId", "0");
 
         if ((toUserId_ != null) && (toUserId_.length() > 0)) {
             req.addParameter("toUserId", toUserId_);
