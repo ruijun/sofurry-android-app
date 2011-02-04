@@ -1,18 +1,19 @@
 package com.sofurry.listadapters;
 
-import android.content.Context;
+import java.util.ArrayList;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.ArrayAdapter;
 
+import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.model.PrivateMessage;
 import com.sofurry.viewwrappers.TwoLineIconViewWrapper;
-
-import java.util.ArrayList;
 
 
 /**
@@ -24,6 +25,9 @@ public class PrivateMessageAdapter
         extends ArrayAdapter<PrivateMessage> {
     private ArrayList<PrivateMessage> items;
     private Context                   context;
+    private Drawable icon_new;
+    private Drawable icon_read;
+    private Drawable icon_replied;
 
 
     //~--- constructors -------------------------------------------------------
@@ -40,6 +44,11 @@ public class PrivateMessageAdapter
 
         this.items   = items;
         this.context = context;
+        Resources res = context.getResources();
+        icon_new = res.getDrawable(R.drawable.pm_new);
+        icon_read = res.getDrawable(R.drawable.pm_read);
+        icon_replied = res.getDrawable(R.drawable.pm_replied);
+
     }
 
     //~--- get methods --------------------------------------------------------
@@ -74,6 +83,16 @@ public class PrivateMessageAdapter
         m = items.get(position);
 
         if (m != null) {
+        	Drawable icon = null;
+        	
+        	if ((""+AppConstants.PM_STATUS_NEW).equals(m.getStatus()))
+        		icon = icon_new;
+        	else if ((""+AppConstants.PM_STATUS_READ).equals(m.getStatus()))
+        		icon = icon_read;
+        	else
+        		icon = icon_replied;
+        	
+            wrapper.getIcon().setImageDrawable(icon);
             wrapper.getBottomText().setText("From: " + m.getFromUser());
             wrapper.getCenterText().setText("Date: " + m.getDate());
             wrapper.getTopText().setText(m.getSubject());

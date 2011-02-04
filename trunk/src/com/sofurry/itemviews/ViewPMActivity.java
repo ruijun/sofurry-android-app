@@ -73,20 +73,30 @@ public class ViewPMActivity
      *
      * @return
      */
-    protected String formatContents(String contents) {
+    protected String formatContents(String contents, String fromUserName, String subject, String date) {
         StringBuilder contentBuilder;
 
         contents = contents.replaceAll(AppConstants.PM_CONTENTS_URL_REGEX, AppConstants.PM_CONTENTS_URL_TEMPLATE);
-
+        contents = contents.replace("\n", "<br/>");
         // Create object
-        contentBuilder = new StringBuilder(contents);
+        contentBuilder = new StringBuilder();
 
         // Insert prefix and postfix information to get the right colour
-        contentBuilder.insert(0, AppConstants.PM_CONTENTS_PREFIX);
+        contentBuilder.append(AppConstants.PM_CONTENTS_PREFIX);
+        contentBuilder.append("<b>From:</b> </i>");
+        contentBuilder.append(fromUserName);
+        contentBuilder.append("</i><br/>");
+        contentBuilder.append("<b>Subject:</b> </i>");
+        contentBuilder.append(subject);
+        contentBuilder.append("</i><br/>");
+        contentBuilder.append("<b>Date:</b> </i>");
+        contentBuilder.append(date);
+        contentBuilder.append("</i><br/><br/>");
+        contentBuilder.append(contents);
         contentBuilder.append(AppConstants.PM_CONTENTS_POSTFIX);
-
+        
         // Return result, replacing line breaks
-        return contentBuilder.toString().replace("\n", "<br/>");
+        return contentBuilder.toString();
     }
 
     /**
@@ -180,7 +190,7 @@ public class ViewPMActivity
             msgDate_      = jsonItem.getString("date");
 
             // Generate and show contents
-            content_ = formatContents(jsonItem.getString("message"));
+            content_ = formatContents(jsonItem.getString("message"), fromUserName_, msgSubject_, msgDate_);
 
             showContent();
 
