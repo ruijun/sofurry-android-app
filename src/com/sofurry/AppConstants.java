@@ -94,6 +94,12 @@ public class AppConstants {
 	public static final String PM_CONTENTS_POSTFIX = "</p></body></html>";
 	public static final String PM_CONTENTS_URL_TEMPLATE = "$1<a href=\"$2\">$2</a>";
 	public static final String PM_CONTENTS_URL_REGEX = "(?i)([^\"\\>])(https?://[^\\s<>\"`{}\\[\\]\\\\]+)";
+
+	public static final int PM_STATUS_NEW = 0;
+	public static final int PM_STATUS_READ = 1;
+	public static final int PM_STATUS_REPLIED  = 2;
+	
+	public static final int ENTRIESPERPAGE_GALLERY = 30;
 	
 	/**
 	 * Combines the site URL with the path to the request script

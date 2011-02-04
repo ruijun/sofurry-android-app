@@ -71,7 +71,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 
 	@Override
 	public AjaxRequest getFetchParameters(int page, int source) {
-		return createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_ART,20);
+		return createBrowse(page, source, man.getViewSearch(), AppConstants.CONTENTTYPE_ART, AppConstants.ENTRIESPERPAGE_GALLERY);
 	}
 	
 	/* (non-Javadoc)
