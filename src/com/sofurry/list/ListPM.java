@@ -11,6 +11,7 @@ import android.view.MenuItem;
 
 import android.widget.BaseAdapter;
 
+import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.AbstractContentList;
 import com.sofurry.itemviews.ViewPMActivity;
@@ -159,8 +160,14 @@ public class ListPM
         Log.i("ListPM", "Viewing PM ID: " + pm.getId());
 
         Intent intent = new Intent(this, ViewPMActivity.class);
-
+       
         intent.putExtra("PMID", pm.getId());
+        
         startActivity(intent);
+
+        if ((AppConstants.PM_STATUS_NEW+"").equals(pm.getStatus())) {
+        	pm.setStatus(""+AppConstants.PM_STATUS_READ);
+        	updateView();
+        }
     }
 }
