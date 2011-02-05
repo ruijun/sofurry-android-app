@@ -38,6 +38,7 @@ public class ViewStoryActivity extends FavableActivity  {
 			req.execute(requesthandler);
 	    } else {
 	    	content = (String) retrieveObject("content");
+			content = content.replace("\u00a0", "");
 	    	showContent();
 	    }
 	}
@@ -69,6 +70,7 @@ public class ViewStoryActivity extends FavableActivity  {
 		pbh.hideProgressDialog();
 		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
 			content = obj.getString("content");
+			content = content.replace("\u00a0", "");
 			showContent();
 		} else
 			super.onData(id, obj); // Handle inherited events

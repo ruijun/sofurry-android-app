@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import org.json.JSONObject;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 			req.execute(requesthandler);
 	    } else {
 			content = (String) retrieveObject("content");
+			content = content.replace("\u00a0", "");
 			viewContent();
 	    }
 	}
@@ -67,6 +69,7 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
 			pbh.hideProgressDialog();
 			content = obj.getString("content");
+			content = content.replace("\u00a0", "");
 			viewContent();
 		} else
 			super.onData(id, obj);// Handle inherited events
