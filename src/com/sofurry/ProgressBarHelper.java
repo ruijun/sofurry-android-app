@@ -1,5 +1,7 @@
 package com.sofurry;
 
+import java.util.Random;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -7,6 +9,7 @@ import android.content.DialogInterface.OnCancelListener;
 
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.requests.ProgressSignal;
+import com.sofurry.util.Quotes;
 
 /**
  * @author Rangarig
@@ -18,7 +21,8 @@ public class ProgressBarHelper {
 	private ProgressDialog pd;  // The progress dialog to use
 	private Activity act;		// Connection to the activity this helper is for
 	private ICanCancel cancelReceiver = null; // The object to be called if the progress bar is canceled
-		
+	private Random random = new Random();
+	
 	/**
 	 * Creates a progressbar helper
 	 * @param act
@@ -36,7 +40,8 @@ public class ProgressBarHelper {
 	 * @param msg
 	 */
 	public void showProgressDialog(String msg) {
-		pd = ProgressDialog.show(act, msg, "Please wait", true, true);
+		String quote = Quotes.quotes[random.nextInt(Quotes.quotes.length)];
+		pd = ProgressDialog.show(act, msg, quote, true, true);
 		setCancelListener();
 	}
 	
