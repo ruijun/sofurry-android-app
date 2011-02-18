@@ -15,7 +15,6 @@ import com.sofurry.gallery.GalleryArt;
 import com.sofurry.list.ListMusic;
 import com.sofurry.list.ListStories;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.tempstorage.ManagerStore;
 
 /**
  * @author Rangarig

@@ -42,7 +42,7 @@ public class ListStories extends AbstractContentList<Submission> {
 	public void setSelectedIndex(int selectedIndex) {
 		Submission s = getDataItem(selectedIndex);
 		//int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
-		Log.i("ListStories", "Viewing story ID: " + s.getId());
+		Log.i(AppConstants.TAG_STRING, "ListStories: Viewing story ID: " + s.getId());
 		Intent i = new Intent(this, ViewStoryActivity.class);
 		s.feedIntent(i);
 		//i.putExtra("pageID", s.getId());

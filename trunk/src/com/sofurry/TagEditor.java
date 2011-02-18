@@ -28,7 +28,7 @@ public class TagEditor extends Activity {
 	    textfieldTags = (EditText) findViewById(R.id.Tags);
 	    buttonOk.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
-				Log.i("logon", "ok clicked");
+				Log.i(AppConstants.TAG_STRING, "Logon: ok clicked");
 				closeActivity();
 			}});
 	    buttonGender.setOnClickListener(new Button.OnClickListener() {
@@ -102,7 +102,7 @@ public class TagEditor extends Activity {
 	 * Closes this activity
 	 */
 	private void closeActivity() {
-		Log.i("closeActivity","closing...");
+		Log.i(AppConstants.TAG_STRING,"closeActivity: Closing...");
 		Bundle bundle = new Bundle();
 		Intent mIntent = new Intent();
 		mIntent.putExtras(bundle);

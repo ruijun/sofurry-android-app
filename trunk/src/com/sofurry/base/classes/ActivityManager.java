@@ -173,7 +173,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		// detect if last item is visible
 		if (currentlyFetching) return; // We will not make that request twice, if new data is already being fetched
 		if (visible < total && (first + visible == total)) {// && listRequestThread == null) {
-			Log.d("OnScrollListener - end of list", "fvi: " + first + ", vic: " + visible + ", tic: " + total);
+			Log.d(AppConstants.TAG_STRING, "onScrollListener - End of list: fvi: " + first + ", vic: " + visible + ", tic: " + total);
 			currentPage++;
 			loadPage(false);
 		}
@@ -207,7 +207,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 			} catch (Exception e) {
 				onError(id, e);
 			}
-			Log.d("ONDATA", "OnData Received" + resultList.size());
+			Log.d(AppConstants.TAG_STRING, "OnData Received" + resultList.size());
 			// Reset the adapter, so new entries are shown
 			myAct.plugInAdapter();
 		}
@@ -348,7 +348,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	 * @param newViewSource
 	 */
 	public void resetViewSource(int newViewSource) {
-		Log.i("SF", "ResetViewSource: "+newViewSource);
+		Log.i(AppConstants.TAG_STRING, "ResetViewSource: "+newViewSource);
 		viewSource = newViewSource;
 		currentPage = 0;
 		resultList = new ArrayList<T>();

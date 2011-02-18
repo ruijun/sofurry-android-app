@@ -2,10 +2,11 @@ package com.sofurry.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+
+import com.sofurry.AppConstants;
 
 import android.os.Environment;
 import android.util.Log;
@@ -44,10 +45,11 @@ public class FileStorage {
 	 * @return
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unused")
 	public static FileOutputStream getFileOutputStream(String filename) throws Exception {
 		checkExternalMedia();
 		if (!mExternalStorageWriteable) {
-			Log.i("FileStorage", "External storage not writeable");
+			Log.i(AppConstants.TAG_STRING, "FileStorage: External storage not writeable");
 			return null;
 		}
 
@@ -59,8 +61,10 @@ public class FileStorage {
 		//if (f.canWrite()) {
 		//	Log.i("FileStorage", "writing file "+filename);
 		FileOutputStream fo = new FileOutputStream(f);
-		if (fo == null)
-			Log.d("FO",f.getName() + " null");
+		if (fo == null) {
+			Log.d(AppConstants.TAG_STRING, "FO: " + f.getName() + " null");
+		}
+		
 		return fo;
 		//}
 		//throw new Exception("CanWrite is false, outputstream creation failed.");
@@ -92,7 +96,7 @@ public class FileStorage {
 	public static FileInputStream getFileInputStream(String filename) throws Exception {
 		checkExternalMedia();
 		if (!mExternalStorageAvailable) {
-			Log.i("FileStorage", "External storage not readable");
+			Log.i(AppConstants.TAG_STRING, "FileStorage: External storage not readable");
 			return null;
 		}
 		
@@ -100,7 +104,7 @@ public class FileStorage {
 		if (f.canRead()) {
 			return new FileInputStream(f);
 		} else {
-			Log.i("FileStorage", "Can't read file "+filename);
+			Log.i(AppConstants.TAG_STRING, "FileStorage: Can't read file "+filename);
 		}
 		return null;
 	}

@@ -34,12 +34,12 @@ public class AccountActivity extends Activity {
 	    textfieldPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
 	    buttonOk.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
-				Log.i("logon", "ok clicked");
+				Log.i(AppConstants.TAG_STRING, "Logon: OK clicked");
 				storeCredentials();
 			}});
 	    buttonCancel.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
-				Log.i("logon", "cancel clicked");
+				Log.i(AppConstants.TAG_STRING, "Logon: Cancel clicked");
 				closeActivity();
 			}});
 	    
@@ -60,7 +60,7 @@ public class AccountActivity extends Activity {
 	}
 	
 	private void closeActivity() {
-		Log.i("closeActivity","closing...");
+		Log.i(AppConstants.TAG_STRING,"closeActivity: Closing...");
 		Bundle bundle = new Bundle();
 		Intent mIntent = new Intent();
 		mIntent.putExtras(bundle);

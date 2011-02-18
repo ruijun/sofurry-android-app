@@ -105,7 +105,7 @@ public class ViewArtActivity extends FavableActivity implements Runnable {
 	public void run() {
 		try {
 			String url = thumbnailUrl.replace("/thumbnails/", "/preview/");
-			Log.i("SF ImageDownloader", "Downloading image for id " + pageID + " from " + url);
+			Log.i(AppConstants.TAG_STRING, "ImageDownloader: Downloading image for id " + pageID + " from " + url);
 			
 			Bitmap b = ImageStorage.loadSubmissionImage(filename);
 			if (b == null) {

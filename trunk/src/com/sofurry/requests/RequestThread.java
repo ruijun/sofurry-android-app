@@ -1,7 +1,6 @@
 package com.sofurry.requests;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -56,11 +55,11 @@ public class RequestThread extends Thread {
 			int messageType = parsed.getInt("messageType");
 			if (messageType == AppConstants.AJAXTYPE_APIERROR) {
 				String error = parsed.getString("error");
-				Log.d("List.parseErrorMessage", "Error: " + error);
+				Log.d(AppConstants.TAG_STRING, "List.parseErrorMessage: " + error);
 				throw new Exception(error);
 			}
 		} catch (JSONException e) {
-			Log.d("Auth.parseResponse", e.toString());
+			Log.d(AppConstants.TAG_STRING, "Auth.parseResponse: " + e.toString());
 		}
 	}
 	

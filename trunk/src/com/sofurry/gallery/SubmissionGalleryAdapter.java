@@ -12,7 +12,6 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.sofurry.R;
 import com.sofurry.model.Submission;
 
 public class SubmissionGalleryAdapter extends BaseAdapter {

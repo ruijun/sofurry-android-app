@@ -91,7 +91,7 @@ public class GalleryArt extends AbstractContentGallery<Submission> {
 	public void setSelectedIndex(int selectedIndex) {
 		Submission s = getDataItem(selectedIndex);
 //		int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
-		Log.i("GalleryArt", "Viewing art ID: " + s.getId());
+		Log.i(AppConstants.TAG_STRING, "GalleryArt: Viewing art ID: " + s.getId());
 		Intent i = new Intent(this, ViewArtActivity.class);
 		s.feedIntent(i);
 //		i.putExtra("pageID", s.getId());

@@ -15,7 +15,6 @@ import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IRequestHandler;
 import com.sofurry.requests.AsyncFileDownloader;
 import com.sofurry.requests.ProgressSignal;
-import com.sofurry.requests.RequestHandler;
 
 public class ContentDownloader {
 
@@ -28,7 +27,7 @@ public class ContentDownloader {
 	 * @throws Exception
 	 */
 	public static Bitmap downloadBitmap(String url) throws Exception {
-		Log.d("SF ContentDownloader", "Fetching image...");
+		Log.d(AppConstants.TAG_STRING, "ContentDownloader: Fetching image...");
 		
 		URL myImageURL = new URL(HttpRequest.encodeURL(url));
 		HttpURLConnection connection = null;
@@ -45,7 +44,7 @@ public class ContentDownloader {
 			//connection.setReadTimeout(1000*10); // Set timeout for 10 seconds
 			if (connection.getContentType().toLowerCase().startsWith("text")) throw new Exception("Unable to download image. (text answer where binary expected)");
 			is = connection.getInputStream();
-			Log.d("SF ContentDownloader", "Downloading...");
+			Log.d(AppConstants.TAG_STRING, "ContentDownloader: Downloading...");
 			bos = new ByteArrayOutputStream();
 		    int readBytes;
 		    byte[] buffer = new byte[1024];
@@ -55,7 +54,7 @@ public class ContentDownloader {
 		    bos.flush();
 		    bos.close();
 			//Log.d("SF ContentDownloader", is.available() + " bytes available to be read from server");
-			Log.d("SF ContentDownloader", "creating drawable... ("+bos.size()+" bytes)");
+			Log.d(AppConstants.TAG_STRING, "ContentDownloader: creating drawable... ("+bos.size()+" bytes)");
 			bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(),0,bos.size());
 		} catch (Exception e) {
 			throw e;
@@ -95,7 +94,7 @@ public class ContentDownloader {
 	 * @throws Exception
 	 */
 	public static void downloadFile(String url, String filename, IRequestHandler feedback) throws Exception {
-		Log.d("SF ContentDownloader", "Fetching file...");
+		Log.d(AppConstants.TAG_STRING, "ContentDownloader: Fetching file...");
 		URL myImageURL = new URL(HttpRequest.encodeURL(url));
 		HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
 		connection.setDoInput(true);
@@ -132,7 +131,7 @@ public class ContentDownloader {
 			if ((t < 1024) || (!se.getMessage().toLowerCase().contains("reset")))
 			throw se;
 		} catch (Exception e) {
-		    Log.d("dwn", t + " " + l);
+		    Log.d(AppConstants.TAG_STRING, "Dwn: " + t + " " + l);
 			throw e;
 		} finally {
 			if (is != null)

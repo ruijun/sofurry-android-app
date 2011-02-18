@@ -12,6 +12,9 @@ public class AppConstants {
 	public static final int ACTIVITY_TAGS = 6;
 	public static final int ACTIVITY_MUSICLIST = 7;
 	public static final int ACTIVITY_RATE = 7;
+	
+	
+	public static final String TAG_STRING = "[SoFurry]";
 
 
 	public static final int CONTENTTYPE_STORIES = 0;

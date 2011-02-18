@@ -49,7 +49,7 @@ public class Authentication {
 				md5 = "0" + md5;
 			return md5;
 		} catch (NoSuchAlgorithmException e) {
-			Log.e("MD5", e.getMessage());
+			Log.e(AppConstants.TAG_STRING, "MD5: " + e.getMessage());
 			return null;
 		}
 	}
@@ -58,7 +58,7 @@ public class Authentication {
 	public static String generateRequestHash() {
 		String hashedPassword = getMd5Hash(password + salt);
 	    String hash = getMd5Hash(hashedPassword + authenticationPadding + currentAuthenticationSequence);
-	    Log.d("Auth", "Password: " + hashedPassword +
+	    Log.d(AppConstants.TAG_STRING, "Auth: Password: " + hashedPassword +
 	    			" padding: " + authenticationPadding + 
 	    			" sequence: " + currentAuthenticationSequence +
 	    			" salt: " + salt);
@@ -127,7 +127,7 @@ public class Authentication {
 	public static boolean parseResponse(String httpResult) {
 		try {
 			//check for OTP sequence json and parse it.
-			Log.d("Auth.parseResponse", "response: "+httpResult);
+			Log.d(AppConstants.TAG_STRING, "Auth.parseResponse: "+httpResult);
 			JSONObject jsonParser;
 			jsonParser = new JSONObject(httpResult);
 			int messageType = jsonParser.getInt("messageType");
@@ -136,7 +136,7 @@ public class Authentication {
 				String newPadding = jsonParser.getString("newPadding");
 				String newSalt = jsonParser.getString("salt");
 				String otpVersion = jsonParser.getString("version");
-				Log.d("Auth.parseResponse", "OTP Version: " + otpVersion + 
+				Log.d(AppConstants.TAG_STRING, "Auth.parseResponse: OTP Version: " + otpVersion + 
 							" new Sequence: " + newSequence +
 							" new Padding: " + newPadding +
 							" new salt: " + newSalt );
@@ -146,7 +146,7 @@ public class Authentication {
 				return false;
 			}
 		} catch (JSONException e) {
-			Log.d("Auth.parseResponse", e.toString());
+			Log.d(AppConstants.TAG_STRING, "Auth.parseResponse " + e.toString());
 		}
 		
 		return true;

@@ -1,11 +1,8 @@
 package com.sofurry.base.classes;
 
-import java.util.ArrayList;
-
 import org.json.JSONObject;
 
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,16 +15,11 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Toast;
 
-import com.sofurry.base.interfaces.IHasThumbnail;
+import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IManagedActivity;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.RequestHandler;
-import com.sofurry.requests.RequestThread;
-import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.tempstorage.ManagerStore;
-import com.sofurry.util.ErrorHandler;
 
 /**
  * @author SoFurry
@@ -133,7 +125,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 	 */
 	public void plugInAdapter() {
 		int lastScrollY = getListView().getFirstVisiblePosition();
-		Log.i("SF AbstractContentList", "updateView called, last scrollpos: "+lastScrollY);
+		Log.i(AppConstants.TAG_STRING, "AbstractContentList: updateView called, last scrollpos: " + lastScrollY);
 
 		setListAdapter(getAdapter(this));
 		getListView().setTextFilterEnabled(true);
@@ -171,7 +163,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 		//plugInAdapter();
 		getListView().invalidateViews();
 		
-		Log.i("SF", "Refresh");
+		Log.i(AppConstants.TAG_STRING, "Refresh");
 	}
 
 	/**
