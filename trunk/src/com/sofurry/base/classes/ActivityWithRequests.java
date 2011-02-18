@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.sofurry.AppConstants;
@@ -48,6 +49,15 @@ public abstract class ActivityWithRequests extends Activity implements ICanHandl
 		} else {
 			uniquestoragekey = savedInstanceState.getLong("unique");
 	    	requesthandler = (RequestHandler) retrieveObject("handler");
+	    	
+	    	// Extra sanity check, because requesthandler can sometimes be null
+	    	// TODO: Might want to figure out why this happens
+	    	if (requesthandler == null) {
+	    		uniquestoragekey = System.nanoTime();
+	    		requesthandler = new RequestHandler(this);
+	    	}
+	    	
+	    	// Set feedback callback handler
 	    	requesthandler.setFeedbackReceive(this);
 		}
 		
@@ -141,15 +151,12 @@ public abstract class ActivityWithRequests extends Activity implements ICanHandl
 	}
 
 	/**
-	 * A quick hack to determine if the device is in landscape or portrait mode
+	 * A quick shortcut to determine if the device is in landscape or portrait mode
 	 * 
 	 * @return True if the device is in landscape mode, false otherwise
 	 */
 	public boolean isOrientationLandscape() {
-		int width = getWindowManager().getDefaultDisplay().getWidth();
-		int height = getWindowManager().getDefaultDisplay().getHeight();
-		
-		return (width > height);
+		return (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 	}
 	
 	@Override

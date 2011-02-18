@@ -13,6 +13,7 @@
 	>
 		<Button
 			android:id="@+id/stories"
+			android:onClick="buttonClick"
 			android:gravity="center_horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -22,6 +23,7 @@
 			android:drawableTop="@drawable/menustories" />
 		<Button
 			android:id="@+id/art"
+			android:onClick="buttonClick"
 			android:gravity="center_horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -31,6 +33,7 @@
 			android:drawableTop="@drawable/menuart" />
 		<Button
 			android:id="@+id/music"
+			android:onClick="buttonClick"
 			android:gravity="center_horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -40,6 +43,7 @@
 			android:drawableTop="@drawable/menumusic" />
 		<Button
 			android:id="@+id/journals"
+			android:onClick="buttonClick"
 			android:gravity="center_horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -56,6 +60,7 @@
 	>
 		<Button
 			android:id="@+id/chat"
+			android:onClick="buttonClick"
 			android:gravity="center_horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -65,6 +70,7 @@
 			android:drawableTop="@drawable/menuchat" />
 		<Button
 			android:id="@+id/forums"
+			android:onClick="buttonClick"
 			android:gravity="center_horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -74,6 +80,7 @@
 			android:drawableTop="@drawable/menuforums" />
 		<Button
 			android:id="@+id/logbook"
+			android:onClick="buttonClick"
 			android:gravity="center_horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -83,6 +90,7 @@
 			android:drawableTop="@drawable/menumessages" />
 		<Button
 			android:id="@+id/pms"
+			android:onClick="buttonClick"
 			android:gravity="center_horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -99,6 +107,7 @@
 	>
 		<Button
 			android:id="@+id/settings"
+			android:onClick="buttonClick"
 			android:layout_width="95dp"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="20dip"
