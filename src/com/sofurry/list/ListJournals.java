@@ -55,7 +55,7 @@ public class ListJournals extends AbstractContentList<Submission> {
 	public void setSelectedIndex(int selectedIndex) {
 		Submission s = getDataItem(selectedIndex);
 		//int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
-		Log.i("ListJournals", "Viewing journal ID: " + s.getId());
+		Log.i(AppConstants.TAG_STRING, "ListJournals: Viewing journal ID: " + s.getId());
 		Intent i = new Intent(this, ViewJournalActivity.class);
 		s.feedIntent(i);
 //		i.putExtra("pageID", s.getId());

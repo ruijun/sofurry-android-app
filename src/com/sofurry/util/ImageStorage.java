@@ -1,9 +1,10 @@
 package com.sofurry.util;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import com.sofurry.AppConstants;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -78,10 +79,10 @@ public class ImageStorage {
 			if (is != null && is.available() > 0) {
 				bitmap = BitmapFactory.decodeStream(is);
 			} else {
-				Log.w("soFurryApp", "Can't load from external storage");
+				Log.w(AppConstants.TAG_STRING, "ImageStorage: Can't load from external storage");
 			}
 		} catch (Exception e) {
-			Log.e("soFurryApp", "error in loadIcon", e);
+			Log.e(AppConstants.TAG_STRING, "ImageStorage: Error in loadIcon", e);
 		} finally {
 			if (is != null) {
 				try {
@@ -124,7 +125,7 @@ public class ImageStorage {
 				}
 			}
 		}
-		Log.d("soFurryApp", "icon saved " + filename);
+		Log.d(AppConstants.TAG_STRING, "ImageStorage: Icon saved " + filename);
 	}
 	
 	/**

@@ -18,9 +18,8 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 
+import com.sofurry.AppConstants;
 import com.sofurry.R;
-import com.sofurry.R.id;
-import com.sofurry.R.layout;
 import com.sofurry.base.interfaces.IManagedActivity;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.tempstorage.ManagerStore;
@@ -160,7 +159,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	 */
 	public void updateView() {
 		galleryView.invalidateViews();
-		Log.i("SF", "Refresh");
+		Log.i(AppConstants.TAG_STRING, "Refresh");
 	}
 	
 	/**

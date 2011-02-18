@@ -35,7 +35,7 @@ public class ListMusic extends AbstractContentList<Submission> {
 	@Override
 	public void setSelectedIndex(int selectedIndex) {
 		Submission s = getDataItem(selectedIndex);
-		Log.i("ListMusic", "Viewing music ID: " + s.getId());
+		Log.i(AppConstants.TAG_STRING, "ListMusic: Viewing music ID: " + s.getId());
 		Intent i = new Intent(this, ViewMusicActivity.class);
 		s.feedIntent(i);
 		//i.putExtra("pageID", s.getId());

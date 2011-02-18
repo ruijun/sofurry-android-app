@@ -1,7 +1,8 @@
 package com.sofurry.util;
 
+import com.sofurry.AppConstants;
+
 import android.app.Activity;
-import android.test.IsolatedContext;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,7 +16,7 @@ import android.widget.Toast;
 public class ErrorHandler {
 	public static void justLogError(Exception e) {
 		if (e.getClass().equals(NullPointerException.class)) e= new Exception("NullPointerException");
-		Log.d("Exception", e.getMessage());
+		Log.d(AppConstants.TAG_STRING, "Exception: " + e.getMessage());
 	}
 
 	

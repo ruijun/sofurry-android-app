@@ -1,8 +1,6 @@
 package com.sofurry.util;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,14 +11,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
 import com.sofurry.AppConstants;
 
-import android.text.Html;
 import android.util.Log;
 
 
@@ -45,7 +41,7 @@ public class HttpRequest {
 				k = itKeys.next();
 				if (k != null) {
 					v = kvPairs.get(k);
-					Log.d("HTTP", "k/v: "+k+" / "+v);
+					Log.d(AppConstants.TAG_STRING, "HTTP: k/v: "+k+" / "+v);
 					nameValuePairs.add(new BasicNameValuePair(k, v));
 				}
 			}

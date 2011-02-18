@@ -277,7 +277,7 @@ public class ChatActivity extends ActivityWithRequests {
 			roomIds = new int[cnt];
 			for (int i = 0; i < cnt; i++) {
 				JSONObject item = items.getJSONObject(i);
-				Log.d("item", item.getString("name") + " " + item.getString("id"));
+				Log.d(AppConstants.TAG_STRING, "Item: " + item.getString("name") + " " + item.getString("id"));
 				roomNames[i] = Html.fromHtml(item.getString("name")).toString();
 				roomIds[i] = Integer.parseInt(item.getString("id")); 
 			}
@@ -322,10 +322,10 @@ public class ChatActivity extends ActivityWithRequests {
 		chatView.setText(""); // Clear chat window
 		
 		// Start the polling for our new room
-		chatPollThread = new ChatPollThread(this.roomId);
+		chatPollThread = new ChatPollThread(ChatActivity.roomId);
 		chatPollThread.start();
 		chatSendQueue = new LinkedBlockingQueue<String>();
-		chatSendThread = new ChatSendThread(this.roomId);
+		chatSendThread = new ChatSendThread(ChatActivity.roomId);
 		chatSendThread.start();
 		
 	}
@@ -338,7 +338,7 @@ public class ChatActivity extends ActivityWithRequests {
 		pbh.showProgressDialog("Fetching users");
 		AjaxRequest getRooms = new AjaxRequest();
 		getRooms.addParameter("f", "onlineUsers");
-		getRooms.addParameter("roomid", "" + this.roomId);
+		getRooms.addParameter("roomid", "" + ChatActivity.roomId);
 		getRooms.setRequestID(AppConstants.REQUEST_ID_USERLIST); // Mark this request, so the return value handler knows what to do with the result
 		getRooms.execute(requesthandler);
 	}
@@ -541,7 +541,7 @@ public class ChatActivity extends ActivityWithRequests {
     }
 
     private void onSend() {
-    	Log.i("SF chat", "onSend() called");
+    	Log.i(AppConstants.TAG_STRING, "Chat: onSend() called");
     	chatSendQueue.add(chatEntry.getText().toString());
     	chatEntry.setText("");
     }

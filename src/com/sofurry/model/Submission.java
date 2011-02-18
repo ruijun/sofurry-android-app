@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.sofurry.SubmissionViewActivity;
+import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IHasThumbnail;
 import com.sofurry.util.ContentDownloader;
 import com.sofurry.util.ImageStorage;
@@ -135,9 +135,9 @@ public class Submission implements Serializable, IHasThumbnail {
 		if (fastmode) return; // In fastmode we will not try downloading the thumb.
 		
 		if (thumbnail == null) {
-		  Log.i("SF ThumbDownloader", "Downloading thumb for pid " + getId() + " from " + thumbnailUrl);
+		  Log.i(AppConstants.TAG_STRING, "ThumbDownloader: Downloading thumb for pid " + getId() + " from " + thumbnailUrl);
 		  thumbnail = ContentDownloader.downloadBitmap(thumbnailUrl);
-		  Log.i("SF ThumbDownloader", "Storing image");
+		  Log.i(AppConstants.TAG_STRING, "ThumbDownloader: Storing image");
 		  storeIcon();
 		}
 	}

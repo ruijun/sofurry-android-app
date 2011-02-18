@@ -157,7 +157,7 @@ public class ListPM
         PrivateMessage pm = getDataItem(selectedIndex);
 
         // int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
-        Log.i("ListPM", "Viewing PM ID: " + pm.getId());
+        Log.i(AppConstants.TAG_STRING, "ListPM: Viewing PM ID: " + pm.getId());
 
         Intent intent = new Intent(this, ViewPMActivity.class);
        

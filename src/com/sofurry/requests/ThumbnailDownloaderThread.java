@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import android.util.Log;
 
+import com.sofurry.AppConstants;
 import com.sofurry.RefreshRequest;
 import com.sofurry.base.interfaces.IHasThumbnail;
 import com.sofurry.base.interfaces.IRequestHandler;
@@ -67,7 +68,7 @@ public class ThumbnailDownloaderThread extends Thread {
 					  try {
 						  s.populateThumbnail(fastmode);
 					  } catch (Exception e) {
-						  Log.d("thumb", "Thumbloading failed " + e.getMessage());
+						  Log.d(AppConstants.TAG_STRING, "Thumbloading failed " + e.getMessage());
 					  }
 					
 					// If fetching of one thumbnail fails, we will try the whole list again
@@ -92,7 +93,7 @@ public class ThumbnailDownloaderThread extends Thread {
 	 * Triggers a refresh in the view this downloader is attached to
 	 */
 	private void triggerRefresh() {
-		Log.i("SF ThumbDownloader", "Updating listview");
+		Log.i(AppConstants.TAG_STRING, "ThumbDownloader: Updating listview");
 		updateHandler.postMessage(new RefreshRequest());
 	}
 }

@@ -1,14 +1,11 @@
 package com.sofurry;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RatingBar;
 
 public class RateActivity extends Activity {
@@ -32,7 +29,7 @@ public class RateActivity extends Activity {
 	 * Closes this activity
 	 */
 	private void closeActivity() {
-		Log.i("closeActivity","closing...");
+		Log.i(AppConstants.TAG_STRING,"closeActivity: Closing...");
 		Bundle bundle = new Bundle();
 		Intent mIntent = new Intent();
 		mIntent.putExtras(bundle);

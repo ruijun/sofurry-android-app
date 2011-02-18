@@ -237,7 +237,7 @@ public class MainMenu
             updateButtons();
         } else {
             // Fetch the information from the server instead
-            Log.i("[AngelOD]", "onCreate check");
+            Log.i(AppConstants.TAG_STRING, "MainMenu: onCreate check");
             checkPmCount();
         }
     }
@@ -277,7 +277,7 @@ public class MainMenu
 
         // Check if we need to check for messages
         if (new Date().getTime() > lastCheck_ + 300000) {
-            Log.i("[AngelOD]", "onResume check");
+            Log.i(AppConstants.TAG_STRING, "MainMenu: onResume check");
             checkPmCount();
         }
     }
