@@ -140,6 +140,7 @@ public class ListPM
 
         req.addParameter("f", "pm");
         req.addParameter("page", "" + page);
+		req.addParameter("entriesPerPage", "" + AppConstants.ENTRIESPERPAGE_LIST);
 
         return req;
     }

@@ -102,7 +102,8 @@ public class AppConstants {
 	public static final int PM_STATUS_READ = 1;
 	public static final int PM_STATUS_REPLIED  = 2;
 	
-	public static final int ENTRIESPERPAGE_GALLERY = 30;
+	public static final int ENTRIESPERPAGE_GALLERY = 40;
+	public static final int ENTRIESPERPAGE_LIST = 40;
 	
 	/**
 	 * Combines the site URL with the path to the request script

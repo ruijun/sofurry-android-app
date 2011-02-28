@@ -21,7 +21,7 @@ public class ListMusic extends AbstractContentList<Submission> {
 
 	@Override
 	public AjaxRequest getFetchParameters(int page, int source) {
-		return GalleryArt.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_MUSIC,30);
+		return GalleryArt.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_MUSIC,AppConstants.ENTRIESPERPAGE_GALLERY);
 	}
 	
 

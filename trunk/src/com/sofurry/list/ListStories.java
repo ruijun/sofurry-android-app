@@ -21,7 +21,7 @@ public class ListStories extends AbstractContentList<Submission> {
 
 	@Override
 	public AjaxRequest getFetchParameters(int page, int source) {
-		return GalleryArt.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_STORIES,10);
+		return GalleryArt.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_STORIES,AppConstants.ENTRIESPERPAGE_GALLERY);
 	}
 	
 
