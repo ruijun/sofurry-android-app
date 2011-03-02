@@ -159,7 +159,14 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	 */
 	public void updateView() {
 		galleryView.invalidateViews();
-		Log.i(AppConstants.TAG_STRING, "Refresh");
+		Log.i(AppConstants.TAG_STRING, "Refresh AbstractContentGallery");
+
+		Log.d(AppConstants.TAG_STRING, "LastVis: " + galleryView.getLastVisiblePosition()+" resultsize:"+man.getResultList().size());
+		Log.d(AppConstants.TAG_STRING, "rest: " + (man.getResultList().size()%AppConstants.ENTRIESPERPAGE_GALLERY));
+
+		if (galleryView.getLastVisiblePosition()+1 >= man.getResultList().size() && (man.getResultList().size()%AppConstants.ENTRIESPERPAGE_GALLERY) == 0) {
+			man.forceLoadNext();
+		}
 	}
 	
 	/**

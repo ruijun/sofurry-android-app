@@ -163,7 +163,13 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 		//plugInAdapter();
 		getListView().invalidateViews();
 		
-		Log.i(AppConstants.TAG_STRING, "Refresh");
+		Log.i(AppConstants.TAG_STRING, "Refresh AbstractContentList");
+		Log.d(AppConstants.TAG_STRING, "LastVis: " + getListView().getLastVisiblePosition()+" resultsize:"+man.getResultList().size());
+		Log.d(AppConstants.TAG_STRING, "rest: " + (man.getResultList().size()%AppConstants.ENTRIESPERPAGE_LIST));
+
+		if (getListView().getLastVisiblePosition()+1 >= man.getResultList().size() && (man.getResultList().size()%AppConstants.ENTRIESPERPAGE_LIST) == 0) {
+			man.forceLoadNext();
+		}
 	}
 
 	/**
