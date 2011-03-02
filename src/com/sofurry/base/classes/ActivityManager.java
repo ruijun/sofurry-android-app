@@ -179,6 +179,11 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		}
 	}
 
+	public void forceLoadNext() {
+		if (currentlyFetching) return; // We will not make that request twice, if new data is already being fetched
+		currentPage++;
+		loadPage(false);
+	}
 	
 	/**
 	 * The request handler to be used to handle the feedback from the AjaxRequest
