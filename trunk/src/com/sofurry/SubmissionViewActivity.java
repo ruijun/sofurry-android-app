@@ -1,97 +1,160 @@
 package com.sofurry;
 
-import com.sofurry.base.classes.ActivityWithRequests;
-import com.sofurry.base.interfaces.ICanCancel;
+//~--- imports ----------------------------------------------------------------
 
 import android.os.Bundle;
+
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.sofurry.base.classes.ActivityWithRequests;
+import com.sofurry.base.interfaces.ICanCancel;
+
+
+//~--- classes ----------------------------------------------------------------
+
 /**
  * @author Rangarig
- * 
- * A class that contains all the tools for an item that is favable, ratable and you know. 
- * 
+ *
+ * A class that contains all the tools for an item that can be faved and rated.
+ *
  */
-public abstract class SubmissionViewActivity extends ActivityWithRequests implements ICanCancel {
-	
-	protected int pageID;
-	protected String name;
-	protected int authorId;
-	protected String authorName;
-	protected String thumbURL;
+public abstract class SubmissionViewActivity
+        extends ActivityWithRequests
+        implements ICanCancel {
+    protected String authorName;
+    protected String name;
+    protected String thumbURL;
+    protected int    authorId;
+    protected int    pageID;
 
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		Bundle extras = getIntent().getExtras() ;
-	    if( extras != null ) {
-	        pageID = extras.getInt("pageID");
-	        name = extras.getString("name");
-	        authorId = extras.getInt("authorId");
-	        authorName = extras.getString("authorName");
-	        thumbURL = extras.getString("thumbnail");
-	    }
-	}
-	
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
-	 * 
-	 * Creates the Context Menu for this Activity.
-	 */
-	public boolean onCreateOptionsMenu(Menu menu) {
-		boolean result = super.onCreateOptionsMenu(menu);
-		menu.add(0,AppConstants.MENU_SAVE   ,0,"Save").setIcon(android.R.drawable.ic_menu_save);
 
-		createExtraMenuOptions(menu);
-		
-		return result;
-	}
+    //~--- methods ------------------------------------------------------------
 
-	/**
-	 * Allows for the implementing view to add extra menu options to the menu
-	 * @param menu
-	 */
-	public abstract void createExtraMenuOptions(Menu menu);
-	
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case AppConstants.MENU_SAVE:
-			save();
-			return true;
-		default:
-			return super.onContextItemSelected(item);
-		}
-	}
+    /**
+     * Allows for the implementing view to add extra menu options to the menu
+     * @param menu
+     */
+    public abstract void createExtraMenuOptions(Menu menu);
 
-	
-	@Override
-	public void onError(int id, Exception e) {
-		pbh.hideProgressDialog();
-		super.onError(id, e);
-	}
-	
-	public abstract void save();
-
-	/* (non-Javadoc)
-	 * @see com.sofurry.IManagedActivity#finish()
-	 */
-	@Override
-	public void finish() {
-		super.finish();
-	}
-	
+    /**
+     * Method description
+     *
+     */
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-        	finish();
+    public void finish() {
+        super.finish();
+    }
+
+    /**
+     * Method description
+     *
+     *
+     * @param savedInstanceState
+     */
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle extras = getIntent().getExtras();
+
+        if (extras != null) {
+            pageID     = extras.getInt("pageID");
+            name       = extras.getString("name");
+            authorId   = extras.getInt("authorId");
+            authorName = extras.getString("authorName");
+            thumbURL   = extras.getString("thumbnail");
+        }
+    }
+
+    /**
+     * Creates the Context Menu for this Activity.
+     *
+     *
+     * @param menu
+     *
+     * @return
+     */
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean result = super.onCreateOptionsMenu(menu);
+
+        menu.add(0,
+                 AppConstants.MENU_SAVE,
+                 0,
+                 "Save").setIcon(android.R.drawable.ic_menu_save);
+        createExtraMenuOptions(menu);
+
+        return result;
+    }
+
+    /**
+     * Method description
+     *
+     *
+     * @param id
+     * @param e
+     */
+    @Override
+    public void onError(int id, Exception e) {
+        pbh.hideProgressDialog();
+        super.onError(id, e);
+    }
+
+    /**
+     * Method description
+     *
+     *
+     * @param keyCode
+     * @param event
+     *
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)
+                && (event.getRepeatCount() == 0)) {
+            finish();
         }
 
         return super.onKeyDown(keyCode, event);
     }
 
-    
-    
+    /**
+     * Method description
+     *
+     *
+     * @param item
+     *
+     * @return
+     */
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case AppConstants.MENU_SAVE:
+                save();
 
+                return true;
+
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    /**
+     * Method description
+     *
+     *
+     * @param fileName
+     *
+     * @return
+     */
+    public String sanitizeFileName(String fileName) {
+        // Remove non-permitted characters
+        return fileName.replaceAll("[\\\\/?%*:|<>.\"]", "_").trim();
+    }
+
+    /**
+     * Method description
+     *
+     */
+    public abstract void save();
 }
-

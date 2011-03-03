@@ -153,7 +153,7 @@ public class ViewArtActivity extends FavableActivity implements Runnable {
 			File f = new File(FileStorage.getPath(ImageStorage.getSubmissionImagePath(filename)));
 			if (!f.exists()) throw new Exception("File has not downloaded properly yet. File does not exist.");
 			
-			String targetPath = FileStorage.getUserStoragePath("Images", filename);
+			String targetPath = FileStorage.getUserStoragePath("Images", sanitizeFileName(filename));
 			File tf = new File(targetPath);
 			
 			FileStorage.ensureDirectory(tf.getParent());

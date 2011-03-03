@@ -22,7 +22,7 @@ public class FileStorage {
 	public static String unusable = "*+~|<> !?";
 	
 	/**
-	 * Liefert den Root des Pfades zurück
+	 * Returns the path to the root file folder
 	 * @return
 	 */
 	public static String getPathRoot() {
