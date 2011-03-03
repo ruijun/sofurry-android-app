@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen
+		name="reply_handle_graphics_height"
+	>43px</dimen>
+	<dimen
+		name="reply_handle_graphics_width"
+	>95px</dimen>
+	<dimen
+		name="reply_handle_padding"
+	>45px</dimen>
+</resources>
