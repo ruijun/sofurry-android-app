@@ -148,8 +148,12 @@ public class MainMenu
     }
 
     private void checkPmCount() {
-    	// Limit how often it'll refresh itself, and only do so if information has been filled out
-        if ((buttonPMs_.isEnabled()) && (new Date().getTime() > lastCheck_ + 300000)) {
+        /*
+         *  Limit how often it'll refresh itself, and only do so if information
+         * has been filled out
+         */
+        if ((buttonPMs_.isEnabled())
+                && (new Date().getTime() > lastCheck_ + 300000)) {
             pbh.showProgressDialog("Fetching data...");
             getCheckParameters().execute(requesthandler);
 
@@ -169,16 +173,16 @@ public class MainMenu
                                     int resultCode,
                                     Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        
+
         // Check button state
         checkButtonDisabledState();
 
         // Check if we're coming from settings
         if (requestCode == AppConstants.ACTIVITY_SETTINGS) {
-        	// Check for PMs
-        	checkPmCount();
+            // Check for PMs
+            checkPmCount();
         }
-        
+
         if (intent != null) {
             Bundle extras = intent.getExtras();
 

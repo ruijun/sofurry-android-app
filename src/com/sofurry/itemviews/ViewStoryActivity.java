@@ -91,7 +91,7 @@ public class ViewStoryActivity extends FavableActivity  {
 	@Override
 	public void save() {
 		try {
-			String targetPath = FileStorage.getUserStoragePath("Stories", name + ".html");
+			String targetPath = FileStorage.getUserStoragePath("Stories", sanitizeFileName(name) + ".html");
 
 			File tf = new File(targetPath);
 			FileStorage.ensureDirectory(tf.getParent());

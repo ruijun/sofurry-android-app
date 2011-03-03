@@ -292,7 +292,7 @@ public class ViewMusicActivity extends FavableActivity  {
 			File f = new File(playPath);
 			if (!f.exists()) throw new Exception("File does not exist, try to download again.");
 			
-			String targetPath = FileStorage.getUserStoragePath("Music", filename);
+			String targetPath = FileStorage.getUserStoragePath("Music", sanitizeFileName(filename));
 
 			File tf = new File(targetPath);
 			FileStorage.ensureDirectory(tf.getParent());
