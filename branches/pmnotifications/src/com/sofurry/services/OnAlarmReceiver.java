@@ -2,6 +2,8 @@ package com.sofurry.services;
 
 //~--- imports ----------------------------------------------------------------
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
@@ -13,27 +15,18 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
  * Class description
  *
  */
-public class PmNotificationService
-        extends WakefulIntentService {
-    /**
-     * Constructs ...
-     *
-     */
-    public PmNotificationService() {
-        super("PmNotificationService");
-    }
-
-    //~--- methods ------------------------------------------------------------
-
+public class OnAlarmReceiver
+        extends BroadcastReceiver {
     /**
      * Method description
      *
      *
-     *
+     * @param context
      * @param intent
      */
     @Override
-    protected void doWakefulWork(Intent intent) {
-        // TODO Auto-generated method stub
+    public void onReceive(Context context, Intent intent) {
+        WakefulIntentService.sendWakefulWork(context,
+                                             PmNotificationService.class);
     }
 }
