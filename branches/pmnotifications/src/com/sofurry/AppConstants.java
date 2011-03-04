@@ -105,6 +105,10 @@ public class AppConstants {
 	public static final int ENTRIESPERPAGE_GALLERY = 40;
 	public static final int ENTRIESPERPAGE_LIST = 40;
 	
+	public static final long[] VIBRATE_PM_INCOMING = {0, 150, 100, 150, 100, 150};
+	
+	public static final int NOTIFICATION_ID_PM = 5000;
+	
 	/**
 	 * Combines the site URL with the path to the request script
 	 * 
