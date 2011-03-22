@@ -34,7 +34,8 @@ import com.sofurry.tempstorage.ManagerStore;
 public abstract class AbstractContentGallery<T> extends Activity implements IManagedActivity<T> {
 
 	protected long uniqueKey = 0;  // The key to be used by the storage manager to recognize this particular activity
-
+	protected int lastUpdateListSize = 0; // temp variable to keep track of how many submissions were added by the next page loading
+	
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#getUniqueKey()
 	 */
@@ -159,13 +160,16 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	 */
 	public void updateView() {
 		galleryView.invalidateViews();
-		Log.i(AppConstants.TAG_STRING, "Refresh AbstractContentGallery");
 
+		Log.i(AppConstants.TAG_STRING, "Refresh AbstractContentGallery");
 		Log.d(AppConstants.TAG_STRING, "LastVis: " + galleryView.getLastVisiblePosition()+" resultsize:"+man.getResultList().size());
 		Log.d(AppConstants.TAG_STRING, "rest: " + (man.getResultList().size()%AppConstants.ENTRIESPERPAGE_GALLERY));
 
 		if (galleryView.getLastVisiblePosition()+1 >= man.getResultList().size() && (man.getResultList().size()%AppConstants.ENTRIESPERPAGE_GALLERY) == 0) {
-			man.forceLoadNext();
+			if (lastUpdateListSize != man.getResultList().size()) {
+				lastUpdateListSize = man.getResultList().size();
+				man.forceLoadNext();
+			}
 		}
 	}
 	

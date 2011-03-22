@@ -34,6 +34,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 	private boolean finished = false;
 	
 	protected long uniqueKey = 0;  // The key to be used by the storage manager to recognize this particular activity
+	protected int lastUpdateListSize = 0; // temp variable to keep track of how many submissions were added by the next page loading
 
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#getUniqueKey()
@@ -168,7 +169,10 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 		Log.d(AppConstants.TAG_STRING, "rest: " + (man.getResultList().size()%AppConstants.ENTRIESPERPAGE_LIST));
 
 		if (getListView().getLastVisiblePosition()+1 >= man.getResultList().size() && (man.getResultList().size()%AppConstants.ENTRIESPERPAGE_LIST) == 0) {
-			man.forceLoadNext();
+			if (lastUpdateListSize != man.getResultList().size()) {
+				lastUpdateListSize = man.getResultList().size();
+				man.forceLoadNext();
+			}
 		}
 	}
 
