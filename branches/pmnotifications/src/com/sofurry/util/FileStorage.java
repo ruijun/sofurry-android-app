@@ -19,7 +19,7 @@ public class FileStorage {
 	private static String pathroot = "/Android/data/com.sofurry/files/";
 	
 	public static String MUSIC_PATH = "music";
-	public static String unusable = "*+~|<> !?";
+	public static String unusable = "/\\:*+~|<> !?";
 	
 	/**
 	 * Returns the path to the root file folder
