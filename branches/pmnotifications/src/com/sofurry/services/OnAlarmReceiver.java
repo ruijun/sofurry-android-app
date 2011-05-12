@@ -5,8 +5,10 @@ package com.sofurry.services;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
+import com.sofurry.AppConstants;
 
 
 //~--- classes ----------------------------------------------------------------
@@ -26,6 +28,8 @@ public class OnAlarmReceiver
      */
     @Override
     public void onReceive(Context context, Intent intent) {
+    	Log.i(AppConstants.TAG_STRING, "Triggering alarm");
+    	
         WakefulIntentService.sendWakefulWork(context,
                                              PmNotificationService.class);
     }

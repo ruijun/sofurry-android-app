@@ -10,13 +10,17 @@ package com.sofurry.mainmenu;
 
 //~--- imports ----------------------------------------------------------------
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 
+import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.Typeface;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 
 import android.util.Log;
 
@@ -35,6 +39,9 @@ import com.sofurry.list.ListMusic;
 import com.sofurry.list.ListPM;
 import com.sofurry.list.ListStories;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.services.BootVersionChecker;
+import com.sofurry.services.OnAlarmReceiver;
+import com.sofurry.services.OnBootReceiver;
 import com.sofurry.util.Authentication;
 
 import org.json.JSONObject;
@@ -135,10 +142,8 @@ public class MainMenu
     }
 
     private void checkButtonDisabledState() {
-        if ((Authentication.getUsername() == null)
-                || (Authentication.getUsername().trim().length() <= 0)
-                || (Authentication.getPassword() == null)
-                || (Authentication.getPassword().trim().length() <= 0)) {
+        if ((Authentication.getUsername() == null) || (Authentication.getUsername().trim().length() <= 0)
+                || (Authentication.getPassword() == null) || (Authentication.getPassword().trim().length() <= 0)) {
             buttonPMs_.setEnabled(false);
             buttonChat_.setEnabled(false);
         } else {
@@ -152,8 +157,7 @@ public class MainMenu
          *  Limit how often it'll refresh itself, and only do so if information
          * has been filled out
          */
-        if ((buttonPMs_.isEnabled())
-                && (new Date().getTime() > lastCheck_ + 300000)) {
+        if ((buttonPMs_.isEnabled()) && (new Date().getTime() > lastCheck_ + 300000)) {
             pbh.showProgressDialog("Fetching data...");
             getCheckParameters().execute(requesthandler);
 
@@ -169,9 +173,7 @@ public class MainMenu
      * @param resultCode
      * @param intent
      */
-    protected void onActivityResult(int requestCode,
-                                    int resultCode,
-                                    Intent intent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
         // Check button state
@@ -191,8 +193,7 @@ public class MainMenu
                 String errorMessage = extras.getString("errorMessage");
 
                 if (errorMessage != null) {
-                    new AlertDialog.Builder(MainMenu.this).setMessage(
-                        errorMessage).show();
+                    new AlertDialog.Builder(MainMenu.this).setMessage(errorMessage).show();
                 }
 
                 switch (requestCode) {
@@ -218,6 +219,9 @@ public class MainMenu
         // Retrieve authentication info
         Authentication.loadAuthenticationInformation(this);
 
+        // If the notification alarm service hasn't been scheduled, do so
+        setupAlarmIfNeeded();
+
         // Set the content view
         setContentView(R.layout.mainmenu);
 
@@ -241,7 +245,6 @@ public class MainMenu
             updateButtons();
         } else {
             // Fetch the information from the server instead
-            Log.i(AppConstants.TAG_STRING, "MainMenu: onCreate check");
             checkPmCount();
         }
     }
@@ -302,14 +305,40 @@ public class MainMenu
      * Method description
      *
      */
+    protected void setupAlarmIfNeeded() {
+        Context            context       = getApplicationContext();
+        BootVersionChecker bvc           = new BootVersionChecker();
+        AlarmManager       manager       = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent             alarmIntent   = new Intent(context, OnAlarmReceiver.class);
+        PendingIntent      pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
+
+        // Check if an alarm has been set for this version
+        if (!bvc.hasLaunched(context)) {
+            // It hasn't, so let's launch one.
+        	// But first we'll be sure to cancel old ones, just in case.
+        	manager.cancel(pendingIntent);
+        	
+        	// Then start schedule a new one
+            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                 SystemClock.elapsedRealtime() + 10000,
+                                 OnBootReceiver.PERIOD,
+                                 pendingIntent);
+
+            // Tell the system about this newly set alarm
+            bvc.setHasLaunched(context);
+        }
+    }
+
+    /**
+     * Method description
+     *
+     */
     protected void updateButtons() {
         // Alter the PM button based on the number of messages
         if (messageCount_ > 0) {
-            buttonPMs_.setTypeface(Typeface.create((String) null,
-                                                   Typeface.BOLD));
+            buttonPMs_.setTypeface(Typeface.create((String) null, Typeface.BOLD));
         } else {
-            buttonPMs_.setTypeface(Typeface.create((String) null,
-                                                   Typeface.NORMAL));
+            buttonPMs_.setTypeface(Typeface.create((String) null, Typeface.NORMAL));
         }
 
         // Including the text

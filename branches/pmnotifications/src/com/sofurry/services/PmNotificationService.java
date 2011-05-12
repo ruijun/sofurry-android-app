@@ -18,6 +18,7 @@ import com.sofurry.list.ListPM;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
+import com.sofurry.requests.RequestThread;
 import com.sofurry.util.Authentication;
 
 import org.json.JSONObject;
@@ -61,8 +62,20 @@ public class PmNotificationService
      */
     @Override
     protected void doWakefulWork(Intent intent) {
+        RequestThread thread = null;
+
         Log.i(AppConstants.TAG_STRING, "Requesting PM count...");
-        getRequestParameters().execute(getRequestHandler());
+
+        // Load auth information from server
+        Authentication.loadAuthenticationInformation(this);
+
+        if (hasAuthInformation()) {
+            thread = getRequestParameters().execute(getRequestHandler());
+
+            try {
+                thread.join();
+            } catch (InterruptedException ignored) {}
+        }
     }
 
     /**
@@ -77,10 +90,15 @@ public class PmNotificationService
     @Override
     public void onData(int id, JSONObject obj) throws Exception {
         // TODO Handle data
+        Log.i(AppConstants.TAG_STRING,
+              "onData called with ID: " + id + " :: Should be: " + AppConstants.REQUEST_ID_FETCHDATA);
+
         if (id == AppConstants.REQUEST_ID_FETCHDATA) {
             int messageCount = obj.getInt("unreadpmcount");
 
             // Check if they're the same
+            Log.i(AppConstants.TAG_STRING, "Comparing " + messageCount_ + " to " + messageCount);
+
             if ((messageCount_ != messageCount) && (messageCount > 0)) {
                 NotificationManager manager;
                 Notification        note;
@@ -88,14 +106,12 @@ public class PmNotificationService
                 Intent              intent;
 
                 // Get the notification manager system service
-                manager = (NotificationManager) getSystemService(
-                    NOTIFICATION_SERVICE);
+                manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
                 // Create a new notification
-                note = new Notification(
-                    android.R.drawable.stat_notify_voicemail,
-                    "New SoFurry PM(s)",
-                    System.currentTimeMillis());
+                note = new Notification(android.R.drawable.stat_notify_voicemail,
+                                        "New SoFurry PM(s)",
+                                        System.currentTimeMillis());
 
                 // Create the Intent and wrap it in a PendingIntent
                 intent = new Intent(this, ListPM.class);
@@ -107,17 +123,15 @@ public class PmNotificationService
                 // Set some settings for the notification
                 note.setLatestEventInfo(this,
                                         "SoFurry PM",
-                                        "You have " + messageCount
-                                        + " unread message(s).",
+                                        "You have " + messageCount + " unread message(s).",
                                         pendingIntent);
 
                 note.vibrate  = AppConstants.VIBRATE_PM_INCOMING;
-                note.ledARGB  = 0x0000FFFF; // Cyan
+                note.ledARGB  = 0x0000FFFF;    // Cyan
                 note.ledOffMS = 1500;
                 note.ledOnMS  = 500;
                 note.number   = messageCount;
-                note.flags    = Notification.FLAG_AUTO_CANCEL
-                                | Notification.FLAG_SHOW_LIGHTS;
+                note.flags    = Notification.FLAG_AUTO_CANCEL | Notification.FLAG_SHOW_LIGHTS;
 
                 // Fire off the notification
                 manager.notify(AppConstants.NOTIFICATION_ID_PM, note);
@@ -137,8 +151,7 @@ public class PmNotificationService
      */
     @Override
     public void onError(int id, Exception e) {
-        Log.e(AppConstants.TAG_STRING,
-              "Error occurred: " + e.getLocalizedMessage());
+        Log.e(AppConstants.TAG_STRING, "Error occurred: " + e.getLocalizedMessage());
     }
 
     /**
@@ -152,9 +165,7 @@ public class PmNotificationService
      */
     @Override
     public void onOther(int id, Object obj) throws Exception {
-        Log.w(AppConstants.TAG_STRING,
-              "Unexpected object type: " + obj.getClass().getName()
-              + " received");
+        Log.w(AppConstants.TAG_STRING, "Unexpected object type: " + obj.getClass().getName() + " received");
     }
 
     /**
@@ -224,10 +235,8 @@ public class PmNotificationService
      * @return
      */
     protected boolean hasAuthInformation() {
-        if ((Authentication.getUsername() == null)
-                || (Authentication.getUsername().trim().length() <= 0)
-                || (Authentication.getPassword() == null)
-                || (Authentication.getPassword().trim().length() <= 0)) {
+        if ((Authentication.getUsername() == null) || (Authentication.getUsername().trim().length() <= 0)
+                || (Authentication.getPassword() == null) || (Authentication.getPassword().trim().length() <= 0)) {
             return false;
         }
 

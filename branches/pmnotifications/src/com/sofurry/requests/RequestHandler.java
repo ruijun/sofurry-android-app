@@ -20,7 +20,8 @@ public class RequestHandler implements IRequestHandler {
 	private boolean killed = false;
 	
 	/**
-	 * Constructor that will allow the request handler to be joined with an activity that know how to handle the feedback (implemented CanHandleFeedback interface) 
+	 * Constructor that will allow the request handler to be joined with an activity that know how to handle the
+	 * feedback (implemented CanHandleFeedback interface) 
 	 * @param feedback
 	 */
 	public RequestHandler(ICanHandleFeedback feedback) {

@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -22,15 +23,15 @@ public class Authentication {
 	private static String password = null;
 	private static String salt = "";
 	
-	public static void loadAuthenticationInformation(final Activity activity) {
-	    SharedPreferences credentials = activity.getSharedPreferences(AppConstants.PREFS_NAME, 0);
+	public static void loadAuthenticationInformation(final Context context) {
+	    SharedPreferences credentials = context.getSharedPreferences(AppConstants.PREFS_NAME, 0);
 	    username = credentials.getString("username", "");
 	    password = credentials.getString("password", "");
 	    salt = credentials.getString("salt", "");
 	}
 
-	public static void savePreferences(final Activity activity) {
-	      SharedPreferences settings = activity.getSharedPreferences(AppConstants.PREFS_NAME, 0);
+	public static void savePreferences(final Context context) {
+	      SharedPreferences settings = context.getSharedPreferences(AppConstants.PREFS_NAME, 0);
 	      SharedPreferences.Editor editor = settings.edit();
 	      editor.putString("username", username);
 	      editor.putString("password", password);
