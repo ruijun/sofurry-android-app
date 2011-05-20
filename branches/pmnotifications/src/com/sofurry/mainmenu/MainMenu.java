@@ -320,8 +320,8 @@ public class MainMenu
         	
         	// Then start schedule a new one
             manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                 SystemClock.elapsedRealtime() + 10000,
-                                 OnBootReceiver.PERIOD,
+                                 SystemClock.elapsedRealtime() + AppConstants.ALARM_CHECK_DELAY_FIRST,
+                                 AppConstants.ALARM_CHECK_DELAY_PERIOD,
                                  pendingIntent);
 
             // Tell the system about this newly set alarm

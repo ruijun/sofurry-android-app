@@ -2,6 +2,8 @@ package com.sofurry.services;
 
 //~--- imports ----------------------------------------------------------------
 
+import com.sofurry.AppConstants;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -14,7 +16,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
  *
  */
 public class BootVersionChecker {
-    public static final String HIDDEN_PREFS_NAME       = "com.sofurry.hiddenPrefs";
     public static final String LAST_LAUNCH_VERSION_KEY = "lastLaunchVersion";
 
 
@@ -50,7 +51,7 @@ public class BootVersionChecker {
      * @return
      */
     public boolean hasLaunched(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(HIDDEN_PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(AppConstants.PREFS_NAME, Context.MODE_PRIVATE);
 
         // Check if the preference value matches the version code
         if (prefs.getInt(LAST_LAUNCH_VERSION_KEY, 0) != getVersionCode(context)) {
@@ -70,7 +71,7 @@ public class BootVersionChecker {
      * @param context
      */
     public void setHasLaunched(Context context) {
-        SharedPreferences        prefs  = context.getSharedPreferences(HIDDEN_PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences        prefs  = context.getSharedPreferences(AppConstants.PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
         // Save the setting

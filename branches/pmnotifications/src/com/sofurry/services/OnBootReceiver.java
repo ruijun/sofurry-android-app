@@ -2,6 +2,8 @@ package com.sofurry.services;
 
 //~--- imports ----------------------------------------------------------------
 
+import com.sofurry.AppConstants;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 
@@ -19,7 +21,6 @@ import android.os.SystemClock;
  */
 public class OnBootReceiver
         extends BroadcastReceiver {
-    public static final int PERIOD = 20000;    // 5 Minutes (300000)
 
 
     //~--- methods ------------------------------------------------------------
@@ -40,8 +41,8 @@ public class OnBootReceiver
         BootVersionChecker bvc           = new BootVersionChecker();
 
         manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                             SystemClock.elapsedRealtime() + 10000,
-                             PERIOD,
+                             SystemClock.elapsedRealtime() + AppConstants.ALARM_CHECK_DELAY_FIRST,
+                             AppConstants.ALARM_CHECK_DELAY_PERIOD,
                              pendingIntent);
 
         // Tell the system that we have set an alarm
