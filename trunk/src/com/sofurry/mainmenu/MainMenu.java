@@ -1,11 +1,3 @@
-/*
- * @(#)MainMenu.java   2011-02-09
- *
- * Copyright (c) 2011 Tristan Bendixen
- */
-
-
-
 package com.sofurry.mainmenu;
 
 //~--- imports ----------------------------------------------------------------
@@ -18,13 +10,10 @@ import android.graphics.Typeface;
 
 import android.os.Bundle;
 
-import android.util.Log;
-
 import android.view.View;
 
 import android.widget.Button;
 
-import com.sofurry.AccountActivity;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
@@ -35,6 +24,7 @@ import com.sofurry.list.ListMusic;
 import com.sofurry.list.ListPM;
 import com.sofurry.list.ListStories;
 import com.sofurry.requests.AjaxRequest;
+import com.sofurry.services.BootVersionChecker;
 import com.sofurry.util.Authentication;
 
 import org.json.JSONObject;
@@ -112,7 +102,7 @@ public class MainMenu
                 break;
 
             case R.id.settings:
-                intent     = new Intent(this, AccountActivity.class);
+                intent     = new Intent(this, SettingsActivity.class);
                 activityId = AppConstants.ACTIVITY_SETTINGS;
 
                 break;
@@ -135,10 +125,8 @@ public class MainMenu
     }
 
     private void checkButtonDisabledState() {
-        if ((Authentication.getUsername() == null)
-                || (Authentication.getUsername().trim().length() <= 0)
-                || (Authentication.getPassword() == null)
-                || (Authentication.getPassword().trim().length() <= 0)) {
+        if ((Authentication.getUsername() == null) || (Authentication.getUsername().trim().length() <= 0)
+                || (Authentication.getPassword() == null) || (Authentication.getPassword().trim().length() <= 0)) {
             buttonPMs_.setEnabled(false);
             buttonChat_.setEnabled(false);
         } else {
@@ -152,8 +140,7 @@ public class MainMenu
          *  Limit how often it'll refresh itself, and only do so if information
          * has been filled out
          */
-        if ((buttonPMs_.isEnabled())
-                && (new Date().getTime() > lastCheck_ + 300000)) {
+        if ((buttonPMs_.isEnabled()) && (new Date().getTime() > lastCheck_ + 300000)) {
             pbh.showProgressDialog("Fetching data...");
             getCheckParameters().execute(requesthandler);
 
@@ -169,19 +156,11 @@ public class MainMenu
      * @param resultCode
      * @param intent
      */
-    protected void onActivityResult(int requestCode,
-                                    int resultCode,
-                                    Intent intent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
         // Check button state
         checkButtonDisabledState();
-
-        // Check if we're coming from settings
-        if (requestCode == AppConstants.ACTIVITY_SETTINGS) {
-            // Check for PMs
-            checkPmCount();
-        }
 
         if (intent != null) {
             Bundle extras = intent.getExtras();
@@ -191,8 +170,7 @@ public class MainMenu
                 String errorMessage = extras.getString("errorMessage");
 
                 if (errorMessage != null) {
-                    new AlertDialog.Builder(MainMenu.this).setMessage(
-                        errorMessage).show();
+                    new AlertDialog.Builder(MainMenu.this).setMessage(errorMessage).show();
                 }
 
                 switch (requestCode) {
@@ -218,6 +196,9 @@ public class MainMenu
         // Retrieve authentication info
         Authentication.loadAuthenticationInformation(this);
 
+        // If the notification alarm service hasn't been scheduled, do so
+        setupAlarmIfNeeded();
+
         // Set the content view
         setContentView(R.layout.mainmenu);
 
@@ -241,7 +222,6 @@ public class MainMenu
             updateButtons();
         } else {
             // Fetch the information from the server instead
-            Log.i(AppConstants.TAG_STRING, "MainMenu: onCreate check");
             checkPmCount();
         }
     }
@@ -278,12 +258,8 @@ public class MainMenu
     @Override
     protected void onResume() {
         super.onResume();
-
-        // Check if we need to check for messages
-        if (new Date().getTime() > lastCheck_ + 300000) {
-            Log.i(AppConstants.TAG_STRING, "MainMenu: onResume check");
-            checkPmCount();
-        }
+        checkButtonDisabledState();
+        checkPmCount();
     }
 
     /**
@@ -302,14 +278,20 @@ public class MainMenu
      * Method description
      *
      */
+    protected void setupAlarmIfNeeded() {
+        BootVersionChecker.scheduleAlarm(getApplicationContext(), true);
+    }
+
+    /**
+     * Method description
+     *
+     */
     protected void updateButtons() {
         // Alter the PM button based on the number of messages
         if (messageCount_ > 0) {
-            buttonPMs_.setTypeface(Typeface.create((String) null,
-                                                   Typeface.BOLD));
+            buttonPMs_.setTypeface(Typeface.create((String) null, Typeface.BOLD));
         } else {
-            buttonPMs_.setTypeface(Typeface.create((String) null,
-                                                   Typeface.NORMAL));
+            buttonPMs_.setTypeface(Typeface.create((String) null, Typeface.NORMAL));
         }
 
         // Including the text
