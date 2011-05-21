@@ -4,47 +4,22 @@
           android:versionCode="15"
           android:versionName="0.2.8 beta">
 
-    <!--
-        BEGIN
-        // Application
-     -->
     <application android:icon="@drawable/icon"
                  android:label="@string/app_name"
                  android:debuggable="false">
         
-        <!--
-            BEGIN
-            // Receiver (.services.OnBootReceiver) [BOOT]
-            || ========
-            || Launched at boot-time to schedule checking of PMs, and possibly
-            || more things in the future.
-            \\ ========
-         -->
         <receiver android:name=".services.OnBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         
-        <!--
-            BEGIN
-            // Receiver (.services.OnAlarmReceiver)
-         -->
         <receiver android:name=".services.OnAlarmReceiver" />
         
-        <!--
-            BEGIN
-            // Service (.services.PmNotificationService)
-         -->
+        
         <service android:name=".services.PmNotificationService" />
         
-        <!--
-            BEGIN
-            // Activity (.mainmenu.MainMenu) [MAIN]
-            || ========
-            || The main activity, started from the Application Launcher.
-            \\ ========
-         -->
+        
         <activity android:name=".mainmenu.MainMenu"
                   android:label="@string/app_name"
                   android:icon="@drawable/icon">
@@ -54,10 +29,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.list.ListStories)
-         -->
         <activity android:name=".list.ListStories"
                   android:label="@string/app_name_liststories">
             <intent-filter>
@@ -66,10 +37,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.gallery.GalleryArt)
-         -->
         <activity android:name=".gallery.GalleryArt"
                   android:label="@string/app_name_listgallery">
             <intent-filter>
@@ -78,10 +45,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.list.ListJournals)
-         -->
         <activity android:name=".list.ListJournals"
                   android:label="@string/app_name_listjournals">
             <intent-filter>
@@ -90,10 +53,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.list.ListMusic)
-         -->
         <activity android:name=".list.ListMusic"
                   android:label="@string/app_name_listmusic">
             <intent-filter>
@@ -102,10 +61,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.itemviews.ViewArtActivity)
-         -->
         <activity android:name=".itemviews.ViewArtActivity"
                   android:screenOrientation="sensor"
                   android:label="@string/app_name_viewart">
@@ -115,10 +70,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.itemviews.ViewStoryActivity)
-         -->
         <activity android:name=".itemviews.ViewStoryActivity"
                   android:label="@string/app_name_viewstory">
             <intent-filter>
@@ -127,10 +78,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.itemviews.ViewJournalActivity)
-         -->
         <activity android:name=".itemviews.ViewJournalActivity"
                   android:label="@string/app_name_viewjournal">
             <intent-filter>
@@ -139,10 +86,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.list.ListPM)
-         -->
         <activity android:name=".list.ListPM"
                   android:label="@string/app_name_listpm">
             <intent-filter>
@@ -151,10 +94,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.itemviews.ViewPMActivity)
-         -->
         <activity android:name=".itemviews.ViewPMActivity"
                   android:label="@string/app_name_viewpm">
             <intent-filter>
@@ -163,10 +102,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.itemviews.ViewMusicActivity)
-         -->
         <activity android:name=".itemviews.ViewMusicActivity"
                   android:label="@string/app_name_viewmusic">
             <intent-filter>
@@ -175,22 +110,9 @@
             </intent-filter>
         </activity>
         
-        <!--
-            BEGIN
-            // Activity (.AccountActivity)
-         -->
-        <activity android:label="@string/app_name_settings"
-                  android:name=".AccountActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.ACCOUNTACTIVITY" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".mainmenu.SettingsActivity"
+                  android:label="@string/app_name_settings" />
 
-        <!--
-            BEGIN
-            // Activity (.chat.ChatActivity)
-         -->
         <activity android:name=".chat.ChatActivity"
                   android:label="@string/app_name_chat">
             <intent-filter>
@@ -199,10 +121,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.RateActivity)
-         -->
         <activity android:name=".RateActivity"
                   android:label="@string/app_name_rater">
             <intent-filter>
@@ -211,24 +129,16 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BEGIN
-            // Activity (.TagEditor)
-         -->
-        <activity android:label="@string/app_name_tageditor"
-                  android:name=".TagEditor">
+        <activity android:name=".TagEditor"
+                  android:label="@string/app_name_tageditor">
             <intent-filter>
                 <action android:name="android.intent.action.TAGSELECT" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         
-        <!--
-            BEGIN
-            // Activity (.submits.SendPMActivity)
-         -->
-        <activity android:label="@string/app_name_sendpm"
-        		  android:name=".submits.SendPMActivity">
+        <activity android:name=".submits.SendPMActivity"
+        		  android:label="@string/app_name_sendpm">
         	<intent-filter>
         		<action android:name="android.intent.action.SENDPM" />
         		<category android:name="android.intent.category.DEFAULT" />
@@ -236,26 +146,15 @@
         </activity>
     </application>
 
-    <!--
-        BEGIN
-        // Uses SDK
-     -->
-    <uses-sdk android:minSdkVersion="4"/>
+    <uses-sdk android:minSdkVersion="4"
+              android:targetSdkVersion="4" />
     
-    <!--
-        BEGIN
-        // Uses Permission
-     -->
     <uses-permission android:name="android.permission.INTERNET" /> 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
-    <!--
-        BEGIN
-        // Supports Screens
-     -->
     <supports-screens android:anyDensity="true"
                       android:smallScreens="true"
                       android:resizeable="true"

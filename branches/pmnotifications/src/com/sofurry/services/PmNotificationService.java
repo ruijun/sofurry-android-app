@@ -37,6 +37,27 @@ public class PmNotificationService
     private int            messageCount_ = -1;
 
 
+    //~--- inner classes ------------------------------------------------------
+
+    private class DelayThread
+            extends Thread {
+        /**
+         * Method description
+         *
+         */
+        @Override
+        public void run() {
+            super.run();
+
+            synchronized (this) {
+                try {
+                    wait(5000);
+                } catch (InterruptedException ignored) {}
+            }
+        }
+    }
+
+
     //~--- constructors -------------------------------------------------------
 
     // private long uniqueStorageKey_;
@@ -62,7 +83,8 @@ public class PmNotificationService
      */
     @Override
     protected void doWakefulWork(Intent intent) {
-        RequestThread thread = null;
+        RequestThread thread     = null;
+        DelayThread   waitThread = null;
 
         Log.i(AppConstants.TAG_STRING, "Requesting PM count...");
 
@@ -73,7 +95,18 @@ public class PmNotificationService
             thread = getRequestParameters().execute(getRequestHandler());
 
             try {
+                Log.i(AppConstants.TAG_STRING, "Waiting for other thread to finish...");
                 thread.join();
+                Log.i(AppConstants.TAG_STRING, "Thread finished...");
+
+                Log.i(AppConstants.TAG_STRING, "Creating waitThread...");
+                waitThread = new DelayThread();
+
+                Log.i(AppConstants.TAG_STRING, "Starting waitThread...");
+                waitThread.start();
+                Log.i(AppConstants.TAG_STRING, "Join waitThread...");
+                waitThread.join();
+                Log.i(AppConstants.TAG_STRING, "waitThread done...");
             } catch (InterruptedException ignored) {}
         }
     }

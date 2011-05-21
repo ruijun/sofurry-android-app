@@ -38,6 +38,15 @@ public class AppConstants {
     public static final String PM_CONTENTS_URL_TEMPLATE = "$1<a href=\"$2\">$2</a>";
 
     /**
+     * Preference
+     */
+    public static final String PREFERENCE_LAST_LAUNCH_VERSION = "lastLaunchVersion";
+    public static final String PREFERENCE_PASSWORD            = "password";
+    public static final String PREFERENCE_PM_CHECK_INTERVAL   = "pmCheckInterval";
+    public static final String PREFERENCE_SALT                = "salt";
+    public static final String PREFERENCE_USERNAME            = "username";
+
+    /**
      * Name of the preference storage
      */
     public static final String PREFS_NAME = "SoFurryPreferences";
@@ -58,49 +67,18 @@ public class AppConstants {
     public static final String TAG_STRING = "[SoFurry]";
 
     /**
-     * Activity ID for the {@link com.sofurry.gallery.GalleryArt} class
+     * One of several Activity IDs
      */
-    public static final int ACTIVITY_GALLERYART = 4;
-
-    /**
-     * Activity ID for the {@link com.sofurry.list.ListJournals} class
-     */
+    public static final int ACTIVITY_ACCOUNT      = 8;
+    public static final int ACTIVITY_GALLERYART   = 4;
     public static final int ACTIVITY_JOURNALSLIST = 3;
-
-    /**
-     * Activity ID for the {@link com.sofurry.list.ListMusic} class
-     */
-    public static final int ACTIVITY_MUSICLIST = 7;
-
-    /**
-     * Activity ID for the {@link com.sofurry.list.ListPM} class
-     */
-    public static final int ACTIVITY_PMLIST = 1;
-
-    /**
-     * Activity ID for the {@link com.sofurry.RateActivity} class
-     */
-    public static final int ACTIVITY_RATE = 7;
-
-    /**
-     * Activity ID for the {@link com.sofurry.AccountActivity} class
-     */
-    public static final int ACTIVITY_SETTINGS = 2;
-
-    /**
-     * Activity ID for the {@link com.sofurry.list.ListStories} class
-     */
-    public static final int ACTIVITY_STORIESLIST = 0;
-
-    /**
-     * Activity ID for the {@link com.sofurry.TagEditor} class
-     */
-    public static final int ACTIVITY_TAGS = 6;
-
-    /**
-     * Activity ID for the {@link com.sofurry.itemviews.ViewPMActivity} class
-     */
-    public static final int ACTIVITY_VIEWPM = 5;
+    public static final int ACTIVITY_MUSICLIST    = 7;
+    public static final int ACTIVITY_PMLIST       = 1;
+    public static final int ACTIVITY_RATE         = 7;
+    public static final int ACTIVITY_SETTINGS     = 2;
+    public static final int ACTIVITY_STORIESLIST  = 0;
+    public static final int ACTIVITY_TAGS         = 6;
+    public static final int ACTIVITY_VIEWPM       = 5;
 
     /**
      * TODO: Document this!
@@ -113,34 +91,12 @@ public class AppConstants {
     public static final int AJAXTYPE_OTPAUTH = 6;
 
     /**
-     * Initial delay after boot before checking for PMs the first time
+     * One of several Content Types
      */
-    public static final int ALARM_CHECK_DELAY_FIRST = 30000;
-
-    /**
-     * Delay between checking for PMs
-     */
-    public static final int ALARM_CHECK_DELAY_PERIOD = 30000;
-
-    /**
-     * Content Type: Artwork
-     */
-    public static final int CONTENTTYPE_ART = 1;
-
-    /**
-     * Content Type: Journals
-     */
+    public static final int CONTENTTYPE_ART      = 1;
     public static final int CONTENTTYPE_JOURNALS = 3;
-
-    /**
-     * Content Type: Music
-     */
-    public static final int CONTENTTYPE_MUSIC = 2;
-
-    /**
-     * Content Type: Stories
-     */
-    public static final int CONTENTTYPE_STORIES = 0;
+    public static final int CONTENTTYPE_MUSIC    = 2;
+    public static final int CONTENTTYPE_STORIES  = 0;
 
     /**
      * Dialog ID: Error Dialog
@@ -158,134 +114,34 @@ public class AppConstants {
     public static final int ENTRIESPERPAGE_LIST = 40;
 
     /**
-     * Menu ID: Add Favorite
+     * One of many Menu entry IDs
      */
-    public static final int MENU_ADDFAV = 4201;
-
-    /**
-     * Menu ID: Change Room
-     */
-    public static final int MENU_CHGROOM = 4401;
-
-    /**
-     * Menu ID: Cum!
-     */
-    public static final int MENU_CUM = 4203;
-
-    /**
-     * Menu ID: Filter: All
-     */
-    public static final int MENU_FILTER_ALL = 9090900;
-
-    /**
-     * Menu ID: Filter: Favorites
-     */
-    public static final int MENU_FILTER_FAVORITES = 9090902;
-
-    /**
-     * Menu ID: Filter: Featured
-     */
-    public static final int MENU_FILTER_FEATURED = 9090901;
-
-    /**
-     * Menu ID: Filter: Group
-     */
-    public static final int MENU_FILTER_GROUP = 9090904;
-
-    /**
-     * Menu ID: Filter: Keywords
-     */
-    public static final int MENU_FILTER_KEYWORDS = 4204;
-
-    /**
-     * Menu ID: Filter: Watchlist
-     */
-    public static final int MENU_FILTER_WATCHLIST = 9090903;
-
-    /**
-     * Menu ID: Filter: Watchlist Combined
-     */
+    public static final int MENU_ADDFAV                    = 4201;
+    public static final int MENU_CHGROOM                   = 4401;
+    public static final int MENU_CUM                       = 4203;
+    public static final int MENU_FILTER_ALL                = 9090900;
+    public static final int MENU_FILTER_FAVORITES          = 9090902;
+    public static final int MENU_FILTER_FEATURED           = 9090901;
+    public static final int MENU_FILTER_GROUP              = 9090904;
+    public static final int MENU_FILTER_KEYWORDS           = 4204;
+    public static final int MENU_FILTER_WATCHLIST          = 9090903;
     public static final int MENU_FILTER_WATCHLIST_COMBINED = 9090905;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_HD = 4204;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_PLAY = 4205;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_RATE = 4300;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_RATE1 = 4301;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_RATE2 = 4302;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_RATE3 = 4303;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_RATE4 = 4304;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_RATE5 = 4305;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_REMFAV = 4202;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_SAVE = 4306;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_UNWATCH = 4207;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_USERS = 4402;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_USERSART = 4211;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_USERSMUSIK = 4212;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_USERSSTORIES = 4210;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int MENU_WATCH = 4206;
+    public static final int MENU_HD                        = 4204;
+    public static final int MENU_PLAY                      = 4205;
+    public static final int MENU_RATE                      = 4300;
+    public static final int MENU_RATE1                     = 4301;
+    public static final int MENU_RATE2                     = 4302;
+    public static final int MENU_RATE3                     = 4303;
+    public static final int MENU_RATE4                     = 4304;
+    public static final int MENU_RATE5                     = 4305;
+    public static final int MENU_REMFAV                    = 4202;
+    public static final int MENU_SAVE                      = 4306;
+    public static final int MENU_UNWATCH                   = 4207;
+    public static final int MENU_USERS                     = 4402;
+    public static final int MENU_USERSART                  = 4211;
+    public static final int MENU_USERSMUSIK                = 4212;
+    public static final int MENU_USERSSTORIES              = 4210;
+    public static final int MENU_WATCH                     = 4206;
 
     /**
      * Notification ID for Private Messages
@@ -293,129 +149,50 @@ public class AppConstants {
     public static final int NOTIFICATION_ID_PM = 5000;
 
     /**
-     * Private Message Status: New Message
+     * Private Message Status
      */
-    public static final int PM_STATUS_NEW = 0;
-
-    /**
-     * Private Message Status: Message Read
-     */
-    public static final int PM_STATUS_READ = 1;
-
-    /**
-     * Private Message Status: Message Replied To
-     */
+    public static final int PM_STATUS_NEW     = 0;
+    public static final int PM_STATUS_READ    = 1;
     public static final int PM_STATUS_REPLIED = 2;
 
     /**
-     * Keeps track of the largest Request ID defined
+     * Request ID
      */
-    public static final int REQUEST_ID_0LARGEST = 4513;
-
-    /**
-     * Request ID: Cum!
-     */
-    public static final int REQUEST_ID_CUM = 4508;
-
-    /**
-     * Request ID: Download File
-     */
-    public static final int REQUEST_ID_DOWNLOADFILE = 4510;
-
-    /**
-     * Request ID: Download Image
-     */
-    public static final int REQUEST_ID_DOWNLOADIMAGE = 4511;
-
-    /**
-     * Request ID: Favorite
-     */
-    public static final int REQUEST_ID_FAV = 4506;
-
-    /**
-     * Request ID: Fetch Content
-     */
-    public static final int REQUEST_ID_FETCHCONTENT = 4503;
-
-    /**
-     * Request ID: Fetch Data
-     */
-    public static final int REQUEST_ID_FETCHDATA = 4505;
-
-    /**
-     * Request ID: Fetch Submission Data
-     */
+    public static final int REQUEST_ID_CUM                 = 4508;
+    public static final int REQUEST_ID_DOWNLOADFILE        = 4510;
+    public static final int REQUEST_ID_DOWNLOADIMAGE       = 4511;
+    public static final int REQUEST_ID_FAV                 = 4506;
+    public static final int REQUEST_ID_FETCHCONTENT        = 4503;
+    public static final int REQUEST_ID_FETCHDATA           = 4505;
     public static final int REQUEST_ID_FETCHSUBMISSIONDATA = 4504;
+    public static final int REQUEST_ID_RATE                = 4509;
+    public static final int REQUEST_ID_ROOMLIST            = 4501;
+    public static final int REQUEST_ID_SEND                = 4513;
+    public static final int REQUEST_ID_UNFAV               = 4507;
+    public static final int REQUEST_ID_USERLIST            = 4502;
+    public static final int REQUEST_ID_WATCH               = 4512;
 
     /**
-     * Request ID: Rate
+     * ViewSource
      */
-    public static final int REQUEST_ID_RATE = 4509;
-
-    /**
-     * Request ID: Roomlist
-     */
-    public static final int REQUEST_ID_ROOMLIST = 4501;
-
-    /**
-     * Request ID: Send
-     */
-    public static final int REQUEST_ID_SEND = 4513;
-
-    /**
-     * Request ID: Un-favorite
-     */
-    public static final int REQUEST_ID_UNFAV = 4507;
-
-    /**
-     * Request ID: Userlist
-     */
-    public static final int REQUEST_ID_USERLIST = 4502;
-
-    /**
-     * Request ID: Watch
-     */
-    public static final int REQUEST_ID_WATCH = 4512;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int VIEWSOURCE_ALL = 0;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int VIEWSOURCE_FAVORITES = 1;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int VIEWSOURCE_FEATURED = 8;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int VIEWSOURCE_GROUP = 10;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int VIEWSOURCE_SEARCH = 5;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int VIEWSOURCE_USER = 7;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int VIEWSOURCE_WATCHLIST = 2;
-
-    /**
-     * TODO: Document this!
-     */
+    public static final int VIEWSOURCE_ALL                = 0;
+    public static final int VIEWSOURCE_FAVORITES          = 1;
+    public static final int VIEWSOURCE_FEATURED           = 8;
+    public static final int VIEWSOURCE_GROUP              = 10;
+    public static final int VIEWSOURCE_SEARCH             = 5;
+    public static final int VIEWSOURCE_USER               = 7;
+    public static final int VIEWSOURCE_WATCHLIST          = 2;
     public static final int VIEWSOURCE_WATCHLIST_COMBINED = 11;
+
+    /**
+     * Initial delay after boot before checking for PMs the first time
+     */
+    public static final long ALARM_CHECK_DELAY_FIRST = 60000;
+
+    /**
+     * Delay between checking for PMs
+     */
+    public static final long ALARM_CHECK_DELAY_PERIOD = 900000;
 
     /**
      * Vibration pattern for Private Messages

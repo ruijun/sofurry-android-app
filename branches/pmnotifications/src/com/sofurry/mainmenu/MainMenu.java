@@ -1,34 +1,19 @@
-/*
- * @(#)MainMenu.java   2011-02-09
- *
- * Copyright (c) 2011 Tristan Bendixen
- */
-
-
-
 package com.sofurry.mainmenu;
 
 //~--- imports ----------------------------------------------------------------
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 
-import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.Typeface;
 
 import android.os.Bundle;
-import android.os.SystemClock;
-
-import android.util.Log;
 
 import android.view.View;
 
 import android.widget.Button;
 
-import com.sofurry.AccountActivity;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
@@ -40,8 +25,6 @@ import com.sofurry.list.ListPM;
 import com.sofurry.list.ListStories;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.services.BootVersionChecker;
-import com.sofurry.services.OnAlarmReceiver;
-import com.sofurry.services.OnBootReceiver;
 import com.sofurry.util.Authentication;
 
 import org.json.JSONObject;
@@ -119,7 +102,7 @@ public class MainMenu
                 break;
 
             case R.id.settings:
-                intent     = new Intent(this, AccountActivity.class);
+                intent     = new Intent(this, SettingsActivity.class);
                 activityId = AppConstants.ACTIVITY_SETTINGS;
 
                 break;
@@ -178,12 +161,6 @@ public class MainMenu
 
         // Check button state
         checkButtonDisabledState();
-
-        // Check if we're coming from settings
-        if (requestCode == AppConstants.ACTIVITY_SETTINGS) {
-            // Check for PMs
-            checkPmCount();
-        }
 
         if (intent != null) {
             Bundle extras = intent.getExtras();
@@ -281,12 +258,8 @@ public class MainMenu
     @Override
     protected void onResume() {
         super.onResume();
-
-        // Check if we need to check for messages
-        if (new Date().getTime() > lastCheck_ + 300000) {
-            Log.i(AppConstants.TAG_STRING, "MainMenu: onResume check");
-            checkPmCount();
-        }
+        checkButtonDisabledState();
+        checkPmCount();
     }
 
     /**
@@ -306,27 +279,7 @@ public class MainMenu
      *
      */
     protected void setupAlarmIfNeeded() {
-        Context            context       = getApplicationContext();
-        BootVersionChecker bvc           = new BootVersionChecker();
-        AlarmManager       manager       = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent             alarmIntent   = new Intent(context, OnAlarmReceiver.class);
-        PendingIntent      pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
-
-        // Check if an alarm has been set for this version
-        if (!bvc.hasLaunched(context)) {
-            // It hasn't, so let's launch one.
-        	// But first we'll be sure to cancel old ones, just in case.
-        	manager.cancel(pendingIntent);
-        	
-        	// Then start schedule a new one
-            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                 SystemClock.elapsedRealtime() + AppConstants.ALARM_CHECK_DELAY_FIRST,
-                                 AppConstants.ALARM_CHECK_DELAY_PERIOD,
-                                 pendingIntent);
-
-            // Tell the system about this newly set alarm
-            bvc.setHasLaunched(context);
-        }
+        BootVersionChecker.scheduleAlarm(getApplicationContext(), true);
     }
 
     /**
