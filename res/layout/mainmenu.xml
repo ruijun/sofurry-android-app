@@ -106,12 +106,12 @@
 		android:layout_height="wrap_content"
 	>
 		<Button
+			android:layout_height="wrap_content"
 			android:id="@+id/settings"
 			android:onClick="buttonClick"
-			android:layout_width="95dp"
-			android:layout_height="wrap_content"
 			android:layout_marginTop="20dip"
 			android:text="Settings"
-			android:gravity="center" />
+			android:layout_width="fill_parent"
+			android:layout_weight="1" />
 	</LinearLayout>
 </LinearLayout>
