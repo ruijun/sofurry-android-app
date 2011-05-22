@@ -18,10 +18,10 @@ import android.widget.Toast;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.FavableActivity;
+import com.sofurry.requests.ContentDownloader;
+import com.sofurry.requests.HttpRequest;
 import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
-import com.sofurry.util.ContentDownloader;
-import com.sofurry.util.HttpRequest;
 
 public class ViewArtActivity extends FavableActivity implements Runnable {
 

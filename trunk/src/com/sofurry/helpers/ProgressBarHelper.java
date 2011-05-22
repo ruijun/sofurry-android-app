@@ -9,7 +9,7 @@ import android.content.DialogInterface.OnCancelListener;
 
 import com.sofurry.Quotes;
 import com.sofurry.base.interfaces.ICanCancel;
-import com.sofurry.requests.ProgressSignal;
+import com.sofurry.util.ProgressSignal;
 
 /**
  * @author Rangarig

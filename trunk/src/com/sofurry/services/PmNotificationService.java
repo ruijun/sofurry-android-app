@@ -16,10 +16,9 @@ import com.sofurry.AppConstants;
 import com.sofurry.activities.ListPMActivity;
 import com.sofurry.base.interfaces.ICanHandleFeedback;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
-import com.sofurry.requests.RequestThread;
 import com.sofurry.util.Authentication;
+import com.sofurry.util.ProgressSignal;
 
 import org.json.JSONObject;
 
@@ -33,29 +32,11 @@ import org.json.JSONObject;
 public class PmNotificationService
         extends WakefulIntentService
         implements ICanHandleFeedback {
+    private static int messageCount_ = -1;
+
+    //~--- fields -------------------------------------------------------------
+
     private RequestHandler requestHandler_;
-    private int            messageCount_ = -1;
-
-
-    //~--- inner classes ------------------------------------------------------
-
-    private class DelayThread
-            extends Thread {
-        /**
-         * Method description
-         *
-         */
-        @Override
-        public void run() {
-            super.run();
-
-            synchronized (this) {
-                try {
-                    wait(5000);
-                } catch (InterruptedException ignored) {}
-            }
-        }
-    }
 
 
     //~--- constructors -------------------------------------------------------
@@ -83,31 +64,36 @@ public class PmNotificationService
      */
     @Override
     protected void doWakefulWork(Intent intent) {
-        RequestThread thread     = null;
-        DelayThread   waitThread = null;
-
-        Log.i(AppConstants.TAG_STRING, "Requesting PM count...");
+        /*
+         * RequestThread thread     = null;
+         * DelayThread   waitThread = null;
+         */
 
         // Load auth information from server
         Authentication.loadAuthenticationInformation(this);
 
         if (hasAuthInformation()) {
-            thread = getRequestParameters().execute(getRequestHandler());
+            Log.i(AppConstants.TAG_STRING, "Requesting PM count (Authorized)...");
+            getRequestParameters().executeInline(getRequestHandler());
 
-            try {
-                Log.i(AppConstants.TAG_STRING, "Waiting for other thread to finish...");
-                thread.join();
-                Log.i(AppConstants.TAG_STRING, "Thread finished...");
-
-                Log.i(AppConstants.TAG_STRING, "Creating waitThread...");
-                waitThread = new DelayThread();
-
-                Log.i(AppConstants.TAG_STRING, "Starting waitThread...");
-                waitThread.start();
-                Log.i(AppConstants.TAG_STRING, "Join waitThread...");
-                waitThread.join();
-                Log.i(AppConstants.TAG_STRING, "waitThread done...");
-            } catch (InterruptedException ignored) {}
+            /*
+             * thread = getRequestParameters().execute(getRequestHandler());
+             *
+             * try {
+             *   Log.i(AppConstants.TAG_STRING, "Waiting for other thread to finish...");
+             *   thread.join();
+             *   Log.i(AppConstants.TAG_STRING, "Thread finished...");
+             *
+             *   Log.i(AppConstants.TAG_STRING, "Creating waitThread...");
+             *   waitThread = new DelayThread();
+             *
+             *   Log.i(AppConstants.TAG_STRING, "Starting waitThread...");
+             *   waitThread.start();
+             *   Log.i(AppConstants.TAG_STRING, "Join waitThread...");
+             *   waitThread.join();
+             *   Log.i(AppConstants.TAG_STRING, "waitThread done...");
+             * } catch (InterruptedException ignored) {}
+             */
         }
     }
 
@@ -122,17 +108,10 @@ public class PmNotificationService
      */
     @Override
     public void onData(int id, JSONObject obj) throws Exception {
-        // TODO Handle data
-        Log.i(AppConstants.TAG_STRING,
-              "onData called with ID: " + id + " :: Should be: " + AppConstants.REQUEST_ID_FETCHDATA);
-
         if (id == AppConstants.REQUEST_ID_FETCHDATA) {
             int messageCount = obj.getInt("unreadpmcount");
 
-            // Check if they're the same
-            Log.i(AppConstants.TAG_STRING, "Comparing " + messageCount_ + " to " + messageCount);
-
-            if ((messageCount_ != messageCount) && (messageCount > 0)) {
+            if ((PmNotificationService.messageCount_ != messageCount) && (messageCount > 0)) {
                 NotificationManager manager;
                 Notification        note;
                 PendingIntent       pendingIntent;
@@ -171,7 +150,7 @@ public class PmNotificationService
             }
 
             // Set messageCount_ to the current value for comparison next time
-            messageCount_ = messageCount;
+            PmNotificationService.messageCount_ = messageCount;
         }
     }
 

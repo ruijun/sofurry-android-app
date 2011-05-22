@@ -187,7 +187,7 @@ public class AppConstants {
     /**
      * Initial delay after boot before checking for PMs the first time
      */
-    public static final long ALARM_CHECK_DELAY_FIRST = 60000;
+    public static final long ALARM_CHECK_DELAY_FIRST = 20000;
 
     /**
      * Delay between checking for PMs

@@ -1,7 +1,6 @@
 package com.sofurry.requests;
 
 import com.sofurry.base.interfaces.IRequestHandler;
-import com.sofurry.util.ContentDownloader;
 
 /**
  * @author Rangarig

@@ -22,10 +22,10 @@ import com.sofurry.base.interfaces.IHasThumbnail;
 import com.sofurry.base.interfaces.IManagedActivity;
 import com.sofurry.helpers.ProgressBarHelper;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.util.ErrorHandler;
+import com.sofurry.util.ProgressSignal;
 
 
 /**

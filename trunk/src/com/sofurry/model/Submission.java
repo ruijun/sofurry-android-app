@@ -11,8 +11,8 @@ import android.util.Log;
 
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IHasThumbnail;
+import com.sofurry.requests.ContentDownloader;
 import com.sofurry.storage.ImageStorage;
-import com.sofurry.util.ContentDownloader;
 
 public class Submission implements Serializable, IHasThumbnail {
 

@@ -13,7 +13,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.SystemClock;
 
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.sofurry.AppConstants;
 import com.sofurry.receivers.OnAlarmReceiver;

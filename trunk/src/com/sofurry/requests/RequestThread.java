@@ -13,7 +13,6 @@ import android.util.Log;
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IRequestHandler;
 import com.sofurry.util.Authentication;
-import com.sofurry.util.HttpRequest;
 
 /**
  * A thread that fetches data from the SoFurry API, sending the result, or error to the MessageHandler
