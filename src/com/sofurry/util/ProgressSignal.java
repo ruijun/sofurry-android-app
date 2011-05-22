@@ -1,4 +1,4 @@
-package com.sofurry.requests;
+package com.sofurry.util;
 
 /**
  * @author Rangarig
