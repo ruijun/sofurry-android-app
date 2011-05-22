@@ -49,27 +49,32 @@ public class BootVersionChecker {
         PendingIntent      pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
         SharedPreferences  prefs         = PreferenceManager.getDefaultSharedPreferences(context);
         long               interval;
+        boolean            useService = false;
 
-        // It hasn't, so let's launch one.
-        // But first we'll be sure to cancel old ones, just in case.
+        // Cancel old alarms (if there are any) no matter what
         manager.cancel(pendingIntent);
 
-        // Retrieve the interval, which is stored in preferences as a string
-        try {
-            interval = Long.parseLong(prefs.getString(AppConstants.PREFERENCE_PM_CHECK_INTERVAL,
-                                                      Long.toString(AppConstants.ALARM_CHECK_DELAY_PERIOD)));
-        } catch (NumberFormatException e) {
-            interval = AppConstants.ALARM_CHECK_DELAY_PERIOD;
+        // Check settings to see if the user actually -want- to use the service
+        useService = prefs.getBoolean(AppConstants.PREFERENCE_PM_ENABLE_CHECKS, false);
+
+        if (useService) {
+            // Retrieve the interval, which is stored in preferences as a string
+            try {
+                interval = Long.parseLong(prefs.getString(AppConstants.PREFERENCE_PM_CHECK_INTERVAL,
+                                                          Long.toString(AppConstants.ALARM_CHECK_DELAY_PERIOD)));
+            } catch (NumberFormatException e) {
+                interval = AppConstants.ALARM_CHECK_DELAY_PERIOD;
+            }
+
+            // Then start schedule a new one
+            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                 SystemClock.elapsedRealtime() + AppConstants.ALARM_CHECK_DELAY_FIRST,
+                                 interval,
+                                 pendingIntent);
+
+            // Tell the system about this newly set alarm
+            bvc.setHasLaunched(context);
         }
-
-        // Then start schedule a new one
-        manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                             SystemClock.elapsedRealtime() + AppConstants.ALARM_CHECK_DELAY_FIRST,
-                             interval,
-                             pendingIntent);
-
-        // Tell the system about this newly set alarm
-        bvc.setHasLaunched(context);
     }
 
     //~--- get methods --------------------------------------------------------
