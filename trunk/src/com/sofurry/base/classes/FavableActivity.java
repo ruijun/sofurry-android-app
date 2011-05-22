@@ -9,11 +9,10 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 
 import com.sofurry.AppConstants;
-import com.sofurry.RateActivity;
-import com.sofurry.SubmissionViewActivity;
-import com.sofurry.gallery.GalleryArt;
-import com.sofurry.list.ListMusic;
-import com.sofurry.list.ListStories;
+import com.sofurry.activities.GalleryArtActivity;
+import com.sofurry.activities.ListMusicActivity;
+import com.sofurry.activities.ListStoriesActivity;
+import com.sofurry.activities.RateActivity;
 import com.sofurry.requests.AjaxRequest;
 
 /**
@@ -66,13 +65,13 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 			unwatch();
 			return true;
 		case AppConstants.MENU_USERSSTORIES:
-			morefromuser(ListStories.class,AppConstants.ACTIVITY_STORIESLIST);
+			morefromuser(ListStoriesActivity.class,AppConstants.ACTIVITY_STORIESLIST);
 			return true;
 		case AppConstants.MENU_USERSART:
-			morefromuser(GalleryArt.class,AppConstants.ACTIVITY_GALLERYART);
+			morefromuser(GalleryArtActivity.class,AppConstants.ACTIVITY_GALLERYART);
 			return true;
 		case AppConstants.MENU_USERSMUSIK:
-			morefromuser(ListMusic.class,AppConstants.ACTIVITY_MUSICLIST);
+			morefromuser(ListMusicActivity.class,AppConstants.ACTIVITY_MUSICLIST);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

@@ -15,12 +15,12 @@ import android.widget.AbsListView;
 import android.widget.Toast;
 
 import com.sofurry.AppConstants;
-import com.sofurry.ProgressBarHelper;
-import com.sofurry.TagEditor;
+import com.sofurry.activities.TagEditorActivity;
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.base.interfaces.ICanHandleFeedback;
 import com.sofurry.base.interfaces.IHasThumbnail;
 import com.sofurry.base.interfaces.IManagedActivity;
+import com.sofurry.helpers.ProgressBarHelper;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
@@ -262,7 +262,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case AppConstants.MENU_FILTER_KEYWORDS:
-			Intent intent = new Intent(getAct(), TagEditor.class);
+			Intent intent = new Intent(getAct(), TagEditorActivity.class);
 			getAct().startActivityForResult(intent, AppConstants.ACTIVITY_TAGS);
 			return true;
 		case AppConstants.MENU_FILTER_ALL:

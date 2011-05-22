@@ -19,7 +19,7 @@ import android.widget.BaseAdapter;
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IManagedActivity;
 import com.sofurry.requests.AjaxRequest;
-import com.sofurry.tempstorage.ManagerStore;
+import com.sofurry.storage.ManagerStore;
 
 /**
  * @author SoFurry
