@@ -40,19 +40,23 @@ public class SettingsActivity
      *
      */
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Unregister listener
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    /**
+     * Method description
+     *
+     */
+    @Override
     protected void onResume() {
         super.onResume();
-        
+
         // Register listener
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-    }
-    
-    @Override
-    protected void onPause() {
-    	super.onPause();
-    	
-    	// Unregister listener
-    	getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
 
     /**
@@ -64,8 +68,9 @@ public class SettingsActivity
      */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(AppConstants.PREFERENCE_PM_CHECK_INTERVAL)) {
-            // We need to reschedule the alarm
+        if ((key.equals(AppConstants.PREFERENCE_PM_CHECK_INTERVAL))
+                || (key.equals(AppConstants.PREFERENCE_PM_ENABLE_CHECKS))) {
+            // Schedule, reschedule or cancel the alarm
             BootVersionChecker.scheduleAlarm(getApplicationContext());
         }
     }

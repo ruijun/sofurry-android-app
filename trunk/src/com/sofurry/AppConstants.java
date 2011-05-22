@@ -43,6 +43,7 @@ public class AppConstants {
     public static final String PREFERENCE_LAST_LAUNCH_VERSION = "lastLaunchVersion";
     public static final String PREFERENCE_PASSWORD            = "password";
     public static final String PREFERENCE_PM_CHECK_INTERVAL   = "pmCheckInterval";
+    public static final String PREFERENCE_PM_ENABLE_CHECKS    = "pmEnableChecks";
     public static final String PREFERENCE_SALT                = "salt";
     public static final String PREFERENCE_USERNAME            = "username";
 
