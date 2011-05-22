@@ -12,12 +12,12 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.sofurry.AppConstants;
-import com.sofurry.ProgressBarHelper;
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.base.interfaces.ICanHandleFeedback;
+import com.sofurry.helpers.ProgressBarHelper;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
-import com.sofurry.tempstorage.ItemStorage;
+import com.sofurry.storage.ItemStorage;
 import com.sofurry.util.DialogFactory;
 import com.sofurry.util.ErrorHandler;
 

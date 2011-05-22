@@ -15,6 +15,7 @@ import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IRequestHandler;
 import com.sofurry.requests.AsyncFileDownloader;
 import com.sofurry.requests.ProgressSignal;
+import com.sofurry.storage.FileStorage;
 
 public class ContentDownloader {
 

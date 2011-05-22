@@ -13,8 +13,8 @@ import android.util.Log;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 import com.sofurry.AppConstants;
+import com.sofurry.activities.ListPMActivity;
 import com.sofurry.base.interfaces.ICanHandleFeedback;
-import com.sofurry.list.ListPM;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.ProgressSignal;
 import com.sofurry.requests.RequestHandler;
@@ -147,7 +147,7 @@ public class PmNotificationService
                                         System.currentTimeMillis());
 
                 // Create the Intent and wrap it in a PendingIntent
-                intent = new Intent(this, ListPM.class);
+                intent = new Intent(this, ListPMActivity.class);
 
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
