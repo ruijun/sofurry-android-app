@@ -64,36 +64,12 @@ public class PmNotificationService
      */
     @Override
     protected void doWakefulWork(Intent intent) {
-        /*
-         * RequestThread thread     = null;
-         * DelayThread   waitThread = null;
-         */
-
         // Load auth information from server
         Authentication.loadAuthenticationInformation(this);
 
         if (hasAuthInformation()) {
             Log.i(AppConstants.TAG_STRING, "Requesting PM count (Authorized)...");
             getRequestParameters().executeInline(getRequestHandler());
-
-            /*
-             * thread = getRequestParameters().execute(getRequestHandler());
-             *
-             * try {
-             *   Log.i(AppConstants.TAG_STRING, "Waiting for other thread to finish...");
-             *   thread.join();
-             *   Log.i(AppConstants.TAG_STRING, "Thread finished...");
-             *
-             *   Log.i(AppConstants.TAG_STRING, "Creating waitThread...");
-             *   waitThread = new DelayThread();
-             *
-             *   Log.i(AppConstants.TAG_STRING, "Starting waitThread...");
-             *   waitThread.start();
-             *   Log.i(AppConstants.TAG_STRING, "Join waitThread...");
-             *   waitThread.join();
-             *   Log.i(AppConstants.TAG_STRING, "waitThread done...");
-             * } catch (InterruptedException ignored) {}
-             */
         }
     }
 
