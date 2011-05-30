@@ -4,17 +4,15 @@ package com.sofurry.util;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
-
 import android.os.SystemClock;
-
 import android.preference.PreferenceManager;
 
 import com.sofurry.AppConstants;
+import com.sofurry.R;
 import com.sofurry.receivers.OnAlarmReceiver;
 
 
@@ -47,6 +45,7 @@ public class BootVersionChecker {
         AlarmManager       manager       = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent             alarmIntent   = new Intent(context, OnAlarmReceiver.class);
         PendingIntent      pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
+        PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
         SharedPreferences  prefs         = PreferenceManager.getDefaultSharedPreferences(context);
         long               interval;
         boolean            useService = false;
@@ -55,7 +54,7 @@ public class BootVersionChecker {
         manager.cancel(pendingIntent);
 
         // Check settings to see if the user actually -want- to use the service
-        useService = prefs.getBoolean(AppConstants.PREFERENCE_PM_ENABLE_CHECKS, false);
+        useService = prefs.getBoolean(AppConstants.PREFERENCE_PM_ENABLE_CHECKS, true);
 
         if (useService) {
             // Retrieve the interval, which is stored in preferences as a string

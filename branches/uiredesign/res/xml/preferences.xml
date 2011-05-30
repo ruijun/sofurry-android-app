@@ -23,6 +23,7 @@
 		<CheckBoxPreference
 			android:key="pmEnableChecks"
 			android:title="PM Background Checks"
+			android:defaultValue="true"
 			android:summaryOn="Will check for PMs in the background, even if the app isn't currently running."
 			android:summaryOff="Will NOT check for PMs, and thus won't show notifications." />
 		<ListPreference
