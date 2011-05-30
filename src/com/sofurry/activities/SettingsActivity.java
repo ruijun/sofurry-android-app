@@ -8,6 +8,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
@@ -32,6 +33,7 @@ public class SettingsActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         addPreferencesFromResource(R.xml.preferences);
     }
 

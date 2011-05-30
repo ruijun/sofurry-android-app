@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.sofurry"
-          android:versionCode="15"
-          android:versionName="0.2.8 beta">
+          android:versionCode="17"
+          android:versionName="0.3.0 beta">
 
     <application android:icon="@drawable/icon"
                  android:label="@string/app_name"
-                 android:debuggable="false">
+                 android:debuggable="false"
+                 android:hardwareAccelerated="true">
         
         <receiver android:name=".receivers.OnBootReceiver">
             <intent-filter>
@@ -147,7 +148,7 @@
     </application>
 
     <uses-sdk android:minSdkVersion="4"
-              android:targetSdkVersion="4" />
+              android:targetSdkVersion="11" />
     
     <uses-permission android:name="android.permission.INTERNET" /> 
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -159,5 +160,6 @@
                       android:smallScreens="true"
                       android:resizeable="true"
                       android:normalScreens="true"
-                      android:largeScreens="true" />
+                      android:largeScreens="true"
+                      android:xlargeScreens="true" />
 </manifest> 

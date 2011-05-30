@@ -2,25 +2,23 @@ package com.sofurry.services;
 
 //~--- imports ----------------------------------------------------------------
 
+import org.json.JSONObject;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-
 import android.content.Intent;
-
 import android.util.Log;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
-
 import com.sofurry.AppConstants;
+import com.sofurry.R;
 import com.sofurry.activities.ListPMActivity;
 import com.sofurry.base.interfaces.ICanHandleFeedback;
 import com.sofurry.requests.AjaxRequest;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.util.Authentication;
 import com.sofurry.util.ProgressSignal;
-
-import org.json.JSONObject;
 
 
 //~--- classes ----------------------------------------------------------------
@@ -97,7 +95,7 @@ public class PmNotificationService
                 manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
                 // Create a new notification
-                note = new Notification(android.R.drawable.stat_notify_voicemail,
+                note = new Notification(R.drawable.icon,
                                         "New SoFurry PM(s)",
                                         System.currentTimeMillis());
 
