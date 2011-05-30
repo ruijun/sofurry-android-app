@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:gravity="center_horizontal" android:layout_height="wrap_content" android:layout_weight="0.2">
+		<TextView android:id="@+id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Enter tags here:"></TextView>
+	</LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.5">
+		<EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/Tags"></EditText>
+	</LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.5">
+	
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Gender" android:id="@+id/TagGenderButton"></Button>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Species" android:id="@+id/TagSpeciesButton"></Button>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fetish" android:id="@+id/TagFetishButton"></Button>
+</LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.4">
+		<Button android:text="OK" android:id="@+id/TagOkButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="0.5"></Button>
+	</LinearLayout>
+</LinearLayout>

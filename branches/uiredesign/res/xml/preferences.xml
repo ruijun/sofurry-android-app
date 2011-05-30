@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+>
+	<PreferenceCategory
+		android:title="Account Information"
+	>
+		<EditTextPreference
+			android:key="username"
+			android:title="Username"
+			android:summary="SoFurry username"
+			android:dialogTitle="Enter your SoFurry username" />
+		<EditTextPreference
+			android:key="password"
+			android:title="Password"
+			android:summary="SoFurry password"
+			android:dialogTitle="Enter your SoFurry password"
+			android:inputType="textPassword" />
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="Misc Settings"
+	>
+		<CheckBoxPreference
+			android:key="pmEnableChecks"
+			android:title="PM Background Checks"
+			android:summaryOn="Will check for PMs in the background, even if the app isn't currently running."
+			android:summaryOff="Will NOT check for PMs, and thus won't show notifications." />
+		<ListPreference
+			android:key="pmCheckInterval"
+			android:title="PM Check Interval"
+			android:defaultValue="900000"
+			android:dependency="pmEnableChecks"
+			android:summary="How often the background service should check for PMs"
+			android:dialogTitle="Choose Interval. Smaller values will drain the battery faster."
+			android:entries="@array/interval_titles"
+			android:entryValues="@array/interval_values" />
+	</PreferenceCategory>
+</PreferenceScreen>
