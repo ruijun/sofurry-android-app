@@ -32,7 +32,7 @@ import org.json.JSONObject;
 public class PmNotificationService
         extends WakefulIntentService
         implements ICanHandleFeedback {
-    private static int messageCount_ = -1;
+    private static long lastCheck_ = 0;
 
     //~--- fields -------------------------------------------------------------
 
@@ -87,7 +87,7 @@ public class PmNotificationService
         if (id == AppConstants.REQUEST_ID_FETCHDATA) {
             int messageCount = obj.getInt("unreadpmcount");
 
-            if ((PmNotificationService.messageCount_ != messageCount) && (messageCount > 0)) {
+            if (messageCount > 0) {
                 NotificationManager manager;
                 Notification        note;
                 PendingIntent       pendingIntent;
@@ -111,7 +111,7 @@ public class PmNotificationService
                 // Set some settings for the notification
                 note.setLatestEventInfo(this,
                                         "SoFurry PM",
-                                        "You have " + messageCount + " unread message(s).",
+                                        "You have " + messageCount + " new unread message(s).",
                                         pendingIntent);
 
                 note.vibrate  = AppConstants.VIBRATE_PM_INCOMING;
@@ -125,8 +125,8 @@ public class PmNotificationService
                 manager.notify(AppConstants.NOTIFICATION_ID_PM, note);
             }
 
-            // Set messageCount_ to the current value for comparison next time
-            PmNotificationService.messageCount_ = messageCount;
+            // Set timestamp of when we last checked, for incremental message checks
+            PmNotificationService.lastCheck_ = (System.currentTimeMillis() / 1000);
         }
     }
 
@@ -208,6 +208,7 @@ public class PmNotificationService
 
         // Set request parameters
         req.addParameter("f", "unreadpmcount");
+        req.addParameter("since", ""+PmNotificationService.lastCheck_);
 
         // Set request ID
         req.setRequestID(AppConstants.REQUEST_ID_FETCHDATA);
