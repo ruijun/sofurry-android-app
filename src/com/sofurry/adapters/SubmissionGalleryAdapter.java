@@ -45,9 +45,23 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
         ImageView imageView = null;
         if (convertView == null) {  // if it's not recycled, initialize some attributes
             imageView = new ImageView(context);
-            imageView.setLayoutParams(new GridView.LayoutParams(120, 120));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(5, 5, 5, 5);
+
+            int mThumbSize;
+            float scale = context.getResources().getDisplayMetrics().density;
+            mThumbSize = (int) (125 * scale + 0.5f);
+            mThumbSize= mThumbSize + 5;
+
+            
+            imageView.setLayoutParams(new GridView.LayoutParams(mThumbSize, mThumbSize));
+            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            imageView.setAdjustViewBounds(true);
+//            imageView.setPadding(5, 5, 5, 5);
+            
+            int mPaddingInPixels;
+            mPaddingInPixels = (int) (4 * scale + 0.5f);
+            mPaddingInPixels = mPaddingInPixels + 5;
+            imageView.setPadding(mPaddingInPixels, mPaddingInPixels, mPaddingInPixels, mPaddingInPixels);
+            
         } else {
             imageView = (ImageView) convertView;
         }
