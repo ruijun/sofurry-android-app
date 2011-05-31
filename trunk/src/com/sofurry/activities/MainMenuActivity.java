@@ -35,12 +35,13 @@ import java.util.Date;
  */
 public class MainMenuActivity
         extends ActivityWithRequests {
-    private Button buttonChat_;
-    private Button buttonForums_;
-    private Button buttonLogbook_;
-    private Button buttonPMs_;
-    private int    messageCount_ = -1;
-    private long   lastCheck_    = -1;
+    private Button  buttonChat_;
+    private Button  buttonForums_;
+    private Button  buttonLogbook_;
+    private Button  buttonPMs_;
+    private boolean mustReloadAuthInfo_ = true;
+    private int     messageCount_       = -1;
+    private long    lastCheck_          = -1;
 
 
     //~--- methods ------------------------------------------------------------
@@ -96,8 +97,9 @@ public class MainMenuActivity
                 break;
 
             case R.id.settings:
-                intent     = new Intent(this, SettingsActivity.class);
-                activityId = AppConstants.ACTIVITY_SETTINGS;
+                intent              = new Intent(this, SettingsActivity.class);
+                activityId          = AppConstants.ACTIVITY_SETTINGS;
+                mustReloadAuthInfo_ = true;
 
                 break;
 
@@ -190,6 +192,8 @@ public class MainMenuActivity
         // Retrieve authentication info
         Authentication.loadAuthenticationInformation(this);
 
+        mustReloadAuthInfo_ = false;
+
         // If the notification alarm service hasn't been scheduled, do so
         setupAlarmIfNeeded();
 
@@ -252,6 +256,11 @@ public class MainMenuActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (mustReloadAuthInfo_) {
+            Authentication.loadAuthenticationInformation(this);
+        }
+
         checkButtonDisabledState();
         checkPmCount();
     }
