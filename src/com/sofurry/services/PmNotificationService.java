@@ -8,6 +8,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
@@ -31,7 +33,7 @@ public class PmNotificationService
         extends WakefulIntentService
         implements ICanHandleFeedback {
     private static long lastCheck_ = 0;
-
+    private SharedPreferences prefs;
     //~--- fields -------------------------------------------------------------
 
     private RequestHandler requestHandler_;
@@ -106,10 +108,15 @@ public class PmNotificationService
 
                 pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
+                String message = "You have " + messageCount + " new unread message";
+                if (messageCount > 1)
+                	message += "s";
+
+                message += ".";
                 // Set some settings for the notification
                 note.setLatestEventInfo(this,
                                         "SoFurry PM",
-                                        "You have " + messageCount + " new unread message(s).",
+                                        message,
                                         pendingIntent);
 
                 note.vibrate  = AppConstants.VIBRATE_PM_INCOMING;
@@ -125,6 +132,8 @@ public class PmNotificationService
 
             // Set timestamp of when we last checked, for incremental message checks
             PmNotificationService.lastCheck_ = (System.currentTimeMillis() / 1000);
+            prefs.edit().putLong(AppConstants.PREFERENCE_LAST_PM_CHECK_TIME, PmNotificationService.lastCheck_).commit();
+
         }
     }
 
@@ -202,7 +211,14 @@ public class PmNotificationService
      * @return
      */
     protected AjaxRequest getRequestParameters() {
-        AjaxRequest req = new AjaxRequest();
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        prefs         = PreferenceManager.getDefaultSharedPreferences(this);
+        // Get the last check time from preferences storage at startup
+        PmNotificationService.lastCheck_ = prefs.getLong(AppConstants.PREFERENCE_LAST_PM_CHECK_TIME, 0);
+
+    	
+    	AjaxRequest req = new AjaxRequest();
 
         // Set request parameters
         req.addParameter("f", "unreadpmcount");
