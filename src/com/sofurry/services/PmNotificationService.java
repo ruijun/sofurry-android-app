@@ -8,6 +8,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
@@ -30,8 +32,8 @@ import com.sofurry.util.ProgressSignal;
 public class PmNotificationService
         extends WakefulIntentService
         implements ICanHandleFeedback {
-    private static int messageCount_ = -1;
-
+    private static long lastCheck_ = 0;
+    private SharedPreferences prefs;
     //~--- fields -------------------------------------------------------------
 
     private RequestHandler requestHandler_;
@@ -85,7 +87,7 @@ public class PmNotificationService
         if (id == AppConstants.REQUEST_ID_FETCHDATA) {
             int messageCount = obj.getInt("unreadpmcount");
 
-            if ((PmNotificationService.messageCount_ != messageCount) && (messageCount > 0)) {
+            if (messageCount > 0) {
                 NotificationManager manager;
                 Notification        note;
                 PendingIntent       pendingIntent;
@@ -106,10 +108,15 @@ public class PmNotificationService
 
                 pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
+                String message = "You have " + messageCount + " new unread message";
+                if (messageCount > 1)
+                	message += "s";
+
+                message += ".";
                 // Set some settings for the notification
                 note.setLatestEventInfo(this,
                                         "SoFurry PM",
-                                        "You have " + messageCount + " unread message(s).",
+                                        message,
                                         pendingIntent);
 
                 note.vibrate  = AppConstants.VIBRATE_PM_INCOMING;
@@ -123,8 +130,10 @@ public class PmNotificationService
                 manager.notify(AppConstants.NOTIFICATION_ID_PM, note);
             }
 
-            // Set messageCount_ to the current value for comparison next time
-            PmNotificationService.messageCount_ = messageCount;
+            // Set timestamp of when we last checked, for incremental message checks
+            PmNotificationService.lastCheck_ = (System.currentTimeMillis() / 1000);
+            prefs.edit().putLong(AppConstants.PREFERENCE_LAST_PM_CHECK_TIME, PmNotificationService.lastCheck_).commit();
+
         }
     }
 
@@ -202,10 +211,18 @@ public class PmNotificationService
      * @return
      */
     protected AjaxRequest getRequestParameters() {
-        AjaxRequest req = new AjaxRequest();
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        prefs         = PreferenceManager.getDefaultSharedPreferences(this);
+        // Get the last check time from preferences storage at startup
+        PmNotificationService.lastCheck_ = prefs.getLong(AppConstants.PREFERENCE_LAST_PM_CHECK_TIME, 0);
+
+    	
+    	AjaxRequest req = new AjaxRequest();
 
         // Set request parameters
         req.addParameter("f", "unreadpmcount");
+        req.addParameter("since", ""+PmNotificationService.lastCheck_);
 
         // Set request ID
         req.setRequestID(AppConstants.REQUEST_ID_FETCHDATA);
