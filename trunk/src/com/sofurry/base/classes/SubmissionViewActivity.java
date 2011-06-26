@@ -149,7 +149,7 @@ public abstract class SubmissionViewActivity
      */
     public String sanitizeFileName(String fileName) {
         // Remove non-permitted characters
-        return fileName.replaceAll("[\\\\/?%*:|<>.\"]", "_").trim();
+        return fileName.replaceAll("[\\\\/?%*:|<>\"]", "_").trim();
     }
 
     /**
