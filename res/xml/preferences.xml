@@ -36,4 +36,19 @@
 			android:entries="@array/interval_titles"
 			android:entryValues="@array/interval_values" />
 	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="Image Library"
+	>
+		<EditTextPreference
+			android:key="imgFileNameTemplate"
+			android:dialogTitle="Image file name template"
+			android:title="Image file name template"
+			android:summary="Supports: %AUTHOR%, %NAME%, %DATE%, and %LEVEL%"
+			android:defaultValue="%AUTHOR% - %NAME%" />
+		<CheckBoxPreference
+			android:key="imgFileNameTemplateUseAdultForExtreme"
+			android:title="Do not use 'extreme'"
+			android:summary="Use only 'clean' and 'adult' for level"
+			android:defaultValue="false" />
+	</PreferenceCategory>
 </PreferenceScreen>
