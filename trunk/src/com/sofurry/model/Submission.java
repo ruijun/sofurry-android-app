@@ -183,6 +183,8 @@ public class Submission implements Serializable, IHasThumbnail {
 		intent.putExtra("authorName", getAuthorName());
 		intent.putExtra("authorId", getAuthorID());
 		intent.putExtra("thumbnail", thumbnailUrl);
+		intent.putExtra("date", getDate());
+		intent.putExtra("level", getContentLevel());
 	}
 	
 }

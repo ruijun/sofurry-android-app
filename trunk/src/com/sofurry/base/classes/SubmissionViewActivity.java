@@ -78,10 +78,7 @@ public abstract class SubmissionViewActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean result = super.onCreateOptionsMenu(menu);
 
-        menu.add(0,
-                 AppConstants.MENU_SAVE,
-                 0,
-                 "Save").setIcon(android.R.drawable.ic_menu_save);
+        menu.add(0, AppConstants.MENU_SAVE, 0, "Save").setIcon(android.R.drawable.ic_menu_save);
         createExtraMenuOptions(menu);
 
         return result;
@@ -111,8 +108,7 @@ public abstract class SubmissionViewActivity
      */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK)
-                && (event.getRepeatCount() == 0)) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && (event.getRepeatCount() == 0)) {
             finish();
         }
 
@@ -149,7 +145,24 @@ public abstract class SubmissionViewActivity
      */
     public String sanitizeFileName(String fileName) {
         // Remove non-permitted characters
-        return fileName.replaceAll("[\\\\/?%*:|<>\"]", "_").trim();
+        return sanitizeFileName(fileName, false);
+    }
+
+    /**
+     * Method description
+     *
+     *
+     * @param fileName
+     * @param blockDots
+     *
+     * @return
+     */
+    public String sanitizeFileName(String fileName, boolean blockDots) {
+        if (blockDots) {
+            return fileName.replaceAll("[\\\\/?%*:.|<>\"]", "_").trim();
+        } else {
+            return fileName.replaceAll("[\\\\/?%*:|<>\"]", "_").trim();
+        }
     }
 
     /**

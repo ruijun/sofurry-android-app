@@ -38,15 +38,17 @@ public class AppConstants {
     public static final String PM_CONTENTS_URL_TEMPLATE = "$1<a href=\"$2\">$2</a>";
 
     /**
-     * Preference
+     * Preferences
      */
-    public static final String PREFERENCE_LAST_LAUNCH_VERSION = "lastLaunchVersion";
-    public static final String PREFERENCE_PASSWORD            = "password";
-    public static final String PREFERENCE_PM_CHECK_INTERVAL   = "pmCheckInterval";
-    public static final String PREFERENCE_PM_ENABLE_CHECKS    = "pmEnableChecks";
-    public static final String PREFERENCE_SALT                = "salt";
-    public static final String PREFERENCE_USERNAME            = "username";
-    public static final String PREFERENCE_LAST_PM_CHECK_TIME      = "lastpmchecktime";
+    public static final String PREFERENCE_IMAGE_FILE_NAME_TMPL      = "imgFileNameTemplate";
+    public static final String PREFERENCE_IMAGE_TMPL_USE_ONLY_ADULT = "imgFileNameTemplateUseAdultForExtreme";
+    public static final String PREFERENCE_LAST_LAUNCH_VERSION       = "lastLaunchVersion";
+    public static final String PREFERENCE_LAST_PM_CHECK_TIME        = "lastpmchecktime";
+    public static final String PREFERENCE_PASSWORD                  = "password";
+    public static final String PREFERENCE_PM_CHECK_INTERVAL         = "pmCheckInterval";
+    public static final String PREFERENCE_PM_ENABLE_CHECKS          = "pmEnableChecks";
+    public static final String PREFERENCE_SALT                      = "salt";
+    public static final String PREFERENCE_USERNAME                  = "username";
 
     /**
      * Name of the preference storage
