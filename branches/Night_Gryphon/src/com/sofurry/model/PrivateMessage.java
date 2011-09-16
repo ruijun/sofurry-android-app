@@ -106,6 +106,10 @@ public class PrivateMessage implements Serializable, IHasThumbnail {
 		return null;
 	}
 	
+	public Boolean checkThumbnail() {
+		return false;
+	}
+	
 	public void populateThumbnail(boolean fastmode) throws Exception {
 	
 	}

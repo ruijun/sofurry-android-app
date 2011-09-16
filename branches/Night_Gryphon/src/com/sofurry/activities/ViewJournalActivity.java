@@ -86,7 +86,7 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 	@Override
 	public void save() {
 		try {
-			String targetPath = FileStorage.getUserStoragePath("Journals", sanitizeFileName(name) + ".html");
+			String targetPath = FileStorage.getUserStoragePath("Journals", FileStorage.sanitizeFileName(name) + ".html");
 
 			File tf = new File(targetPath);
 			FileStorage.ensureDirectory(tf.getParent());

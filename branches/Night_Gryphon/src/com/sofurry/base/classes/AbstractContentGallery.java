@@ -95,6 +95,13 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		super.onPause();
 	}
 
+	// refresh visible items when return to foreground (update saved indicators)
+	@Override
+	protected void onResume() {
+		((BaseAdapter) myAdapter).notifyDataSetChanged();
+		super.onResume();
+	}
+
 	/**
 	 * Creates a new adapter and plugs it into the gridview
 	 */

@@ -26,7 +26,7 @@ public class AsyncFileDownloader extends Thread {
 	 * The ID to be passed along with the object
 	 * @return
 	 */
-	public static AsyncFileDownloader doRequest(IRequestHandler req, String url, String filename, int id) {
+	public static AsyncFileDownloader doRequest2(IRequestHandler req, String url, String filename, int id) {
 	  AsyncFileDownloader dl = new AsyncFileDownloader(req, url, filename, id);
 	  dl.start();
 	  return dl;
@@ -45,7 +45,7 @@ public class AsyncFileDownloader extends Thread {
 	 */
 	public void run() {
 		try {
-			ContentDownloader.downloadFile(url, filename,req);
+			ContentDownloader.downloadFile2(url, filename,req);
 			req.postMessage(id, this);
 		} catch (Exception e) {
 			req.postMessage(id, e);
