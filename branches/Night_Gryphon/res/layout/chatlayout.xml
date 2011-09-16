@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<TextView android:id="@+id/roomtextview" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:autoLink="all"
+		android:layout_weight="0" />
+<ScrollView
+        android:id="@+id/scrollview" 
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="0px"
+	android:layout_weight="1" android:fadingEdge="none">
+
+	<TextView android:id="@+id/chatview" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:autoLink="all"
+		android:layout_weight="1" />
+</ScrollView>
+	
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:fadingEdge="none">
+
+		<EditText android:id="@+id/chatentry" 
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1" />
+
+		<Button android:id="@+id/send" 
+			android:text="@string/send"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+	</LinearLayout>
+
+</LinearLayout>
