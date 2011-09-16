@@ -179,6 +179,7 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		Intent intent = new Intent(this, activity);
 		intent.putExtra("viewSource", AppConstants.VIEWSOURCE_USER);
 		intent.putExtra("viewSearch", "" + authorId  );
+		intent.putExtra("activityTitle", "" + authorName  );
 		startActivityForResult(intent, ActivityID);
 	}
 

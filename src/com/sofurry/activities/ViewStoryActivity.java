@@ -128,7 +128,7 @@ public class ViewStoryActivity
     @Override
     public void save() {
         try {
-            String targetPath = FileStorage.getUserStoragePath("Stories", sanitizeFileName(name) + ".html");
+            String targetPath = FileStorage.getUserStoragePath("Stories", FileStorage.sanitizeFileName(name) + ".html");
             File   tf         = new File(targetPath);
 
             FileStorage.ensureDirectory(tf.getParent());

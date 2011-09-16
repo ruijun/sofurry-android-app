@@ -10,6 +10,7 @@ import android.view.MenuItem;
 
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.ICanCancel;
+import com.sofurry.model.Submission;
 
 
 //~--- classes ----------------------------------------------------------------
@@ -67,6 +68,15 @@ public abstract class SubmissionViewActivity
         }
     }
 
+    // changes currently viewed submission
+    public void assignSubmission(Submission s) {
+    	pageID = s.getId();
+    	name = s.getName();
+    	authorId = s.getAuthorID();
+    	authorName = s.getAuthorName();
+    	thumbURL = s.getThumbnailUrl();
+    }
+    
     /**
      * Creates the Context Menu for this Activity.
      *
@@ -132,36 +142,6 @@ public abstract class SubmissionViewActivity
 
             default:
                 return super.onContextItemSelected(item);
-        }
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param fileName
-     *
-     * @return
-     */
-    public String sanitizeFileName(String fileName) {
-        // Remove non-permitted characters
-        return sanitizeFileName(fileName, false);
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param fileName
-     * @param blockDots
-     *
-     * @return
-     */
-    public String sanitizeFileName(String fileName, boolean blockDots) {
-        if (blockDots) {
-            return fileName.replaceAll("[\\\\/?%*:.|<>\"]", "_").trim();
-        } else {
-            return fileName.replaceAll("[\\\\/?%*:|<>\"]", "_").trim();
         }
     }
 

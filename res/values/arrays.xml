@@ -21,4 +21,23 @@
     	<item>43200000</item>
     	<item>86400000</item>
     </string-array>
+    <string-array name="useHD_titles">
+        <item>Use preview Only</item>
+        <item>Always use HD images</item>
+    </string-array>
+    <string-array name="useHD_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array><string-array name="imgMenuPosition_titles">
+        <item>None</item>
+        <item>Bottom</item>
+        <item>Left</item>
+        <item>Right</item>
+    </string-array>
+    <string-array name="imgMenuPosition_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
 </resources>

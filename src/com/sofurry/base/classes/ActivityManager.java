@@ -1,5 +1,6 @@
 package com.sofurry.base.classes;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.json.JSONObject;
@@ -7,6 +8,8 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +43,8 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	protected int viewSource = AppConstants.VIEWSOURCE_ALL; // The currently selected viewsource
 	protected String viewSearch = "";						// The currently selected view Search
 	protected int currentPage = 0;							// The currently selected page
+	public int totalPages = 0;							// total number of available pages. stop load after last page. 0 = unknown amount of pages
+	protected String currentTitle = "";						// Title for current page
 	protected ArrayList<T> resultList;
 	//protected ArrayList<String> pageIDs;					// The page ids
 	
@@ -134,6 +139,10 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	    if (extras != null) {
 	    	viewSource = extras.getInt("viewSource");
 	    	viewSearch = extras.getString("viewSearch");
+	    	currentTitle = extras.getString("activityTitle");
+/*	    	if (currentTitle.length() > 0) {
+	    		((Activity) myAct).setTitle(currentTitle);
+	    	} /**/
 	    }
 	    //pageIDs = new ArrayList<String>();
 	    myAct.plugInAdapter();
@@ -172,7 +181,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	public void onScroll(final AbsListView view, final int first, final int visible, final int total) {
 		// detect if last item is visible
 		if (currentlyFetching) return; // We will not make that request twice, if new data is already being fetched
-		if (visible < total && (first + visible == total)) {// && listRequestThread == null) {
+		if (visible < total && (first + visible == total) && ((totalPages <= 0) || (currentPage < totalPages-1))) {// && listRequestThread == null) {
 			Log.d(AppConstants.TAG_STRING, "onScrollListener - End of list: fvi: " + first + ", vic: " + visible + ", tic: " + total);
 			currentPage++;
 			loadPage(false);
@@ -181,6 +190,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 
 	public void forceLoadNext() {
 		if (currentlyFetching) return; // We will not make that request twice, if new data is already being fetched
+		if ((totalPages > 0) && (currentPage >= totalPages-1)) return; // don't fetch after last page
 		currentPage++;
 		loadPage(false);
 	}
@@ -266,21 +276,27 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 			getAct().startActivityForResult(intent, AppConstants.ACTIVITY_TAGS);
 			return true;
 		case AppConstants.MENU_FILTER_ALL:
+			currentTitle = "Recent";
 			resetViewSource(AppConstants.VIEWSOURCE_ALL);
 			return true;
 		case AppConstants.MENU_FILTER_FEATURED:
+			currentTitle = "Featured";
 			resetViewSource(AppConstants.VIEWSOURCE_FEATURED);
 			return true;
 		case AppConstants.MENU_FILTER_FAVORITES:
+			currentTitle = "Favorites";
 			resetViewSource(AppConstants.VIEWSOURCE_FAVORITES);
 			return true;
 		case AppConstants.MENU_FILTER_WATCHLIST:
+			currentTitle = "Watchlist";
 			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST);
 			return true;
 		case AppConstants.MENU_FILTER_GROUP:
+			currentTitle = "Group";
 			resetViewSource(AppConstants.VIEWSOURCE_GROUP);
 			return true;
 		case AppConstants.MENU_FILTER_WATCHLIST_COMBINED:
+			currentTitle = "Combined";
 			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST_COMBINED);
 			return true;
 		default:
@@ -300,6 +316,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		if (requestCode == AppConstants.ACTIVITY_TAGS) {
 			if (data == null) return true;
 			viewSearch = data.getStringExtra("tags");
+			currentTitle = "Tags";
 			resetViewSource(AppConstants.VIEWSOURCE_SEARCH);
 			return true;
 		}
@@ -322,6 +339,10 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		else
 			Toast.makeText(getAct().getApplicationContext(), "Fetching next page", Toast.LENGTH_SHORT).show();
 		
+		if (currentTitle.length() > 0) {
+			((Activity) myAct).setTitle(currentTitle);
+		}
+
 		AjaxRequest request = myAct.getFetchParameters(currentPage, viewSource);
 		request.setRequestID(AppConstants.REQUEST_ID_FETCHDATA);
 		currentlyFetching = true;
@@ -392,9 +413,5 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		requesthandler.killThreads(); // We instruct all running threads to terminate
 		myAct.finish(); // We instruct the Activity to close
 	}
-	
-	
 
-
-	
 }
