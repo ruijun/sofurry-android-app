@@ -20,6 +20,7 @@ public class AsyncImageLoader extends Thread {
 	private Context my_context = null;
 	private Boolean forceDownload = false;
 	private Boolean onlyDownload = false;
+	private Boolean noScale = false;
 	private Boolean cancelFlag = false;
 	private int id = -1;
 	private Handler mHandler = null;
@@ -29,13 +30,13 @@ public class AsyncImageLoader extends Thread {
 		public void onImageLoad(int id, Object obj); // null = file downloaded no bitmap, exception - error happens, bitmap - loaded picture
 	}
 	
-	public static AsyncImageLoader doLoad(Context con, AsyncImageLoader.IImageLoadResult req, Submission sub, Boolean forceDl, Boolean onlyDL) {
-		  AsyncImageLoader dl = new AsyncImageLoader(con, req, sub, forceDl, onlyDL);
+	public static AsyncImageLoader doLoad(Context con, AsyncImageLoader.IImageLoadResult req, Submission sub, Boolean forceDl, Boolean onlyDL, Boolean noScale) {
+		  AsyncImageLoader dl = new AsyncImageLoader(con, req, sub, forceDl, onlyDL, noScale);
 		  dl.start();
 		  return dl;
 	}
 		
-	public AsyncImageLoader(Context con, AsyncImageLoader.IImageLoadResult req, Submission sub, Boolean forceDl, Boolean onlyDL) {
+	public AsyncImageLoader(Context con, AsyncImageLoader.IImageLoadResult req, Submission sub, Boolean forceDl, Boolean onlyDL, Boolean noSc) {
 			super();
 			
 			this.mHandler = new Handler();
@@ -44,6 +45,7 @@ public class AsyncImageLoader extends Thread {
 			this.my_submission = sub;
 			this.forceDownload = forceDl;
 			this.onlyDownload = onlyDL;
+			this.noScale = noSc;
 			this.requesthandler = req;
 			this.id = my_submission.getId();
 	}
@@ -80,7 +82,9 @@ public class AsyncImageLoader extends Thread {
         	}
         	
             // max size for loaded image. it must be larger than biggest side of screen to fit well even if we rotate screen
-            int maxsize = Math.max(	my_context.getApplicationContext().getResources().getDisplayMetrics().heightPixels, 
+            int maxsize = 0;
+            if (! noScale) 
+            	maxsize = Math.max(	my_context.getApplicationContext().getResources().getDisplayMetrics().heightPixels, 
             						my_context.getApplicationContext().getResources().getDisplayMetrics().widthPixels);
             
         	SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(my_context);

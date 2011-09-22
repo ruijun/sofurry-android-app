@@ -7,15 +7,21 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.graphics.PointF;
+import android.graphics.RectF;
 
 import android.net.Uri;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 //import android.os.Debug;
 //import android.os.Debug.MemoryInfo;
 
 import android.preference.PreferenceManager;
 
+import android.util.FloatMath;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -23,6 +29,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
+import android.view.ViewTreeObserver.OnPreDrawListener;
 
 import android.widget.Button;
 import android.widget.ImageView;
@@ -58,9 +65,10 @@ import java.lang.Math;
  */
 public class ViewArtActivity
         extends FavableActivity 
-        implements OnTouchListener {
+        implements OnTouchListener, OnPreDrawListener {
 	
-
+	static final Boolean useOriginalScale = true;
+	
 	// current page controls (change when page flips)
 	private class PageHolder implements AsyncImageLoader.IImageLoadResult{
 		private Bitmap    imageBitmap = null;
@@ -159,6 +167,11 @@ public class ViewArtActivity
             imageBitmap = ImageStorage.loadSubmissionIcon(submission.getId());
         	image.setImageBitmap(imageBitmap);
 	
+        	// scale/center thumbnail if it is on currently visible page
+        	if (pages.get(curpageId) == this) {
+        		centerImage(true, true, false);
+        	}
+        	
 //			(new thumbLoader()).run();
 //			myThumbLoader.notify();
 
@@ -173,7 +186,7 @@ public class ViewArtActivity
 			
             // start load thread
            	loadingIndicator.setVisibility(View.VISIBLE);
-            imageLoader = AsyncImageLoader.doLoad(context, this, submission, false, ! showImage);
+            imageLoader = AsyncImageLoader.doLoad(context, this, submission, false, ! showImage, useOriginalScale);
 		}
 
 		// assign current submission
@@ -216,7 +229,7 @@ public class ViewArtActivity
 			}
 			
            	loadingIndicator.setVisibility(View.VISIBLE);
-            imageLoader = AsyncImageLoader.doLoad(context, this, submission, true, false);
+            imageLoader = AsyncImageLoader.doLoad(context, this, submission, true, false, useOriginalScale);
 		}
 		
 		public void onImageLoad(int id, Object obj) {
@@ -244,6 +257,11 @@ public class ViewArtActivity
         	image.setImageBitmap(imageBitmap);
         	
         	imageLoaded = true;
+        	
+        	// scale/center image if it is on currently visible page
+        	if (pages.get(curpageId) == this) {
+        		centerImage(true, true, false);
+        	}
 		}
 
 	    public void finish() {
@@ -341,15 +359,44 @@ public class ViewArtActivity
 //    protected ActivityManager man = null; 
     		
 	// screen dragging support
-	private float downXValue; 
-	private float downYValue;
+/*	private float downXValue; 
+	private float downYValue;/**/
+    private PointF downPoint = new PointF();
 	private long downTimer;
+	private long prevClickTime = 0;
+	private Boolean mHasDoubleClicked = false;
 	private VelocityTracker VTracker = null;
+	
+	// scaling
+	float downDist = 0;
+	PointF midPoint = new PointF();
+	
+	// These matrices will be used to move and zoom image
+	Matrix matrix = new Matrix();
+	Matrix savedMatrix = new Matrix();
+
+	// Gesture states
+	static final int NONE = 0;
+	static final int DRAG = 1;
+	static final int ZOOM = 2;
+	int mode = NONE;
+
+    // click feel constants
+    static final float maxClickLength = 15;
+    static final int maxClickTime = 200;
+    static final int maxClickVelocity = 20;
+    static final long doubleClickDuration = 500;
+
 
 	private Animation aLeftIn = null;
 	private Animation aLeftOut = null;
 	private Animation aRightIn = null;
 	private Animation aRightOut = null;
+
+/*	// definitions to use with old API	
+	static final int ACTION_MASK = 0x000000ff;
+	static final int ACTION_POINTER_UP = 0x00000006;
+	static final int ACTION_POINTER_DOWN = 0x00000005;/**/
 	
     //~--- methods ------------------------------------------------------------
 
@@ -395,31 +442,6 @@ public class ViewArtActivity
     	startActivity(intent);
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see com.sofurry.IManagedActivity#finish()
-     */
-
-    /**
-     * Method description
-     *
-     */
-    @Override
-    public void finish() {
-    	if (pages != null) {
-    		pages.get(0).finish();
-    		pages.get(1).finish();
-    		pages.get(2).finish();
-    		pages.clear();
-    		pages = null;
-    	};
-    	
-    	submissions_list = null;
-
-        super.finish();
-        System.gc();
-    }
-
     /**
      * Method description
      *
@@ -435,6 +457,7 @@ public class ViewArtActivity
         
 //      Authentication.loadAuthenticationInformation(this);
         setContentView(R.layout.artdetails);
+        FixedViewFlipper imageFlipper = (FixedViewFlipper) findViewById(R.id.viewFlipper1);
 
         // init pages for flipper
         curpage = new PageHolder(this);
@@ -443,12 +466,6 @@ public class ViewArtActivity
         curpage.InfoText = (TextView) findViewById(R.id.InfoText1);
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator1);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator1);
-/*        curpage.image.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View arg0) {
-                doHdView(pages.get(0).submission);
-            }
-        });/**/
-//        curpage.image.setOnTouchListener((OnTouchListener) this);
         pages.add(curpage);
 
         curpage = new PageHolder(this);
@@ -457,12 +474,6 @@ public class ViewArtActivity
         curpage.InfoText = (TextView) findViewById(R.id.InfoText2);
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator2);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator2);
-/*        curpage.image.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View arg0) {
-                doHdView(pages.get(1).submission);
-            }
-        });/**/
-//        curpage.image.setOnTouchListener((OnTouchListener) this);
         pages.add(curpage);
 
         curpage = new PageHolder(this);
@@ -471,12 +482,6 @@ public class ViewArtActivity
         curpage.InfoText = (TextView) findViewById(R.id.InfoText3);
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator3);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator3);
-/*        curpage.image.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View arg0) {
-                doHdView(pages.get(2).submission);
-            }
-        });/**/
-//        curpage.image.setOnTouchListener((OnTouchListener) this);
         pages.add(curpage);
         
         curpage = pages.get(0);
@@ -556,25 +561,24 @@ public class ViewArtActivity
             	}
             }
 
+            matrix.reset();
         } else {
         	// load saved object
-
             submissions_list = (ArrayList<Submission>)  retrieveObject("list");
             submissions_index = (Integer) retrieveObject("listId");
+            matrix = (Matrix) retrieveObject("matrix");
             
             pages.get(0).retreive("0");
             pages.get(1).retreive("1");
             pages.get(2).retreive("2");
             
             curpageId = (Integer) retrieveObject("pageId");
-            FixedViewFlipper vf = (FixedViewFlipper) findViewById(R.id.viewFlipper1);
-            vf.setDisplayedChild(curpageId);
+            imageFlipper.setDisplayedChild(curpageId);
         }
         
         // init dragging
-        FixedViewFlipper layMain = (FixedViewFlipper) findViewById(R.id.viewFlipper1);
-        layMain.setOnTouchListener((OnTouchListener) this);
-        layMain.captureAllTouch = true;
+        imageFlipper.setOnTouchListener((OnTouchListener) this);
+        imageFlipper.captureAllTouch = true;
         VTracker = VelocityTracker.obtain();
         
         // prepare animation
@@ -583,6 +587,60 @@ public class ViewArtActivity
     	aRightIn = AnimationUtils.loadAnimation(this, R.anim.push_right_in);
     	aRightOut = AnimationUtils.loadAnimation(this, R.anim.push_right_out);
     }
+
+    /*
+     *  (non-Javadoc)
+     * @see com.sofurry.IManagedActivity#finish()
+     */
+
+    @Override
+    public void finish() {
+    	if (pages != null) {
+    		pages.get(0).finish();
+    		pages.get(1).finish();
+    		pages.get(2).finish();
+    		pages.clear();
+    		pages = null;
+    	};
+    	
+    	submissions_list = null;
+
+        super.finish();
+        System.gc();
+    }
+
+    @Override
+	protected void onResume() {
+		super.onResume();
+
+//		getWindow().getDecorView().requestLayout();
+/*		pages.get(0).loadPic();
+		pages.get(1).loadPic();
+		pages.get(2).loadPic(); /**/
+		
+		findViewById(R.id.viewFlipper1).getViewTreeObserver().addOnPreDrawListener(this);
+	}
+
+
+	@Override
+	public boolean onPreDraw() {
+		findViewById(R.id.viewFlipper1).getViewTreeObserver().removeOnPreDrawListener(this);
+		pages.get(curpageId).loadPic(true);
+
+		return true;
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+
+		if (pages != null) { // when destroing activity finish() is called first and destroy pages array
+			pages.get(0).unloadPic();
+			pages.get(1).unloadPic();
+			pages.get(2).unloadPic();
+		}
+	}
+
 
     /**
      * Method description
@@ -651,21 +709,11 @@ public class ViewArtActivity
         storeObject("list", submissions_list);
         storeObject("listId", submissions_index);
         storeObject("pageId", curpageId);
+        storeObject("matrix", matrix);
         
         super.onSaveInstanceState(outState);
     }
 
-/*
-    // destroy image viewer on back button
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)
-    {
-        if ((keyCode == KeyEvent.KEYCODE_BACK))
-        {
-            finish();
-        }
-        return super.onKeyDown(keyCode, event);
-    }/**/
 
 	@Override
 	public void save() {
@@ -687,6 +735,11 @@ public class ViewArtActivity
 			}
 			long tt1 = System.currentTimeMillis() - t; // DEBUG
 
+			// reset image transformations
+			matrix.reset();
+			pages.get(curpageId).image.setImageMatrix(matrix);
+
+			// start load image
 			pages.get(curpageId).loadPic(true);
 			
 			long tt2 = System.currentTimeMillis() - t; // DEBUG
@@ -736,6 +789,12 @@ public class ViewArtActivity
 			if (curpageId < 0) {
 				curpageId = 2;
 			}
+
+			// reset image transformations
+			matrix.reset();
+			pages.get(curpageId).image.setImageMatrix(matrix);
+
+			// start load image
 			pages.get(curpageId).loadPic(true);
 			
 			// preload prev image
@@ -770,115 +829,302 @@ public class ViewArtActivity
 //    	centerview.layout(dX, centerview.getTop(), getApplicationContext().getResources().getDisplayMetrics().widthPixels + dX, centerview.getBottom());
     	centerview.layout(dX, dY, centerview.getWidth() + dX, centerview.getHeight() + dY);
     	centerview.setVisibility(View.VISIBLE);
-		
 	}
+
+	public void getViewPosition(PointF offset) {
+    	View centerview = pages.get(curpageId).myview;
+    	offset.x = centerview.getLeft();
+    	offset.y = centerview.getTop();
+	}
+
+	private void midPoint(PointF point, MotionEvent event) {
+		   float x = event.getX(0) + event.getX(1);
+		   float y = event.getY(0) + event.getY(1);
+		   point.set(x / 2, y / 2);
+	}
+	
+	private float spacing(MotionEvent event) {
+		   float x = event.getX(0) - event.getX(1);
+		   float y = event.getY(0) - event.getY(1);
+		   return FloatMath.sqrt(x * x + y * y);
+	}
+
+	public float centerImage(Boolean forceCenter, Boolean doFit, Boolean rescale) {
+//    	View pageView = pages.get(curpageId).myview;
+    	View pageView = findViewById(R.id.viewFlipper1);
+    	ImageView img = pages.get(curpageId).image;
+    	Bitmap bmp = pages.get(curpageId).imageBitmap;
+    	if (bmp == null)
+    		return 0;
+    	RectF r = new RectF();
+    	r.set(0,0,bmp.getWidth(),bmp.getHeight());
+    	matrix.mapRect(r);
+
+    	if (rescale && (r.width() < pageView.getWidth()) && (r.height() < pageView.getHeight())) 
+    		doFit = true;
+
+    	if (doFit) {
+    		matrix.reset();
+    		float scale = Math.min( (float) pageView.getWidth() / bmp.getWidth(), (float) pageView.getHeight() / bmp.getHeight() );
+    		if ((scale > 0 )&&(scale < 1)) // do not enlarge
+    			matrix.postScale(scale, scale);
+	    	r.set(0,0,bmp.getWidth(),bmp.getHeight());
+	    	matrix.mapRect(r);
+    	}
+    	
+    	float dx = 0;
+    	float dy = 0;
+    	if (forceCenter) {
+        	dx = pageView.getWidth()/2 - r.centerX();
+        	dy = pageView.getHeight()/2 - r.centerY();
+    	} else {
+    		if (r.width() <= pageView.getWidth()) {
+            	dx = pageView.getWidth()/2 - r.centerX();
+    		} else if (r.left > 0) {
+    			dx = -r.left;
+    		} else if (r.right < pageView.getWidth()) {
+    			dx = pageView.getWidth() - r.right;
+    		}
+
+    		if (r.height() <= pageView.getHeight()) {
+            	dy = pageView.getHeight()/2 - r.centerY();
+    		} else if (r.top > 0) {
+    			dy = -r.top;
+    		} else if (r.bottom < pageView.getHeight()) {
+    			dy = pageView.getHeight() - r.bottom;
+    		}
+    	}
+    		
+    	matrix.postTranslate(dx, dy);
+    	
+    	img.setImageMatrix(matrix);
+    	
+    	if ((r.left < 0)&&(r.right > pageView.getWidth())) {
+    		return 0;
+    	} else if ( (r.left > 0)&&(r.right < pageView.getWidth()) ) {
+    		return r.left + r.right - pageView.getWidth();
+    	} else if (r.left > 0) {
+    		return r.left;
+    	} else
+    		return r.right - pageView.getWidth();
+	}
+	
+	// calculate distance to move page in flipper
+	public void calculatePageDisplacement(PointF delta) {
+//    	View pageView = pages.get(curpageId).myview;
+    	View pageView = findViewById(R.id.viewFlipper1);
+    	Bitmap bmp = pages.get(curpageId).imageBitmap;
+    	if (bmp == null)
+    		return;
+    	RectF r = new RectF();
+//    	r.set(img.getDrawable().getBounds());
+    	r.set(0,0,bmp.getWidth(),bmp.getHeight());
+    	
+    	matrix.mapRect(r);
+    	
+    	delta.x = 0;
+    	delta.y = 0;
+
+//    	if ( (r.left > 0)&&(r.right < pageView.getWidth()) ) {
+       	if ( (r.width() <= pageView.getWidth()) ) {
+    		delta.x = (r.left + r.right - pageView.getWidth())/2;
+    	} else if (r.left > 0) {
+    		delta.x = r.left;
+    	} else if (r.right < pageView.getWidth())
+    		delta.x = r.right - pageView.getWidth();
+
+//    	if ( (r.top > 0)&&(r.bottom < pageView.getHeight()) ) {
+       	if ( (r.height() <= pageView.getHeight()) ) {
+    		delta.y = (r.top + r.bottom - pageView.getHeight())/2;
+    	} else if (r.top > 0) {
+    		delta.y = r.top;
+    	} else if (r.bottom < pageView.getHeight())
+    		delta.y = r.bottom - pageView.getHeight();
+	}
+	
 
 	@Override
 	public boolean onTouch(View arg0, MotionEvent arg1) {
         // Get the action that was done on this touch event
-        switch (arg1.getAction())
+        switch (arg1.getAction() & MotionEvent.ACTION_MASK)
         {
         	
             case MotionEvent.ACTION_DOWN:
             {
                 // store the X value when the user's finger was pressed down
-                downXValue = arg1.getX();
-                downYValue = arg1.getY();
+            	downPoint.set(arg1.getX(), arg1.getY());
                 downTimer = System.currentTimeMillis();
                 VTracker.clear();
                 VTracker.addMovement(arg1);
+                
+                savedMatrix.set(matrix);
+                
+                // deny single click if new gesture started
+            	if (System.currentTimeMillis() - prevClickTime <= doubleClickDuration) {
+            		mHasDoubleClicked = true;
+            	}
+            	
+                mode = DRAG;
                 break;
             }
 
+            case MotionEvent.ACTION_POINTER_DOWN:
+            {
+            	downDist = spacing(arg1);
+            	if (downDist > 10f) {
+            		// start scaling
+            	    PointF ofs = new PointF();
+            	    getViewPosition(ofs);
+            	    matrix.postTranslate(ofs.x, ofs.y);
+            	    pages.get(curpageId).image.setImageMatrix(matrix);
+            	    setViewPosition(0, 0);
+
+            	    mode = ZOOM;
+            		savedMatrix.set(matrix);
+            	    midPoint(midPoint, arg1);
+//            		midPoint.set(arg1.getX(0), arg1.getY(0));
+            	}
+            	break;
+            }
+            
+            case MotionEvent.ACTION_POINTER_UP:
+            {
+            	// set matrix and point to drag mode
+            	savedMatrix.set(matrix);
+            	int pid = ( arg1.getAction() & MotionEvent.ACTION_POINTER_ID_MASK ) >> MotionEvent.ACTION_POINTER_ID_SHIFT;
+            	downPoint.set(arg1.getX(1 - pid), arg1.getY(1 - pid));
+            	mode = DRAG;
+            	
+            	break;
+            }
+            
             case MotionEvent.ACTION_UP:
             {
+            	// end of drag event
+            	mode = NONE;
+            	
                 float currentX = arg1.getX();
-                float dX = downXValue - currentX;
-                long clickDuration = System.currentTimeMillis() - downTimer; 
+                float dX = downPoint.x - currentX;
+                long clickTime = System.currentTimeMillis();
+                long clickDuration = clickTime - downTimer;
+                PointF d = new PointF();
+                getViewPosition(d);
+                
+                // flip feel constants
+//                int longflipLength = getApplicationContext().getResources().getDisplayMetrics().widthPixels / 3;
+                int longflipLength = pages.get(curpageId).myview.getWidth() / 3;
+//                int shortflipLength = 15;
+                int MinFlipVelocity = 40; 
 
-                int clickTime = 200;
-                int longflipLength = getApplicationContext().getResources().getDisplayMetrics().widthPixels / 3;
-                int shortflipLength = 15;
-                int MinFlipVelocity = 10; 
-
-                // WIP: replacing drag length flipping with drag speed
+                // read drag speed
                 VTracker.addMovement(arg1);
-                VTracker.computeCurrentVelocity(100);
+                VTracker.computeCurrentVelocity(100); // pixels per last 100ms
                 float vx = VTracker.getXVelocity();
                 VTracker.recycle();
-                
+
+                // CLICK
 //                if ( (clickDuration < clickTime) && (Math.abs(dX) < shortflipLength) ) {
-                if ( (clickDuration < clickTime) && (Math.abs(vx) < MinFlipVelocity) ) {
+                if ( (clickDuration < maxClickTime) && (Math.abs(dX) < maxClickLength) && (Math.abs(vx) < maxClickVelocity) ) {
                 	// click
-                    doHdView(pages.get(curpageId).submission);
+                	
+//                    doHdView(pages.get(curpageId).submission);
+                	if (clickTime - prevClickTime <= doubleClickDuration) {
+                		// double click
+                		mHasDoubleClicked = true;
+                		
+                		float[] p = {arg1.getX(), arg1.getY()};
+                		Matrix m = new Matrix();
+                		matrix.invert(m);
+                		m.mapPoints(p);
+                		matrix.reset();
+                		matrix.postTranslate(arg1.getX() - p[0], arg1.getY() - p[1]);
+            		    pages.get(curpageId).image.setImageMatrix(matrix);
+                		
+                	} else {
+                		// wait for second click
+                		mHasDoubleClicked = false;
+                        Handler myHandler = new Handler() {
+                             public void handleMessage(Message m) {
+                                  if (!mHasDoubleClicked) {
+                                	  doHdView(pages.get(curpageId).submission);
+                                  }
+                             }
+                        };
+                        Message m = new Message();
+                        myHandler.sendMessageDelayed(m, doubleClickDuration);
+                	}/**/
+
+                	prevClickTime = clickTime;
                     return true;
-                }
-                
+                } else
+                // DRAG
                 // very long drag || fast long drag
 //                if ( (Math.abs(dX) > longflipLength) || ( (clickDuration < clickTime) && (Math.abs(dX) >= shortflipLength) )) {
 
-                // very long drag || fast drag
-                if ( (Math.abs(dX) > longflipLength) || ( (Math.abs(vx) >= MinFlipVelocity) )) {
-                	// flip
-
-                	// going backwards: pushing stuff to the right
-//                    if (downXValue < currentX)
+                if ( (Math.abs(vx) >= MinFlipVelocity) ) {
+                	// velocity flip
                     if (vx > 0)
-                    {
                     	if (showPrev()) return true;
-                    }
 
-                    // going forwards: pushing stuff to the left
-//                    if (downXValue > currentX)
                     if (vx < 0)
-                    {
                     	if (showNext()) return true;
-                    }
+                    
+                } else if (Math.abs(d.x) > longflipLength) {
+                	// position flip
+                	if (dX > 0)
+                    	if (showNext()) return true;
+                	
+                	if (dX < 0)
+                    	if (showPrev()) return true;
                 }
                 
+            	// NONE of finally for DRAG (if page was not flipped)
                 // return to center animation
+            	centerImage(false, false, true);
                 setViewPosition(0, 0);
                 
                 break;
             }
             case MotionEvent.ACTION_MOVE:
             {
-            	int dX = (int) (arg1.getX() - downXValue);
-            	setViewPosition(dX, 0);
                 VTracker.addMovement(arg1);
                 
+            	switch (mode) {
+            		case DRAG: {
+//                    	int dX = (int) (arg1.getX() - downPoint.x);
+//                    	setViewPosition(dX, 0);
+
+            			// move image inside view
+                    	matrix.set(savedMatrix);
+                        matrix.postTranslate(arg1.getX() - downPoint.x, arg1.getY() - downPoint.y);
+
+                        // move page
+                        PointF d = new PointF();
+                        calculatePageDisplacement(d);
+                        matrix.postTranslate(-d.x, 0);
+                        setViewPosition(Math.round(d.x), 0);
+                        
+            		    pages.get(curpageId).image.setImageMatrix(matrix);
+                        break;
+            		}
+            		
+            		case ZOOM: {
+            			float newDist = spacing(arg1);
+            		    if (newDist > 10f) {
+            		       matrix.set(savedMatrix);
+            		       float scale = newDist / downDist;
+            		       matrix.postScale(scale, scale, midPoint.x, midPoint.y);
+            		    }
+            		    pages.get(curpageId).image.setImageMatrix(matrix);
+            			break;
+            		}
+            	}
+                
                 break;
-            }
-            case MotionEvent.ACTION_CANCEL:
-            {	
-//                VTracker.recycle();
-            	break;
             }
         }
 
         // if you return false, these actions will not be recorded
         return true;
 	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-/*		pages.get(0).loadPic();
-		pages.get(1).loadPic();
-		pages.get(2).loadPic(); /**/
-		pages.get(curpageId).loadPic(true);
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-
-		if (pages != null) { // when destroing activity finish() is called first and destroy pages array
-			pages.get(0).unloadPic();
-			pages.get(1).unloadPic();
-			pages.get(2).unloadPic();
-		}
-	}
-
 }
