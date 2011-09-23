@@ -96,7 +96,7 @@ public class AsyncImageLoader extends Thread {
             } else {
             	if (onlyDownload) {
             		// if files already in cache/library then exit
-                	if ( ((prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_USE_LIB, false)) && (FileStorage.fileExists2(my_submission.getSaveName(my_context)))) || (FileStorage.fileExists2(ImageStorage.getSubmissionImagePath2(my_submission.getCacheName())))) {
+                	if ( ((prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_USE_LIB, false)) && (FileStorage.fileExists(my_submission.getSaveName(my_context)))) || (FileStorage.fileExists(ImageStorage.getSubmissionImagePath(my_submission.getCacheName())))) {
                     	send_result(null); // close progress bar
                 		return;
                 	}
@@ -104,7 +104,7 @@ public class AsyncImageLoader extends Thread {
             	} else {
             		// try to load images from cache/library
                 	if (prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_USE_LIB, false)) {
-                    	bmp = ImageStorage.loadBitmap2(my_submission.getSaveName(my_context), maxsize);
+                    	bmp = ImageStorage.loadBitmap(my_submission.getSaveName(my_context), maxsize);
                 	}
                 	
                 	if (bmp == null) {
@@ -124,7 +124,7 @@ public class AsyncImageLoader extends Thread {
 
                 Log.i(AppConstants.TAG_STRING, "ImageDownloader: Downloading image for id " + my_submission.getId() + " from " + url);
 
-                ContentDownloader.downloadFile2(url, ImageStorage.getSubmissionImagePath2(my_submission.getCacheName()), null);
+                ContentDownloader.downloadFile(url, ImageStorage.getSubmissionImagePath(my_submission.getCacheName()), null);
 
                 if ((!cancelFlag)&&(!onlyDownload)) { // if image load was cancelled or onlyDL then do not load bitmap in memory, just put file to cache for future use 
                 	// read file

@@ -1,6 +1,5 @@
 package com.sofurry.storage;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,12 +30,12 @@ public class ImageStorage {
 	 * The filename of the image to show.
 	 * @return
 	 */
-	public static String getSubmissionImagePath2(String filename) {
-		return FileStorage.getPath2(SUBMISSION_IMAGE_PATH + "/" + filename);
+	public static String getSubmissionImagePath(String filename) {
+		return FileStorage.getPath(SUBMISSION_IMAGE_PATH + "/" + filename);
 	}
 
 	public static Boolean checkSubmissionImage(String filename) {
-		return FileStorage.fileExists2(getSubmissionImagePath2(filename));
+		return FileStorage.fileExists(getSubmissionImagePath(filename));
 	}
 	
 	/**
@@ -46,7 +45,7 @@ public class ImageStorage {
 	 * @return
 	 */
 	public static Bitmap loadSubmissionImage(String relative_filename, int MaxSize) {
-		return loadBitmap2(getSubmissionImagePath2(relative_filename), MaxSize);
+		return loadBitmap(getSubmissionImagePath(relative_filename), MaxSize);
 	}
 	
 //	public static void saveSubmissionImage(int id, Bitmap icon) throws Exception  {
@@ -54,37 +53,37 @@ public class ImageStorage {
 //	}
 	
 	// ================== SubmissionIcon =====================
-	public static String getSubmissionIconPath2(int id) {
-		return FileStorage.getPath2(THUMB_PATH +"/t"+id);
+	public static String getSubmissionIconPath(int id) {
+		return FileStorage.getPath(THUMB_PATH +"/t"+id);
 	}
 
 	public static Boolean checkSubmissionIcon(int id) {
-		return FileStorage.fileExists2(getSubmissionIconPath2(id));
+		return FileStorage.fileExists(getSubmissionIconPath(id));
 	}
 
 	public static Bitmap loadSubmissionIcon(int id) {
-		return loadBitmap2(getSubmissionIconPath2(id), 0);
+		return loadBitmap(getSubmissionIconPath(id), 0);
 	}
 
 	public static void saveSubmissionIcon(int id, Bitmap icon) throws Exception  {
-		saveBitmap2(getSubmissionIconPath2(id), icon);
+		saveBitmap(getSubmissionIconPath(id), icon);
 	}
 
 	// ==================== UserIcon =====================
-	public static String getUserIconPath2(int uid) {
-		return FileStorage.getPath2(AVATAR_PATH + "/a"+uid);
+	public static String getUserIconPath(int uid) {
+		return FileStorage.getPath(AVATAR_PATH + "/a"+uid);
 	}
 
 	public static Boolean checkUserIcon(int uid) {
-		return FileStorage.fileExists2(getUserIconPath2(uid));
+		return FileStorage.fileExists(getUserIconPath(uid));
 	}
 
 	public static Bitmap loadUserIcon(int uid) {
-		return loadBitmap2(getUserIconPath2(uid), 0);
+		return loadBitmap(getUserIconPath(uid), 0);
 	}
 
 	public static void saveUserIcon(int uid, Bitmap icon) throws Exception {
-		saveBitmap2(getUserIconPath2(uid), icon);
+		saveBitmap(getUserIconPath(uid), icon);
 	}
 	
 	
@@ -95,11 +94,11 @@ public class ImageStorage {
 	 * The filename of the icon e.g. avatars/a121212
 	 * @return
 	 */
-	public static Bitmap loadBitmap2(String filename, int MaxSize) {
+	public static Bitmap loadBitmap(String absfilename, int MaxSize) {
 		FileInputStream is = null;
 		Bitmap bitmap = null;
 		try {
-			is = FileStorage.getFileInputStream2(filename);
+			is = FileStorage.getFileInputStream(absfilename);
 			if (is != null && is.available() > 0) {
 				if (MaxSize > 0) {
 					//Decode image size
@@ -123,7 +122,7 @@ public class ImageStorage {
 			        BitmapFactory.Options o2 = new BitmapFactory.Options();
 			        o2.inSampleSize = scale;
 
-					is = FileStorage.getFileInputStream2(filename);
+					is = FileStorage.getFileInputStream(absfilename);
 					bitmap = BitmapFactory.decodeStream(is, null, o2);
 
 				} else {
@@ -151,16 +150,16 @@ public class ImageStorage {
 	
 	/**
 	 * Saves an icon into the specified path
-	 * @param filename
+	 * @param filename (absolute path)
 	 * file name e.G. images/somedragon.jpg
 	 * @param icon
 	 * @throws Exception
 	 */
-	private static void saveBitmap2(String filename, Bitmap icon) throws Exception{
-		if (icon == null) throw new Exception("Attempt to store null icon for " + filename);
+	private static void saveBitmap(String absfilename, Bitmap icon) throws Exception{
+		if (icon == null) throw new Exception("Attempt to store null icon for " + absfilename);
 		FileOutputStream os = null;
 		try {
-			os = FileStorage.getFileOutputStream2(filename);
+			os = FileStorage.getFileOutputStream(absfilename);
 			if (os != null) {
 				icon.compress(CompressFormat.JPEG, 80, os);
 			} else {
@@ -178,7 +177,7 @@ public class ImageStorage {
 				}
 			}
 		}
-		Log.d(AppConstants.TAG_STRING, "ImageStorage: Icon saved " + filename);
+		Log.d(AppConstants.TAG_STRING, "ImageStorage: Icon saved " + absfilename);
 	}
 	
 	/**
@@ -186,7 +185,7 @@ public class ImageStorage {
 	 * @throws Exception
 	 */
 	public static void cleanupImages() throws Exception {
-		FileStorage.cleanup2(FileStorage.getPath2(SUBMISSION_IMAGE_PATH + "/"));
+		FileStorage.cleanup(FileStorage.getPath(SUBMISSION_IMAGE_PATH + "/"));
 	}
 	
 	

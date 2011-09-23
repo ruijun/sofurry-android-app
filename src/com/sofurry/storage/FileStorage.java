@@ -35,18 +35,18 @@ public class FileStorage {
 	 * The filename to complete with path
 	 * @return
 	 */
-	public static String getPath2(String filename) {
+	public static String getPath(String filename) {
 		return getPathRoot()+filename;
 	}
 	
 	/**
 	 * Returns a readymade fileoutput stream to store the file into
-	 * @param filename
+	 * @param filename (absolute file name)
 	 * @return
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unused")
-	public static FileOutputStream getFileOutputStream2(String filename) throws Exception {
+	public static FileOutputStream getFileOutputStream(String absfilename) throws Exception {
 		checkExternalMedia();
 		if (!mExternalStorageWriteable) {
 			Log.i(AppConstants.TAG_STRING, "FileStorage: External storage not writeable");
@@ -55,11 +55,11 @@ public class FileStorage {
 
 		// Check if our datapath exists
 //		File d = new File(getPath(filename));
-		File d = new File(filename);
+		File d = new File(absfilename);
 		ensureDirectory(d.getParent());
 				
 //		File f = new File(getPath(filename));
-		File f = new File(filename);
+		File f = new File(absfilename);
 		//if (f.canWrite()) {
 		//	Log.i("FileStorage", "writing file "+filename);
 		FileOutputStream fo = new FileOutputStream(f);
@@ -84,15 +84,15 @@ public class FileStorage {
 	
 	/**
 	 * Returns true, if the file in question exists
-	 * @param filename
+	 * @param filename (absolute file path)
 	 * The file's filename
 	 * @return
 	 * @throws IOException <- what for? if we can't open/access file then it does not exists for us
 	 */
-	public static boolean fileExists2(String filename) {
+	public static boolean fileExists(String absfilename) {
 		try {
 //			File f = new File(getPath(filename));
-			File f = new File(filename);
+			File f = new File(absfilename);
 			
 			return f.exists();
 		} catch (Exception e) {
@@ -100,18 +100,18 @@ public class FileStorage {
 		}
 	}
 
-	public static FileInputStream getFileInputStream2(String filename) throws Exception {
+	public static FileInputStream getFileInputStream(String absfilename) throws Exception {
 		checkExternalMedia();
 		if (!mExternalStorageAvailable) {
 			Log.i(AppConstants.TAG_STRING, "FileStorage: External storage not readable");
 			return null;
 		}
 		
-		File f = new File(filename);
+		File f = new File(absfilename);
 		if (f.canRead()) {
 			return new FileInputStream(f);
 		} else {
-			Log.i(AppConstants.TAG_STRING, "FileStorage: Can't read file "+filename);
+			Log.i(AppConstants.TAG_STRING, "FileStorage: Can't read file "+absfilename);
 		}
 		return null;
 	}
@@ -175,14 +175,13 @@ public class FileStorage {
     }
 	
 	/**
-	 * Deletes all contained files in indicated path
+	 * Deletes all contained files in indicated path (absolute path)
 	 * @param path
 	 * The path to clean e.g. images/
 	 * @throws Exception
 	 */
-	public static void cleanup2(String path) throws Exception {
+	public static void cleanup(String abspath) throws Exception {
 //		String abspath = FileStorage.getPath(path);
-		String abspath = path;
 		
 		File f = new File(abspath);
 		File[] tokill = f.listFiles();
@@ -194,7 +193,7 @@ public class FileStorage {
 	}
 	
 	public static void cleanMusic() throws Exception {
-		cleanup2(FileStorage.getPath2(MUSIC_PATH));
+		cleanup(FileStorage.getPath(MUSIC_PATH));
 	}
 	
 	/**

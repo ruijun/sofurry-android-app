@@ -10,8 +10,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
-import android.util.Log;
-
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IHasThumbnail;
 import com.sofurry.requests.ContentDownloader;
@@ -123,21 +121,13 @@ public class Submission implements Serializable, IHasThumbnail {
 		}
 	} /**/
 
-/*	public void loadIconFromStorage() {
-		if (type == SUBMISSION_TYPE.ARTWORK) {
-			thumbnail = ImageStorage.loadSubmissionIcon(getId());
-		} else {
-			thumbnail = ImageStorage.loadUserIcon(getAuthorID());
-		}
-	} /**/
-	
 	public Bitmap loadIconFromStorage() {
 		if (type == SUBMISSION_TYPE.ARTWORK) {
 			return ImageStorage.loadSubmissionIcon(getId());
 		} else {
 			return ImageStorage.loadUserIcon(getAuthorID());
 		}
-	} /**/
+	}
 
 /*	public void storeIcon() throws Exception {
 		if (type == SUBMISSION_TYPE.ARTWORK) {
@@ -173,16 +163,15 @@ public class Submission implements Serializable, IHasThumbnail {
 
 		if (type == SUBMISSION_TYPE.ARTWORK) {
 			if (!ImageStorage.checkSubmissionIcon(getId()) ) {
-				ContentDownloader.downloadFile2(thumbnailUrl, ImageStorage.getSubmissionIconPath2(getId()), null);
+				ContentDownloader.downloadFile(thumbnailUrl, ImageStorage.getSubmissionIconPath(getId()), null);
 			}
 		} else {
 			if (! ImageStorage.checkUserIcon(getAuthorID()) ) {
-				ContentDownloader.downloadFile2(thumbnailUrl, ImageStorage.getUserIconPath2(getAuthorID()), null);
+				ContentDownloader.downloadFile(thumbnailUrl, ImageStorage.getUserIconPath(getAuthorID()), null);
 			}
 		}
 			
 	}
-	
 	
 	/**
 	 * Returns the number of attempts that were used to get the thumbnail
