@@ -77,8 +77,8 @@ public class ContentDownloader {
 	 * @param req
 	 * The request handler to signal arrival to
 	 */
-	public static AsyncFileDownloader asyncDownload2(String url, String filename, IRequestHandler req) {
-		return AsyncFileDownloader.doRequest2(req, url, filename, AppConstants.REQUEST_ID_DOWNLOADFILE);
+	public static AsyncFileDownloader asyncDownload2(String url, String absfilename, IRequestHandler req) {
+		return AsyncFileDownloader.doRequest2(req, url, absfilename, AppConstants.REQUEST_ID_DOWNLOADFILE);
 	}
 	
 	/**
@@ -93,7 +93,7 @@ public class ContentDownloader {
 	 * The Thread this is called from. If it exists, it can be checked for cancelation requests
 	 * @throws Exception
 	 */
-	public static void downloadFile2(String url, String filename, IRequestHandler feedback) throws Exception {
+	public static void downloadFile(String url, String absfilename, IRequestHandler feedback) throws Exception {
 		Log.d(AppConstants.TAG_STRING, "ContentDownloader: Fetching file...");
 		URL myImageURL = new URL(HttpRequest.encodeURL(url));
 		HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
@@ -104,7 +104,7 @@ public class ContentDownloader {
 		//int len = connection.getContentLength(); // Maybe one needs to do this nowerdays. How am I supposed to know?
 		//Log.d("contDown", "contentType" + connection.getContentType() + " / " + connection.getContentLength());
 		InputStream is = connection.getInputStream();
-		FileOutputStream os = FileStorage.getFileOutputStream2(filename);
+		FileOutputStream os = FileStorage.getFileOutputStream(absfilename);
 		int t = 0; // Total bytes transfered
 		int l = 0;
 		try {

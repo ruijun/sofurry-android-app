@@ -94,12 +94,11 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 		Log.i(AppConstants.TAG_STRING, "GalleryArt: Viewing art ID: " + s.getId());
 		Intent i = new Intent(this, ViewArtActivity.class);
 		s.feedIntent(i);
-//		man.getResultList().get(selectedIndex).feedIntent(i); // duplicate feedIntent from same submission
-		
 		// allow viewer to know submissions list
 		i.putExtra("list", man.getResultList()); 
 		i.putExtra("listId", selectedIndex); 
 //		i.putExtra("manager", man); 
+//		man.getResultList().get(selectedIndex).feedIntent(i); // duplicate feedIntent from same submission
 		startActivity(i);
 	}
 

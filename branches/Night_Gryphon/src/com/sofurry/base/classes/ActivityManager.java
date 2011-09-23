@@ -1,6 +1,5 @@
 package com.sofurry.base.classes;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.json.JSONObject;
@@ -8,8 +7,6 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -339,6 +336,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		else
 			Toast.makeText(getAct().getApplicationContext(), "Fetching next page", Toast.LENGTH_SHORT).show();
 		
+		//ToDo myAct is not always activity. Replace this hack with clean code to set activity title 
 		if (currentTitle.length() > 0) {
 			((Activity) myAct).setTitle(currentTitle);
 		}

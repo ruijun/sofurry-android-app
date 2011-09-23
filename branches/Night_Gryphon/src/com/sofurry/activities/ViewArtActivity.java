@@ -321,7 +321,7 @@ public class ViewArtActivity
 	    public void save() {
 	        try {
 	            // source file in cache
-	            File f = new File(ImageStorage.getSubmissionImagePath2(submission.getCacheName()));
+	            File f = new File(ImageStorage.getSubmissionImagePath(submission.getCacheName()));
 	            if (! f.exists()) {
 	                throw new Exception("File has not downloaded properly yet. File does not exist.");
 	            }
@@ -428,7 +428,7 @@ public class ViewArtActivity
 		} 
     	
     	if ( (f == null) || (!f.exists())) {
-    		f = new File(ImageStorage.getSubmissionImagePath2(s.getCacheName()));
+    		f = new File(ImageStorage.getSubmissionImagePath(s.getCacheName()));
     		if (!f.exists()) {
     			return;    // Until that file exists, there is nothing we can do really.
     		}

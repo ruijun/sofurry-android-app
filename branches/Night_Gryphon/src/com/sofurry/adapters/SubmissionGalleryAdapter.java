@@ -5,12 +5,9 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.PaintDrawable;
-import android.graphics.drawable.ShapeDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,7 +103,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
             		((BitmapDrawable) toRecycle).getBitmap().recycle();
             	}
                 holder.image.setImageBitmap(null);
-            } /**/
+            }
         }
 
         Bitmap thumb = items.get(position).getThumbnail();
@@ -117,7 +114,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
 
         if (enableLayoutItems) {
         	try {
-        		if (FileStorage.fileExists2(items.get(position).getSaveName(context))) {
+        		if (FileStorage.fileExists(items.get(position).getSaveName(context))) {
         			holder.saved_indicator.setVisibility(View.VISIBLE);
         		} else {
         			holder.saved_indicator.setVisibility(View.INVISIBLE);
@@ -131,8 +128,6 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
         	} else {
         		bg.setStroke(1, 0xFF2C0000);
         	}
-//        	Paint pa = bg.getPaint();
-//        	pa.setColor(0x0000FF00);
         }
         
         return convertView;
