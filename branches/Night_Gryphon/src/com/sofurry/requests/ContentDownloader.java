@@ -77,8 +77,8 @@ public class ContentDownloader {
 	 * @param req
 	 * The request handler to signal arrival to
 	 */
-	public static AsyncFileDownloader asyncDownload2(String url, String absfilename, IRequestHandler req) {
-		return AsyncFileDownloader.doRequest2(req, url, absfilename, AppConstants.REQUEST_ID_DOWNLOADFILE);
+	public static AsyncFileDownloader asyncDownload(String url, String absfilename, IRequestHandler req) {
+		return AsyncFileDownloader.doRequest(req, url, absfilename, AppConstants.REQUEST_ID_DOWNLOADFILE);
 	}
 	
 	/**
