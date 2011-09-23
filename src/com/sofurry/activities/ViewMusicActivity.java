@@ -216,7 +216,7 @@ public class ViewMusicActivity extends FavableActivity  {
 		
 		pbh.hideProgressDialog();
 		pbh.showProgressDialog("Downloading Song...");
-		down = ContentDownloader.asyncDownload2(tmp, FileStorage.getPath(FileStorage.MUSIC_PATH + getFname()), requesthandler);
+		down = ContentDownloader.asyncDownload(tmp, FileStorage.getPath(FileStorage.MUSIC_PATH + getFname()), requesthandler);
 	}
 	
 	/**
