@@ -30,7 +30,7 @@ public class FileStorage {
 	}
 	
 	/**
-	 * Returns the complete filename to the app storage
+	 * Returns the complete filename to the app storage (inside app working/temp/cache dir)
 	 * @param filename
 	 * The filename to complete with path
 	 * @return
@@ -41,12 +41,12 @@ public class FileStorage {
 	
 	/**
 	 * Returns a readymade fileoutput stream to store the file into
-	 * @param filename
+	 * @param filename (absolute file name)
 	 * @return
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unused")
-	public static FileOutputStream getFileOutputStream(String filename) throws Exception {
+	public static FileOutputStream getFileOutputStream(String absfilename) throws Exception {
 		checkExternalMedia();
 		if (!mExternalStorageWriteable) {
 			Log.i(AppConstants.TAG_STRING, "FileStorage: External storage not writeable");
@@ -54,10 +54,12 @@ public class FileStorage {
 		}
 
 		// Check if our datapath exists
-		File d = new File(getPath(filename));
+//		File d = new File(getPath(filename));
+		File d = new File(absfilename);
 		ensureDirectory(d.getParent());
 				
-		File f = new File(getPath(filename));
+//		File f = new File(getPath(filename));
+		File f = new File(absfilename);
 		//if (f.canWrite()) {
 		//	Log.i("FileStorage", "writing file "+filename);
 		FileOutputStream fo = new FileOutputStream(f);
@@ -82,29 +84,34 @@ public class FileStorage {
 	
 	/**
 	 * Returns true, if the file in question exists
-	 * @param filename
+	 * @param filename (absolute file path)
 	 * The file's filename
 	 * @return
-	 * @throws IOException
+	 * @throws IOException <- what for? if we can't open/access file then it does not exists for us
 	 */
-	public static boolean fileExists(String filename) throws IOException {
-		File f = new File(getPath(filename));
-		
-		return f.exists();
+	public static boolean fileExists(String absfilename) {
+		try {
+//			File f = new File(getPath(filename));
+			File f = new File(absfilename);
+			
+			return f.exists();
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
-	public static FileInputStream getFileInputStream(String filename) throws Exception {
+	public static FileInputStream getFileInputStream(String absfilename) throws Exception {
 		checkExternalMedia();
 		if (!mExternalStorageAvailable) {
 			Log.i(AppConstants.TAG_STRING, "FileStorage: External storage not readable");
 			return null;
 		}
 		
-		File f = new File(getPath(filename));
+		File f = new File(absfilename);
 		if (f.canRead()) {
 			return new FileInputStream(f);
 		} else {
-			Log.i(AppConstants.TAG_STRING, "FileStorage: Can't read file "+filename);
+			Log.i(AppConstants.TAG_STRING, "FileStorage: Can't read file "+absfilename);
 		}
 		return null;
 	}
@@ -168,13 +175,13 @@ public class FileStorage {
     }
 	
 	/**
-	 * Deletes all contained files in indicated path
+	 * Deletes all contained files in indicated path (absolute path)
 	 * @param path
 	 * The path to clean e.g. images/
 	 * @throws Exception
 	 */
-	public static void cleanup(String path) throws Exception {
-		String abspath = FileStorage.getPath(path);
+	public static void cleanup(String abspath) throws Exception {
+//		String abspath = FileStorage.getPath(path);
 		
 		File f = new File(abspath);
 		File[] tokill = f.listFiles();
@@ -186,7 +193,7 @@ public class FileStorage {
 	}
 	
 	public static void cleanMusic() throws Exception {
-		cleanup(MUSIC_PATH);
+		cleanup(FileStorage.getPath(MUSIC_PATH));
 	}
 	
 	/**
@@ -217,5 +224,36 @@ public class FileStorage {
 		}
 		return sb.toString();
 	}
+
+    /**
+     * Method description
+     *
+     *
+     * @param fileName
+     *
+     * @return
+     */
+    public static String sanitizeFileName(String fileName) {
+        // Remove non-permitted characters
+        return sanitizeFileName(fileName, false);
+    }
+
+    /**
+     * Method description
+     *
+     *
+     * @param fileName
+     * @param blockDots
+     *
+     * @return
+     */
+    public static String sanitizeFileName(String fileName, boolean blockDots) {
+        if (blockDots) {
+            return fileName.replaceAll("[$\\/?%*:.|<>\"]", "_").trim();
+        } else {
+            return fileName.replaceAll("[$\\/?%*:|<>\"]", "_").trim();
+        }
+    }
+
 	
 }

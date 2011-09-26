@@ -64,7 +64,7 @@ public class ThumbnailDownloaderThread extends Thread {
 					if (s.getThumbAttempts() > 3) continue;  // We will give up after trying to fetch the thumbnail 3 times
 					
 					// The IHasThumbnail object will know what to do
-					if (s.getThumbnail() == null)
+					if (!s.checkThumbnail())
 					  try {
 						  s.populateThumbnail(fastmode);
 					  } catch (Exception e) {
@@ -72,7 +72,7 @@ public class ThumbnailDownloaderThread extends Thread {
 					  }
 					
 					// If fetching of one thumbnail fails, we will try the whole list again
-					if (s.getThumbnail() == null)
+					if (!s.checkThumbnail())
 						tryAgain = true;
 					
 					//Don't refresh more often than once every 4 seconds

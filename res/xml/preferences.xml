@@ -35,6 +35,7 @@
 			android:dialogTitle="Choose Interval. Smaller values will drain the battery faster."
 			android:entries="@array/interval_titles"
 			android:entryValues="@array/interval_values" />
+		
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="Image Library"
@@ -50,5 +51,10 @@
 			android:title="Do not use 'extreme'"
 			android:summary="Use only 'clean' and 'adult' for level"
 			android:defaultValue="false" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="Submission Viewer"><ListPreference android:key="useHDImg" android:entries="@array/useHD_titles" android:entryValues="@array/useHD_values" android:title="Use HD images" android:dialogTitle="Choose when to use HD images" android:summary="Controls when to download HD images" android:defaultValue="0"></ListPreference>
+		<CheckBoxPreference android:defaultValue="true" android:key="imgCheckSaved" android:title="Show if image already saved in library" android:summaryOn="Will show saved status" android:summaryOff="Will NOT show saved status"></CheckBoxPreference>
+		<ListPreference android:title="Side menu position" android:key="imgMenuPosition" android:entries="@array/imgMenuPosition_titles" android:summary="position of always visible fast buttons bar" android:dialogTitle="Choose menu bar position" android:defaultValue="1" android:entryValues="@array/imgMenuPosition_values"></ListPreference>
+		<CheckBoxPreference android:summaryOn="Load library images" android:summaryOff="Download image" android:summary="Try use library image before download" android:title="Show images from library" android:key="imgLoadFromLib" android:defaultValue="true"></CheckBoxPreference>
 	</PreferenceCategory>
 </PreferenceScreen>
