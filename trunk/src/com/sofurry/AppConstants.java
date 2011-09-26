@@ -42,6 +42,10 @@ public class AppConstants {
      */
     public static final String PREFERENCE_IMAGE_FILE_NAME_TMPL      = "imgFileNameTemplate";
     public static final String PREFERENCE_IMAGE_TMPL_USE_ONLY_ADULT = "imgFileNameTemplateUseAdultForExtreme";
+    public static final String PREFERENCE_IMAGE_CHECK_SAVED         = "imgCheckSaved";
+    public static final String PREFERENCE_IMAGE_USE_LIB         	= "imgLoadFromLib";
+    public static final String PREFERENCE_IMAGE_MENU_POSITION       = "imgMenuPosition";
+    public static final String PREFERENCE_USE_HD_IMAGES      		= "useHDImg";
     public static final String PREFERENCE_LAST_LAUNCH_VERSION       = "lastLaunchVersion";
     public static final String PREFERENCE_LAST_PM_CHECK_TIME        = "lastpmchecktime";
     public static final String PREFERENCE_PASSWORD                  = "password";
@@ -131,6 +135,7 @@ public class AppConstants {
     public static final int MENU_FILTER_WATCHLIST          = 9090903;
     public static final int MENU_FILTER_WATCHLIST_COMBINED = 9090905;
     public static final int MENU_HD                        = 4204;
+    public static final int MENU_REFRESH                   = 4213;
     public static final int MENU_PLAY                      = 4205;
     public static final int MENU_RATE                      = 4300;
     public static final int MENU_RATE1                     = 4301;
@@ -165,6 +170,7 @@ public class AppConstants {
     public static final int REQUEST_ID_CUM                 = 4508;
     public static final int REQUEST_ID_DOWNLOADFILE        = 4510;
     public static final int REQUEST_ID_DOWNLOADIMAGE       = 4511;
+    public static final int REQUEST_ID_ASYNCDOWNLOADIMAGE  = 4514;
     public static final int REQUEST_ID_FAV                 = 4506;
     public static final int REQUEST_ID_FETCHCONTENT        = 4503;
     public static final int REQUEST_ID_FETCHDATA           = 4505;

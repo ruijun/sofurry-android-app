@@ -216,7 +216,7 @@ public class ViewMusicActivity extends FavableActivity  {
 		
 		pbh.hideProgressDialog();
 		pbh.showProgressDialog("Downloading Song...");
-		down = ContentDownloader.asyncDownload(tmp, FileStorage.MUSIC_PATH + getFname(), requesthandler);
+		down = ContentDownloader.asyncDownload(tmp, FileStorage.getPath(FileStorage.MUSIC_PATH + getFname()), requesthandler);
 	}
 	
 	/**
@@ -292,7 +292,7 @@ public class ViewMusicActivity extends FavableActivity  {
 			File f = new File(playPath);
 			if (!f.exists()) throw new Exception("File does not exist, try to download again.");
 			
-			String targetPath = FileStorage.getUserStoragePath("Music", sanitizeFileName(filename));
+			String targetPath = FileStorage.getUserStoragePath("Music", FileStorage.sanitizeFileName(filename));
 
 			File tf = new File(targetPath);
 			FileStorage.ensureDirectory(tf.getParent());

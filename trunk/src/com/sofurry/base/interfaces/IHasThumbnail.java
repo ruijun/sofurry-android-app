@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
  */
 public interface IHasThumbnail {
 
+	Boolean checkThumbnail();
 	Bitmap getThumbnail();
 	void populateThumbnail(boolean fastmode) throws Exception;
 	byte getThumbAttempts();

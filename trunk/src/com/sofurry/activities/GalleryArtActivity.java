@@ -58,6 +58,7 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 	 */
 	public static void jsonToResultlist(JSONObject obj, ActivityManager<Submission> man, SUBMISSION_TYPE typ) throws JSONException {
 		JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
+		man.totalPages = Integer.parseInt(obj.getString("totalpages"));
 		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
 		for (int i = 0; i < items.length(); i++) {
 			Submission s = new Submission();
@@ -90,13 +91,14 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 	@Override
 	public void setSelectedIndex(int selectedIndex) {
 		Submission s = getDataItem(selectedIndex);
-//		int pageID = Integer.parseInt(man.getPageIDs().get(selectedIndex));
 		Log.i(AppConstants.TAG_STRING, "GalleryArt: Viewing art ID: " + s.getId());
 		Intent i = new Intent(this, ViewArtActivity.class);
 		s.feedIntent(i);
-//		i.putExtra("pageID", s.getId());
-//		i.putExtra("name", s.getName());
-		man.getResultList().get(selectedIndex).feedIntent(i);
+		// allow viewer to know submissions list
+		i.putExtra("list", man.getResultList()); 
+		i.putExtra("listId", selectedIndex); 
+//		i.putExtra("manager", man); 
+//		man.getResultList().get(selectedIndex).feedIntent(i); // duplicate feedIntent from same submission
 		startActivity(i);
 	}
 
