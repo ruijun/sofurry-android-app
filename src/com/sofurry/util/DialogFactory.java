@@ -21,7 +21,6 @@ public class DialogFactory {
 		// And finally set the remaining options
 		builder.setCancelable(false)
 		       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
 					}

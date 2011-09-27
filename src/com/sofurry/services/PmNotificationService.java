@@ -82,7 +82,6 @@ public class PmNotificationService
      *
      * @throws Exception
      */
-    @Override
     public void onData(int id, JSONObject obj) throws Exception {
         if (id == AppConstants.REQUEST_ID_FETCHDATA) {
             int messageCount = obj.getInt("unreadpmcount");
@@ -144,7 +143,6 @@ public class PmNotificationService
      * @param id
      * @param e
      */
-    @Override
     public void onError(int id, Exception e) {
         Log.e(AppConstants.TAG_STRING, "Error occurred: " + e.getLocalizedMessage());
     }
@@ -158,7 +156,6 @@ public class PmNotificationService
      *
      * @throws Exception
      */
-    @Override
     public void onOther(int id, Object obj) throws Exception {
         Log.w(AppConstants.TAG_STRING, "Unexpected object type: " + obj.getClass().getName() + " received");
     }
@@ -172,7 +169,6 @@ public class PmNotificationService
      *
      * @throws Exception
      */
-    @Override
     public void onProgress(int id, ProgressSignal prg) throws Exception {
         // Might place some logging stuff here if needed...
     }
@@ -183,7 +179,6 @@ public class PmNotificationService
      *
      * @throws Exception
      */
-    @Override
     public void refresh() throws Exception {
         // Nothing to do here
     }

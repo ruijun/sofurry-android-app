@@ -241,7 +241,6 @@ public class ViewPMActivity
      * Changes the drawer's handle graphics, as well as closes the soft keyboard
      *
      */
-    @Override
     public void onDrawerClosed() {
         if (isOrientationLandscape()) {
             drawerHandle_.setImageResource(R.drawable.reply_land);
@@ -259,7 +258,6 @@ public class ViewPMActivity
      * Changes the drawer's handle graphics
      *
      */
-    @Override
     public void onDrawerOpened() {
         if (isOrientationLandscape()) {
             drawerHandle_.setImageResource(R.drawable.reply_land_close);

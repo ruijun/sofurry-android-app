@@ -622,7 +622,6 @@ public class ViewArtActivity
 	}
 
 
-	@Override
 	public boolean onPreDraw() {
 		findViewById(R.id.viewFlipper1).getViewTreeObserver().removeOnPreDrawListener(this);
 		pages.get(curpageId).loadPic(true);
@@ -944,7 +943,6 @@ public class ViewArtActivity
 	}
 	
 
-	@Override
 	public boolean onTouch(View arg0, MotionEvent arg1) {
         // Get the action that was done on this touch event
         switch (arg1.getAction() & MotionEvent.ACTION_MASK)
