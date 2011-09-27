@@ -68,7 +68,6 @@ public class SettingsActivity
      * @param sharedPreferences
      * @param key
      */
-    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if ((key.equals(AppConstants.PREFERENCE_PM_CHECK_INTERVAL))
                 || (key.equals(AppConstants.PREFERENCE_PM_ENABLE_CHECKS))) {
