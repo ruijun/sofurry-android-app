@@ -34,6 +34,7 @@ public class Submission implements Serializable, IHasThumbnail {
 	private String date;
 	private String thumbnailUrl;
 	private String SavedNameCache = "";
+	private String saveFilename;
 
 	private byte attempts = 0;
 	
@@ -102,7 +103,13 @@ public class Submission implements Serializable, IHasThumbnail {
 		this.thumbnailUrl = thumbnailUrl;
 	}
 	
-//	public String getFilenameUrl() {
+	public String getSaveFilename() {
+		return saveFilename;
+	}
+	public void setSaveFilename(String saveFilename) {
+		this.saveFilename = saveFilename;
+	}
+	//	public String getFilenameUrl() {
 //		return filenameUrl;
 //	}
 	/* (non-Javadoc)
@@ -199,7 +206,7 @@ public class Submission implements Serializable, IHasThumbnail {
 
         // filename must have correct extension. not sure is it true or not
 //        String targetPath = fileNameTmpl + '.' + filename.substring(filename.lastIndexOf('.') + 1);
-        String targetPath = fileNameTmpl + HttpRequest.extractExtension(getThumbnailUrl());
+        String targetPath = fileNameTmpl + HttpRequest.extractExtension(getSaveFilename());
 
         /*
          *  sanitizeFileName removes '/' character so separately sanitize every unsecure data field that comes from
@@ -236,11 +243,11 @@ public class Submission implements Serializable, IHasThumbnail {
     }
 
     public String getPreviewURL() {
-		return thumbnailUrl.replace("/thumbnails/", "/preview/");
+		return "http://beta.sofurry.com/std/preview?page="+getId();
 	}
 	
 	public String getFullURL() {
-		return thumbnailUrl.replace("/art/thumbnails/", "/content/" + getId() + ".jpg/");
+		return "http://beta.sofurry.com/std/content?page="+getId();
 	}
 	
 	/**
@@ -257,7 +264,8 @@ public class Submission implements Serializable, IHasThumbnail {
 		setAuthorID(Integer.parseInt(datasource.getString("authorId")));
 		setContentLevel(datasource.getString("contentLevel"));
 		setTags(datasource.getString("keywords"));
-		setThumbnailUrl(datasource.getString("thumb"));
+		setThumbnailUrl("http://beta.sofurry.com/std/thumb?page="+getId());
+		setSaveFilename(datasource.getString("thumb"));
 //		if (type == SUBMISSION_TYPE.MUSIC) {
 //			filenameUrl = datasource.getString("filename");
 //		}
