@@ -757,6 +757,7 @@ public class ViewArtActivity
 				pages.get(nextpage).loadPic(false); // preload file, do not load bitmap
 			} else {
 				// fetch next page 
+				// TODO Add code to load next page (pass man from GalleryArt?)
 //				man.forceLoadNext(); // can't pass man through intent :(
 			}
 			
