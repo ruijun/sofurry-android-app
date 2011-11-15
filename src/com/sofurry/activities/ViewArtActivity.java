@@ -721,7 +721,7 @@ public class ViewArtActivity
 
 	public boolean showNext() {
 		if (submissions_index < submissions_list.size()-1) {
-			long t = System.currentTimeMillis(); // DEBUG
+//			long t = System.currentTimeMillis(); // DEBUG
 			
 			submissions_index ++;
 			assignSubmission(submissions_list.get(submissions_index));
@@ -732,7 +732,7 @@ public class ViewArtActivity
 			if (curpageId > 2) {
 				curpageId = 0;
 			}
-			long tt1 = System.currentTimeMillis() - t; // DEBUG
+//			long tt1 = System.currentTimeMillis() - t; // DEBUG
 
 			// reset image transformations
 			matrix.reset();
@@ -741,8 +741,8 @@ public class ViewArtActivity
 			// start load image
 			pages.get(curpageId).loadPic(true);
 			
-			long tt2 = System.currentTimeMillis() - t; // DEBUG
-			long tt3 = 0;// DEBUG
+//			long tt2 = System.currentTimeMillis() - t; // DEBUG
+//			long tt3 = 0;// DEBUG
 
 			 // preload next image
 			int nextpage = curpageId + 1;
@@ -752,7 +752,7 @@ public class ViewArtActivity
 			
 			if (submissions_index < submissions_list.size()-1) {
 				pages.get(nextpage).setSubmission(submissions_list.get(submissions_index+1));
-			 tt3 = System.currentTimeMillis() - t; // DEBUG
+//			 tt3 = System.currentTimeMillis() - t; // DEBUG
 				pages.get(nextpage).loadPic(false); // preload file, do not load bitmap
 			} else {
 				// fetch next page 
@@ -760,7 +760,7 @@ public class ViewArtActivity
 //				man.forceLoadNext(); // can't pass man through intent :(
 			}
 			
-			 long tt4 = System.currentTimeMillis() - t; // DEBUG
+//			 long tt4 = System.currentTimeMillis() - t; // DEBUG
 	        // Get a reference to the ViewFlipper
 	        ViewFlipper vf = (ViewFlipper) findViewById(R.id.viewFlipper1);
 	         // Set the animation
@@ -771,8 +771,8 @@ public class ViewArtActivity
 	         
 			 pages.get(oldpageId).unloadPic();
 			
-			 long tt5 = System.currentTimeMillis() - t; // DEBUG
-			 t = tt1 + tt2 + tt3 + tt4 + tt5; // DEBUG
+//			 long tt5 = System.currentTimeMillis() - t; // DEBUG
+//			 t = tt1 + tt2 + tt3 + tt4 + tt5; // DEBUG
 			 return true;
 		}
 		return false;
