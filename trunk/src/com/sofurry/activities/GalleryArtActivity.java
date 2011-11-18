@@ -6,6 +6,9 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.BaseAdapter;
 
@@ -121,6 +124,15 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 			ErrorHandler.justLogError(e);
 		}
 		super.finish();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		
+        SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(this);
+		galleryView.setColumnWidth(prefs.getInt(AppConstants.PREFERENCE_THUMB_SIZE, 130));
 	}
 	
 	

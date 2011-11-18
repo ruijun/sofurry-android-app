@@ -3,11 +3,13 @@ package com.sofurry.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.model.Submission;
 import com.sofurry.storage.FileStorage;
@@ -79,9 +82,10 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
             
             convertView.setTag(holder);
 
-            int mThumbSize;
+            SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(context);
+            int mThumbSize = prefs.getInt(AppConstants.PREFERENCE_THUMB_SIZE, 130);
             float scale = context.getResources().getDisplayMetrics().density;
-            mThumbSize = (int) (130 * scale + 0.5f);
+            mThumbSize = (int) (mThumbSize * scale + 0.5f);
             mThumbSize= mThumbSize + 5;
             
             convertView.setLayoutParams(new GridView.LayoutParams(mThumbSize, mThumbSize));
