@@ -75,6 +75,7 @@ public class ViewArtActivity
 		private Boolean   imageLoaded = false;
 		private ImageView image = null; 
 		private ImageView savedIndicator = null;
+		private ImageView playIndicator = null;
 		private TextView  InfoText = null;
 		private View 	  loadingIndicator = null;
 		private View	  myview = null;	
@@ -186,6 +187,7 @@ public class ViewArtActivity
 			
             // start load thread
            	loadingIndicator.setVisibility(View.VISIBLE);
+			playIndicator.setVisibility(View.INVISIBLE);
             imageLoader = AsyncImageLoader.doLoad(context, this, submission, false, ! showImage, useOriginalScale);
 		}
 
@@ -229,6 +231,7 @@ public class ViewArtActivity
 			}
 			
            	loadingIndicator.setVisibility(View.VISIBLE);
+			playIndicator.setVisibility(View.INVISIBLE);
             imageLoader = AsyncImageLoader.doLoad(context, this, submission, true, false, useOriginalScale);
 		}
 		
@@ -244,6 +247,11 @@ public class ViewArtActivity
 			// load finished
            	loadingIndicator.setVisibility(View.INVISIBLE);
 			imageLoader = null;
+			
+			// show play indicator
+			if (submission.isVideo()) {
+				playIndicator.setVisibility(View.VISIBLE);
+			}
 
 			// if no bitmap loaded or error
 			if ((obj == null)||(! (obj instanceof Bitmap))) {
@@ -296,6 +304,9 @@ public class ViewArtActivity
             
             if (imageLoader != null) {
             	loadingIndicator.setVisibility(View.VISIBLE);
+				playIndicator.setVisibility(View.INVISIBLE);
+            } else if ((submission != null) && (submission.isVideo())) {
+				playIndicator.setVisibility(View.VISIBLE);
             }
 
             // set titles and indicators
@@ -438,7 +449,11 @@ public class ViewArtActivity
     	Intent intent = new Intent();
 
     	intent.setAction(android.content.Intent.ACTION_VIEW);
-    	intent.setDataAndType(Uri.fromFile(f), "image/*");
+    	if (s.FileExt.equals(".swf")) {
+        	intent.setDataAndType(Uri.fromFile(f), "video/*");
+    	} else {
+        	intent.setDataAndType(Uri.fromFile(f), "image/*");
+    	}
     	startActivity(intent);
     }
 
@@ -466,6 +481,7 @@ public class ViewArtActivity
         curpage.InfoText = (TextView) findViewById(R.id.InfoText1);
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator1);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator1);
+        curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator1);
         pages.add(curpage);
 
         curpage = new PageHolder(this);
@@ -474,6 +490,7 @@ public class ViewArtActivity
         curpage.InfoText = (TextView) findViewById(R.id.InfoText2);
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator2);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator2);
+        curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator2);
         pages.add(curpage);
 
         curpage = new PageHolder(this);
@@ -482,6 +499,7 @@ public class ViewArtActivity
         curpage.InfoText = (TextView) findViewById(R.id.InfoText3);
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator3);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator3);
+        curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator3);
         pages.add(curpage);
         
         curpage = pages.get(0);

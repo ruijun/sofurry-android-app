@@ -55,6 +55,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
     private class ViewHolder {
         public ImageView image = null;
         public ImageView saved_indicator = null;
+        public ImageView video_indicator = null;
     }
 
     // create a new ImageView for each item referenced by the Adapter
@@ -69,6 +70,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
 
             	holder.image = (ImageView) convertView.findViewById(R.id.art_gallery_item_image);
             	holder.saved_indicator = (ImageView) convertView.findViewById(R.id.art_gallery_item_save_indicator);
+            	holder.video_indicator = (ImageView) convertView.findViewById(R.id.art_gallery_item_video_indicator);
             } else {
                 convertView = new ImageView(context);
                 
@@ -114,10 +116,18 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
 
         if (enableLayoutItems) {
         	try {
+            	// set saved indicator
         		if (FileStorage.fileExists(items.get(position).getSaveName(context))) {
         			holder.saved_indicator.setVisibility(View.VISIBLE);
         		} else {
         			holder.saved_indicator.setVisibility(View.INVISIBLE);
+        		}
+
+        		// set video indicator
+        		if (items.get(position).isVideo()) {
+        			holder.video_indicator.setVisibility(View.VISIBLE);
+        		} else {
+        			holder.video_indicator.setVisibility(View.INVISIBLE);
         		}
         	} catch (Exception e) {
         	}

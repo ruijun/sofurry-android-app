@@ -6,5 +6,13 @@
   android:layout_height="fill_parent">
     <ImageView android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_height="fill_parent" android:layout_width="fill_parent" android:id="@+id/art_gallery_item_image" android:background="@drawable/image_border"></ImageView>
     <ImageView android:src="@android:drawable/ic_menu_save" android:layout_alignParentBottom="true" android:id="@+id/art_gallery_item_save_indicator" android:padding="0px" android:scaleType="fitXY" android:visibility="invisible" android:layout_height="20px" android:layout_width="20px" android:layout_centerHorizontal="true"></ImageView>
+
+    <ImageView
+        android:id="@+id/art_gallery_item_video_indicator"
+        android:layout_width="30px"
+        android:layout_height="30px"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/video" android:visibility="invisible"/>
     
 </RelativeLayout>

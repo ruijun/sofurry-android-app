@@ -34,6 +34,7 @@ public class Submission implements Serializable, IHasThumbnail {
 	private String date;
 	private String thumbnailUrl;
 	private String SavedNameCache = "";
+	public  String FileExt = "";
 	private String saveFilename;
 
 	private byte attempts = 0;
@@ -206,7 +207,9 @@ public class Submission implements Serializable, IHasThumbnail {
 
         // filename must have correct extension. not sure is it true or not
 //        String targetPath = fileNameTmpl + '.' + filename.substring(filename.lastIndexOf('.') + 1);
-        String targetPath = fileNameTmpl + HttpRequest.extractExtension(getSaveFilename());
+//        String targetPath = fileNameTmpl + HttpRequest.extractExtension(getSaveFilename());
+        
+        String targetPath = fileNameTmpl + FileExt;
 
         /*
          *  sanitizeFileName removes '/' character so separately sanitize every unsecure data field that comes from
@@ -237,7 +240,8 @@ public class Submission implements Serializable, IHasThumbnail {
 
     // build relative file name to look in cache
     public String getCacheName() {
-        String filename = getName() + HttpRequest.extractExtension(getThumbnailUrl());
+//        String filename = getName() + HttpRequest.extractExtension(getThumbnailUrl());
+        String filename = "content_" + getId() + FileExt;
         filename = FileStorage.sanitize(filename);
     	return filename;
     }
@@ -264,8 +268,34 @@ public class Submission implements Serializable, IHasThumbnail {
 		setAuthorID(Integer.parseInt(datasource.getString("authorId")));
 		setContentLevel(datasource.getString("contentLevel"));
 		setTags(datasource.getString("keywords"));
-		setThumbnailUrl("http://beta.sofurry.com/std/thumb?page="+getId());
+		setThumbnailUrl("http://beta.sofurry.com/std/thumb?page="+getId()); // force load thumbnails for video???
+//		setThumbnailUrl(datasource.getString("thumb")); // thumbnails for video have different URL
 		setSaveFilename(datasource.getString("thumb"));
+		
+		switch (type) {
+			case ARTWORK: {
+		        if (datasource.getString("thumb").contains("/video.png")) {
+		        	FileExt = ".swf";
+		        } else {
+		        	FileExt = ".jpg";
+		        };
+		        break;
+			}
+			
+			case MUSIC: {
+				FileExt = ".mp3";
+		        break;
+			}
+			
+			case STORY: {
+				FileExt = ".txt";
+		        break;
+			}
+			
+			default:
+				FileExt = "";
+		}
+		
 //		if (type == SUBMISSION_TYPE.MUSIC) {
 //			filenameUrl = datasource.getString("filename");
 //		}
@@ -287,4 +317,26 @@ public class Submission implements Serializable, IHasThumbnail {
 		intent.putExtra("level", getContentLevel());
 	}
 	
+    public boolean isImage() {
+    	if (FileExt.equals(".jpg")) return true;
+    	if (FileExt.equals(".jpeg")) return true;
+    	if (FileExt.equals(".gif")) return true;
+    	if (FileExt.equals(".png")) return true;
+    	if (FileExt.equals(".bmp")) return true;
+    	if (FileExt.equals(".tga")) return true;
+    	return false;
+    }
+
+    public boolean isVideo() {
+    	if (FileExt.equals(".swf")) return true;
+    	if (FileExt.equals(".flv")) return true;
+    	if (FileExt.equals(".avi")) return true;
+    	if (FileExt.equals(".mpg")) return true;
+    	if (FileExt.equals(".mkv")) return true;
+    	if (FileExt.equals(".mov")) return true;
+    	if (FileExt.equals(".asf")) return true;
+    	if (FileExt.equals(".mpeg")) return true;
+    	if (FileExt.equals(".wmv")) return true;
+    	return false;
+    }
 }
