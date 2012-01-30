@@ -1,6 +1,4 @@
-package com.sofurry.util;
-
-//~--- imports ----------------------------------------------------------------
+package com.sofurry.mobileapi.core;
 
 import android.app.Activity;
 
@@ -24,13 +22,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 
-//~--- classes ----------------------------------------------------------------
 
 /**
- * Class description
+ * @author Rangarig
  *
+ * The Authentification Handler contains all the Methods used to handle Authentification for the SOFurry api
  */
-public class Authentication {
+public class AuthenticationHandler {
     private static String authenticationPadding         = "@6F393fk6FzVz9aM63CfpsWE0J1Z7flEl9662X";
     private static String password                      = null;
     private static String salt                          = "";
@@ -38,12 +36,12 @@ public class Authentication {
     private static long   currentAuthenticationSequence = 0;
 
 
-    //~--- methods ------------------------------------------------------------
-
     /**
      * Adds Authentication Parameters to a Request, if Authentication Credentials are available
      * @param queryParams
      * The Parameters to add Authentification to
+     * @param fakeAuth
+     * If this is set to true, a fake username will be transmitted, which is required by some parts of the new API
      */
     public static void addAuthParametersToQuery(Map<String, String> queryParams) {
         if (!useAuthentication()) {
@@ -54,13 +52,14 @@ public class Authentication {
         queryParams.put("otpuser", username);
         queryParams.put("otphash", generateRequestHash());
         queryParams.put("otpsequence", "" + currentAuthenticationSequence);
+//        queryParams.put("otpuser", "gargelblargh");
+//        queryParams.put("otphash", "");
+//        queryParams.put("otpsequence", "" + currentAuthenticationSequence);
 
         currentAuthenticationSequence = currentAuthenticationSequence + 1;
-
-        // return result;
     }
 
-    // Create a has using the current authentication sequence counter, thus "salting" the hash.
+    // Create a hash using the current authentication sequence counter, thus "salting" the hash.
 
     /**
      * Method description
@@ -222,8 +221,6 @@ public class Authentication {
     public static String getUsername() {
         return username;
     }
-
-    //~--- set methods --------------------------------------------------------
 
     /**
      * Method description

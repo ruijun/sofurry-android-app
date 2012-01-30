@@ -18,13 +18,14 @@ import android.widget.Toast;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.FavableActivity;
-import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.AsyncFileDownloader;
-import com.sofurry.requests.ContentDownloader;
-import com.sofurry.requests.RequestHandler;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.core.Request;
+import com.sofurry.mobileapi.core.RequestException;
+import com.sofurry.mobileapi.downloaders.AsyncFileDownloader;
+import com.sofurry.requests.AndroidDownloadWrapper;
+import com.sofurry.requests.AndroidRequestWrapper;
+import com.sofurry.requests.DataCall;
 import com.sofurry.storage.FileStorage;
-import com.sofurry.storage.ItemStorage;
-import com.sofurry.util.ProgressSignal;
 
 /**
  * @author Rangarig
@@ -63,9 +64,12 @@ public class ViewMusicActivity extends FavableActivity  {
 	    webview = (WebView) findViewById(R.id.musictext);
 
 	    if (savedInstanceState == null) {
-			AjaxRequest req = getFetchParameters(pageID);
 			pbh.showProgressDialog("Fetching desc...");
-			req.execute(requesthandler);
+
+			Request req = ApiFactory.createGetPageContent(pageID);
+    		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+    		arw.exec(new DataCall() { public void call() { handleFetchContent((JSONObject)arg1);	} });
+
 	    } else {
 	    	try {
 		    	content = (String) retrieveObject("content");
@@ -78,19 +82,23 @@ public class ViewMusicActivity extends FavableActivity  {
 		    	
 		    	if (down != null) pbh.showProgressDialog("Downloading Song...");
 			} catch (Exception e) {
-				onError(-1, e);
+				onError(e);
 			}
 	    }
 	}
 	
-	@Override
-	public void onData(int id, JSONObject obj) throws Exception {
-		pbh.hideProgressDialog();
-		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
+	/**
+	 * Handles the return values from the getPageContent request
+	 * @param obj
+	 */
+	public void handleFetchContent(JSONObject obj) {
+		try {
+		  pbh.hideProgressDialog();
 		  content = obj.getString("content");
 		  showContent();
-		} else
-			super.onData(id, obj);// Handle inherited events
+		} catch (Exception e) {
+		  onError(e);
+		}
 	}
 	
 	/**
@@ -121,29 +129,16 @@ public class ViewMusicActivity extends FavableActivity  {
 
 
 
-	/**
-	 * Returns a story request
-	 * @param pageID
-	 * The pageID of the story to be fetched
-	 * @return
-	 */
-	public static AjaxRequest getFetchParameters(int pageID) {
-		AjaxRequest req = new AjaxRequest();
-		req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
-		req.addParameter("f", "getpagecontent");
-		req.addParameter("pid", "" + pageID);
-		return req;
-	}
 
-	/**
-	 * Creates a request for submission data
-	 * @return
-	 */
-	public static AjaxRequest getFilenameRequest(int pid) {
-		AjaxRequest req = new AjaxRequest(AppConstants.SITE_URL + "/page/" + pid);
-		req.setRequestID(AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA);
-		return req;
-	}
+//	/**
+//	 * Creates a request for submission data
+//	 * @return
+//	 */
+//	public static AjaxRequest getFilenameRequest(int pid) {
+//		AjaxRequest req = new AjaxRequest(AppConstants.SITE_URL + "/page/" + pid);
+//		req.setRequestID(AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA);
+//		return req;
+//	}
 	
 	/**
 	 * Downloads the music file, and replays it
@@ -154,11 +149,11 @@ public class ViewMusicActivity extends FavableActivity  {
 		downloadandplaymode = mode;
 		
 		pbh.showProgressDialog("Fetching song data...");
-		AjaxRequest req = getFilenameRequest(pageID);
-		req.execute(requesthandler);
+		
+		Request req = ApiFactory.createGetSubmissionData(pageID);
+		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+		arw.exec(new DataCall() { public void call() { downloadFile((JSONObject)arg1);	} });
 	}
-	
-	
 	
 	@Override
 	public void createExtraMenuOptions(Menu menu) {
@@ -180,89 +175,107 @@ public class ViewMusicActivity extends FavableActivity  {
 	 * Extracts the file URL from the fetched data, and downloads the file
 	 * @param obj
 	 */
-	public void downloadFile(String html) throws Exception {
-		//String url = obj.getString("filename");
-		// Find markers
-		int end = html.indexOf(AppConstants.MP3_DOWNLOAD_LINK_END_MARKER);
-		int beg = end;
-		int len = AppConstants.MP3_DOWNLOAD_LINK_START_MARKER.length();
-		boolean found = false;
-		// Okay, this might suck, but right now I cant remember the correct phrase. It will work though.
-		while ((beg > 0) && (!found)) {
-			beg--;
-			if (html.substring(beg, beg + len).equals(AppConstants.MP3_DOWNLOAD_LINK_START_MARKER))
-				found = true;
+	public void downloadFile(JSONObject submissionData)  {
+		try {
+			
+			String fname = submissionData.getString("fileName");
+			
+			playPath = FileStorage.getPathRoot() + FileStorage.MUSIC_PATH;
+			FileStorage.ensureDirectory(playPath);
+			playPath += fname;
+			
+			File f = new File(playPath);
+			if (f.exists()) {
+				handlemusic();
+				return;
+			}
+			
+			String url = AppConstants._SongURLPrefix + submissionData.getString("contentSourceUrl");
+			
+			
+			pbh.hideProgressDialog();
+			pbh.showProgressDialog("Downloading Song...");
+			
+			// Prepare async download
+			AndroidDownloadWrapper adw = new AndroidDownloadWrapper(requesthandler, url, playPath);
+			adw.setFinishFeedback(new DataCall() {
+				public void call() throws Exception {
+					handlemusic();
+				}
+			});
+			adw.setPercentageFeedback(new DataCall() {
+				public void call() throws Exception {
+					int i = (Integer)arg1;
+					showProgress(i);
+				}
+			});
+			adw.start(); // Starts the download
+			
+		} catch (Exception e) {
+			onError(e);
 		}
-		if (beg == 0) throw new Exception("URL Extract failed");
-		
-		beg += len;
-		
-		String tmp = html.substring(beg,end);
-		
-		//String tmp2 = html.substring(beg - 10, end + 10);
-
-		beg = tmp.lastIndexOf("/");
-		filename = tmp.substring(beg + 1);
-
-		playPath = FileStorage.getPathRoot() + FileStorage.MUSIC_PATH;
-		FileStorage.ensureDirectory(playPath);
-		playPath += getFname();
-		
-		File f = new File(playPath);
-		if (f.exists()) {
-			handlemusic();
-			return;
+	}
+	
+	/**
+	 * Handles progress messages from the AsyncDownloadManager
+	 * @param i
+	 */
+	public void showProgress(int i) {
+		try {
+			pbh.setMessage("Downloaded " + i / 1024 + " kbyte...");
+		} catch (Exception e) {
+			onError(e);
 		}
-		
-		pbh.hideProgressDialog();
-		pbh.showProgressDialog("Downloading Song...");
-		down = ContentDownloader.asyncDownload(tmp, FileStorage.getPath(FileStorage.MUSIC_PATH + getFname()), requesthandler);
 	}
 	
 	/**
 	 * Decides what to do with the music, now that it is available
 	 */
 	public void handlemusic() {
-		pbh.hideProgressDialog();
-		if (downloadandplaymode == downmode_play)
-		  playmusic();
-		if (downloadandplaymode == downmode_save)
-		  save();
+		try {
+			pbh.hideProgressDialog();
+			if (downloadandplaymode == downmode_play)
+			  playmusic();
+			if (downloadandplaymode == downmode_save)
+			  save();
+		} catch (Exception e) {
+			onError(e);
+		}
 	}
 	
-	/**
-	 * Returns the filename of the mp3 file as it resides on device
-	 * @return
-	 */
-	public String getFname() {
-		return "/m" + pageID + ".mp3";
-	}
+//	/**
+//	 * Returns the filename of the mp3 file as it resides on device
+//	 * @return
+//	 */
+//	public String getFname() {
+//		return "/m" + pageID + ".mp3";
+//	}
 	
-	@Override
-	public void onProgress(int id, ProgressSignal prg) {
-		pbh.setMessage("Downloaded " + prg.progress / 1024 + " kbyte...");
-	}
+//	@Override
+//	public void onProgress(int id, ProgressSignal prg) {
+//		pbh.setMessage("Downloaded " + prg.progress / 1024 + " kbyte...");
+//	}
 
-	/* (non-Javadoc)
-	 * @see com.sofurry.ActivityWithRequests#sonOther(int, java.lang.Object)
-	 * 
-	 * Step Three 
-	 */
-	@Override
-	public void onOther(int id, Object obj) throws Exception {
-		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
-			String str = (String)obj;
-			downloadFile(str);
-			return; // Important :/
-		}
-		
-		// Filedownload is finished, the the android play the file
-		if (obj.getClass().equals(AsyncFileDownloader.class)) {
-			handlemusic();
-			return;
-		}
-		super.onOther(id, obj);
-	}
+//	/* (non-Javadoc)
+//	 * @see com.sofurry.ActivityWithRequests#sonOther(int, java.lang.Object)
+//	 * 
+//	 * Step Three 
+//	 */
+//	@Override
+//	public void onOther(int id, Object obj) throws Exception {
+//		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
+//			String str = (String)obj;
+//			downloadFile(str);
+//			return; // Important :/
+//		}
+//		
+//		// Filedownload is finished, the the android play the file
+//		if (obj.getClass().equals(AsyncFileDownloader.class)) {
+//			handlemusic();
+//			return;
+//		}
+//		super.onOther(id, obj);
+//	}
 	
 	/**
 	 * Plays the music file submitted
@@ -276,7 +289,7 @@ public class ViewMusicActivity extends FavableActivity  {
         try { 
            startActivity(intent); 
         } catch (ActivityNotFoundException e) { 
-           onError(-1, e);
+           onError(e);
         } 	
 		notwice = false;
 	}
@@ -300,16 +313,15 @@ public class ViewMusicActivity extends FavableActivity  {
 			
 			Toast.makeText(getApplicationContext(), "File saved to:\n" + targetPath, Toast.LENGTH_LONG).show();
 		} catch (Exception e) {
-			onError(-1, e);
+			onError(e);
 		}
 	}
 
 	@Override
-	public void onError(int id, Exception e) {
-		if ((id == AppConstants.REQUEST_ID_DOWNLOADFILE) || (id == AppConstants.REQUEST_ID_FETCHCONTENT)) {
-			notwice = false; // Just in case
-		}
-		super.onError(id, e);
+	public void onError(Exception e) {
+		if (e instanceof RequestException)
+		  notwice = false; // Just in case
+		super.onError(e);
 	}
 	
 	

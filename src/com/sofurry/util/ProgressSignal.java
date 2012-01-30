@@ -8,6 +8,7 @@ package com.sofurry.util;
  * Usually percentage values will be passed
  *
  */
+@Deprecated
 public class ProgressSignal {
 	public int progress = 0; // The current progress value
 	public int goal = 0;     // The maximum reachable value

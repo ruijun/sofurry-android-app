@@ -1,4 +1,4 @@
-package com.sofurry.requests;
+package com.sofurry.mobileapi.downloaders;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -88,10 +88,7 @@ public class AsyncImageLoader extends Thread {
             						my_context.getApplicationContext().getResources().getDisplayMetrics().widthPixels);
             
         	SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(my_context);
- 
-        	// for non image files - only download
-        	onlyDownload = onlyDownload || (! my_submission.isImage());
-        	
+            
         	// force DL - download file anyway
         	// only DL - download if not exists, do not load to memory
             if (forceDownload) {
@@ -160,4 +157,5 @@ public class AsyncImageLoader extends Thread {
         	bmp = null;
         }/**/
     }
+
 }

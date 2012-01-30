@@ -1,7 +1,5 @@
 package com.sofurry.util;
 
-//~--- imports ----------------------------------------------------------------
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -15,8 +13,6 @@ import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.receivers.OnAlarmReceiver;
 
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class description
@@ -76,8 +72,6 @@ public class BootVersionChecker {
         }
     }
 
-    //~--- get methods --------------------------------------------------------
-
     /**
      * Method description
      *
@@ -118,8 +112,6 @@ public class BootVersionChecker {
         // We have already launched the alarm
         return true;
     }
-
-    //~--- set methods --------------------------------------------------------
 
     /**
      * Method description

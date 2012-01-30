@@ -7,14 +7,15 @@ import java.io.PrintWriter;
 import org.json.JSONObject;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.webkit.WebView;
 import android.widget.Toast;
 
-import com.sofurry.AppConstants;
 import com.sofurry.base.classes.SubmissionViewActivity;
-import com.sofurry.requests.AjaxRequest;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.core.Request;
+import com.sofurry.requests.AndroidRequestWrapper;
+import com.sofurry.requests.DataCall;
 import com.sofurry.storage.FileStorage;
 
 /**
@@ -34,8 +35,12 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 	    
 	    if (savedInstanceState == null) {
 			pbh.showProgressDialog("Fetching journal...");
-			AjaxRequest req = getFetchParameters(pageID);
-			req.execute(requesthandler);
+			
+			
+			Request req = ApiFactory.createGetPageContent(pageID);
+    		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+    		arw.exec(new DataCall() { public void call() { handlePageContent((JSONObject)arg1);	} });
+
 	    } else {
 			content = (String) retrieveObject("content");
 			content = content.replace("\u00a0", "");
@@ -49,30 +54,34 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 		storeObject("content", content);
 	}
 
-	/**
-	 * Returns a story request
-	 * @param pageID
-	 * The pageID of the story to be fetched
-	 * @return
-	 */
-	protected AjaxRequest getFetchParameters(int pageID) {
-		AjaxRequest req = new AjaxRequest();
-		req.addParameter("f", "getpagecontent");
-		req.addParameter("pid", "" + pageID);
-		req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
-		return req;
-	}
+//	/**
+//	 * Returns a story request
+//	 * @param pageID
+//	 * The pageID of the story to be fetched
+//	 * @return
+//	 */
+//	protected Request getFetchParameters(int pageID) {
+//		AjaxRequest req = new AjaxRequest();
+//		req.addParameter("f", "getpagecontent");
+//		req.addParameter("pid", "" + pageID);
+//		req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
+//		return req;
+//	}
 
 	
-	@Override
-	public void onData(int id, JSONObject obj) throws Exception {
-		if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
+	/**
+	 * Handles the feedback by the getPage Content
+	 * @param obj
+	 */
+	public void handlePageContent(JSONObject obj)  {
+		try {
 			pbh.hideProgressDialog();
 			content = obj.getString("content");
 			content = content.replace("\u00a0", "");
 			viewContent();
-		} else
-			super.onData(id, obj);// Handle inherited events
+		} catch (Exception e) {
+			onError(e);
+		}
 	}
 	
 	public void viewContent() {
@@ -98,7 +107,7 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 			
 			Toast.makeText(getApplicationContext(), "File saved to:\n" + targetPath, Toast.LENGTH_LONG).show();
 		} catch (Exception e) {
-			onError(-1, e);
+			onError(e);
 		}
 	}
 

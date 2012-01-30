@@ -1,28 +1,25 @@
 package com.sofurry.activities;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.content.Intent;
-
 import android.util.Log;
-
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
 import android.widget.BaseAdapter;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.adapters.PrivateMessageAdapter;
 import com.sofurry.base.classes.AbstractContentList;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.PrivateMessage;
-import com.sofurry.requests.AjaxRequest;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class description
@@ -96,7 +93,7 @@ public class ListPMActivity
                 // man.getPageIDs().add("" + m.getId());
             }
         } catch (Exception e) {
-            man.onError(-1, e);
+            man.onError(e);
         }
     }
 
@@ -106,9 +103,7 @@ public class ListPMActivity
      *
      * @param newViewSource
      */
-    public void resetViewSourceExtra(int newViewSource) {}
-
-    //~--- get methods --------------------------------------------------------
+    public void resetViewSourceExtra(ViewSource newViewSource) {}
 
     /**
      * Method description
@@ -133,17 +128,9 @@ public class ListPMActivity
      * @return
      */
     @Override
-    public AjaxRequest getFetchParameters(int page, int source) {
-        AjaxRequest req = new AjaxRequest();
-
-        req.addParameter("f", "pm");
-        req.addParameter("page", "" + page);
-		req.addParameter("entriesPerPage", "" + AppConstants.ENTRIESPERPAGE_LIST);
-
-        return req;
+    public Request getFetchParameters(int page, ViewSource source) throws Exception {
+    	return ApiFactory.createListPMs(page, AppConstants.ENTRIESPERPAGE_LIST);
     }
-
-    //~--- set methods --------------------------------------------------------
 
     /**
      * Method description

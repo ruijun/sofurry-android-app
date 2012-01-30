@@ -21,7 +21,8 @@ import android.widget.ListAdapter;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.interfaces.IManagedActivity;
-import com.sofurry.requests.AjaxRequest;
+import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.core.Request;
 import com.sofurry.storage.ManagerStore;
 
 /**
@@ -201,7 +202,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#getFetchParameters(int, int)
 	 */
-	public abstract AjaxRequest getFetchParameters(int page, int source);
+	public abstract Request getFetchParameters(int page, ViewSource source) throws Exception;
 
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#getAdapter(android.content.Context)
@@ -214,7 +215,7 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	 */
 	public abstract void parseResponse(JSONObject obj) throws Exception;
 	
-	public abstract void resetViewSourceExtra(int newViewSource);
+	public abstract void resetViewSourceExtra(ViewSource newViewSource);
 
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#finish()

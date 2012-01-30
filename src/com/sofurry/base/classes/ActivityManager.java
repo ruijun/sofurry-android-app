@@ -21,7 +21,10 @@ import com.sofurry.base.interfaces.ICanHandleFeedback;
 import com.sofurry.base.interfaces.IHasThumbnail;
 import com.sofurry.base.interfaces.IManagedActivity;
 import com.sofurry.helpers.ProgressBarHelper;
-import com.sofurry.requests.AjaxRequest;
+import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.core.Request;
+import com.sofurry.requests.AndroidRequestWrapper;
+import com.sofurry.requests.DataCall;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.util.ErrorHandler;
@@ -37,13 +40,12 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	
 	private ProgressBarHelper progh = null; 
 
-	protected int viewSource = AppConstants.VIEWSOURCE_ALL; // The currently selected viewsource
+	protected ViewSource viewSource = ViewSource.all; // The currently selected viewsource
 	protected String viewSearch = "";						// The currently selected view Search
 	protected int currentPage = 0;							// The currently selected page
 	public int totalPages = 0;							// total number of available pages. stop load after last page. 0 = unknown amount of pages
 	protected String currentTitle = "";						// Title for current page
 	protected ArrayList<T> resultList;
-	//protected ArrayList<String> pageIDs;					// The page ids
 	
 	protected ThumbnailDownloaderThread thumbnailDownloaderThread;
 	private boolean currentlyFetching = false;
@@ -72,11 +74,11 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		return (Activity)myAct;
 	}
 	
-	public int getViewSource() {
+	public ViewSource getViewSource() {
 		return viewSource;
 	}
 
-	public void setViewSource(int viewSource) {
+	public void setViewSource(ViewSource viewSource) {
 		this.viewSource = viewSource;
 	}
 
@@ -134,7 +136,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	    
 	    Bundle extras = getAct().getIntent().getExtras();
 	    if (extras != null) {
-	    	viewSource = extras.getInt("viewSource");
+	    	viewSource.value = extras.getInt("viewSource");
 	    	viewSearch = extras.getString("viewSearch");
 	    	currentTitle = extras.getString("activityTitle");
 /*	    	if (currentTitle.length() > 0) {
@@ -196,36 +198,26 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	 * The request handler to be used to handle the feedback from the AjaxRequest
 	 */
 	protected RequestHandler requesthandler = null;
+
 	
-	/* (non-Javadoc)
-	 * @see com.sofurry.requests.CanHandleFeedback#onError(int, java.lang.Exception)
-	 */
-	public void onError(int id, Exception e) {
-		if (id == AppConstants.REQUEST_ID_FETCHDATA) currentlyFetching = false; // Fetching failed, give the user a chance to try again
+	public void onError(Exception e) {
+		currentlyFetching = false; // Fetching failed, give the user a chance to try again
 		hideProgressDialog();
 		ErrorHandler.showError(getAct(), e);
 	}
-
-	/* (non-Javadoc)
-	 * @see com.sofurry.requests.CanHandleFeedback#onData(int, org.json.JSONObject)
-	 * Handles data send back from the feedback handler
-	 */
-	public void onData(int id, JSONObject obj) {
-		if (id == AppConstants.REQUEST_ID_FETCHDATA) {
-			currentlyFetching = false; // Fetching was successful, new pages may be fetched
-			// Interpret the feedback data
-			try {
-				myAct.parseResponse(obj);
-			} catch (Exception e) {
-				onError(id, e);
-			}
-			Log.d(AppConstants.TAG_STRING, "OnData Received" + resultList.size());
-			// Reset the adapter, so new entries are shown
-			myAct.plugInAdapter();
+	
+	public void handleData(JSONObject obj) {
+		currentlyFetching = false; // Fetching was successful, new pages may be fetched
+		// Interpret the feedback data
+		try {
+			myAct.parseResponse(obj);
+		} catch (Exception e) {
+			onError(e);
 		}
-	    //myAct.updateView();
+		Log.d(AppConstants.TAG_STRING, "OnData Received" + resultList.size());
+		// Reset the adapter, so new entries are shown
+		myAct.plugInAdapter();
 		hideProgressDialog();
-		
 	}
 
 	public void onProgress(int id, ProgressSignal prg) {
@@ -274,27 +266,27 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 			return true;
 		case AppConstants.MENU_FILTER_ALL:
 			currentTitle = "Recent";
-			resetViewSource(AppConstants.VIEWSOURCE_ALL);
+			resetViewSource(ViewSource.all);
 			return true;
 		case AppConstants.MENU_FILTER_FEATURED:
 			currentTitle = "Featured";
-			resetViewSource(AppConstants.VIEWSOURCE_FEATURED);
+			resetViewSource(ViewSource.featured);
 			return true;
 		case AppConstants.MENU_FILTER_FAVORITES:
 			currentTitle = "Favorites";
-			resetViewSource(AppConstants.VIEWSOURCE_FAVORITES);
+			resetViewSource(ViewSource.favorites);
 			return true;
 		case AppConstants.MENU_FILTER_WATCHLIST:
 			currentTitle = "Watchlist";
-			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST);
+			resetViewSource(ViewSource.watchlist);
 			return true;
 		case AppConstants.MENU_FILTER_GROUP:
 			currentTitle = "Group";
-			resetViewSource(AppConstants.VIEWSOURCE_GROUP);
+			resetViewSource(ViewSource.group);
 			return true;
 		case AppConstants.MENU_FILTER_WATCHLIST_COMBINED:
 			currentTitle = "Combined";
-			resetViewSource(AppConstants.VIEWSOURCE_WATCHLIST_COMBINED);
+			resetViewSource(ViewSource.watchlist_combined);
 			return true;
 		default:
 			return false;
@@ -314,7 +306,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 			if (data == null) return true;
 			viewSearch = data.getStringExtra("tags");
 			currentTitle = "Tags";
-			resetViewSource(AppConstants.VIEWSOURCE_SEARCH);
+			resetViewSource(viewSource.search);
 			return true;
 		}
 		return false;
@@ -341,11 +333,56 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 			((Activity) myAct).setTitle(currentTitle);
 		}
 
-		AjaxRequest request = myAct.getFetchParameters(currentPage, viewSource);
-		request.setRequestID(AppConstants.REQUEST_ID_FETCHDATA);
-		currentlyFetching = true;
-		request.execute(requesthandler);		
+		try {
+			Request request = myAct.getFetchParameters(currentPage, viewSource);
+			// Okay, this is a little bit of excessive anonymous classing, but I am sure it could be worse!
+			// However since I am going to look back at this and will think, WTF did I smoke when I... and so on.
+			//
+			// The request will call back from the worker thread. So its not enough to encapsulate the two method calls
+			// in the callback object. We need to have the method call from inside of the guithread.
+			// Therefore we encapsulate the actual message call in the DataCall object and feed that
+			// into the request handler, so the handler will make the actual call.
+			// So we have the anonymous callback class, using two anonymous DataCall classes.
+			// Well... I have the feeling there should be an easier way to accomplish that,
+			// but with the goal in mind that the MobileApi should not be android specific, I do
+			// not see how.
+			AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, request);
+			arw.exec(new DataCall() {
+				@Override
+				public void call() {
+					handleData((JSONObject)arg1);
+				}
+			});
+			
+// Old version of this request, much of this is handled by the wrapper now.			
+//			request.executeAsync(
+//					new CallBack(){ 
+//						public void success(JSONObject result){
+//							Message msg = new Message();
+//							msg.obj = new DataCall(result) {
+//								public void call() {
+//									handleData((JSONObject)arg1);
+//								}
+//							};
+//							getRequesthandler().postMessage(msg);
+//						}; 
+//						public void fail(Exception e){
+//							Message msg = new Message();
+//							msg.obj = new DataCall(e) {
+//								public void call() {
+//									onError((Exception)arg1);
+//								}
+//							};
+//							getRequesthandler().postMessage(msg);
+//						}; 
+//					} 
+//			);
+			currentlyFetching = true;
+		} catch (Exception e) {
+			onError(e);
+		}
 	}
+	
 
 
 	/**
@@ -371,7 +408,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	 * Resets the viewsource, when filter options are changed via menu.
 	 * @param newViewSource
 	 */
-	public void resetViewSource(int newViewSource) {
+	public void resetViewSource(ViewSource newViewSource) {
 		Log.i(AppConstants.TAG_STRING, "ResetViewSource: "+newViewSource);
 		viewSource = newViewSource;
 		currentPage = 0;
@@ -410,6 +447,10 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	public void cancel() {
 		requesthandler.killThreads(); // We instruct all running threads to terminate
 		myAct.finish(); // We instruct the Activity to close
+	}
+
+	public void onData(int id, JSONObject obj) throws Exception {
+		
 	}
 
 }

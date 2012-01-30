@@ -1,7 +1,5 @@
 package com.sofurry.base.classes;
 
-import org.json.JSONObject;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,7 +11,11 @@ import com.sofurry.activities.GalleryArtActivity;
 import com.sofurry.activities.ListMusicActivity;
 import com.sofurry.activities.ListStoriesActivity;
 import com.sofurry.activities.RateActivity;
-import com.sofurry.requests.AjaxRequest;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.core.Request;
+import com.sofurry.requests.AndroidRequestWrapper;
+import com.sofurry.requests.DataCall;
 
 /**
  * @author Rangarig
@@ -84,11 +86,9 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	public void setFavorite() {
 		pbh.showProgressDialog("Setting favorite");
 
-		AjaxRequest request = new AjaxRequest();
-		request.addParameter("f", "addfav");
-		request.addParameter("pid", "" + pageID);
-		request.setRequestID(AppConstants.REQUEST_ID_FAV);
-		request.execute(requesthandler);
+		Request req = ApiFactory.createAddFav(pageID);
+		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+		arw.exec(new DataCall() { public void call() { justHideProgress();	} });
 	}
 	
 	/**
@@ -96,12 +96,10 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	 */
 	public void unsetFavorite() {
 		pbh.showProgressDialog("Removing favorite");
-		
-		AjaxRequest request = new AjaxRequest();
-		request.addParameter("f", "remfav");
-		request.addParameter("pid", "" + pageID);
-		request.setRequestID(AppConstants.REQUEST_ID_UNFAV);
-		request.execute(requesthandler);
+
+		Request req = ApiFactory.createRemFav(pageID);
+		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+		arw.exec(new DataCall() { public void call() { justHideProgress();	} });
 	}
 	
 	/**
@@ -129,12 +127,10 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	 */
 	public void setRating(int stars) {
 		pbh.showProgressDialog("Rating "+stars+" stars");
-		AjaxRequest request = new AjaxRequest();
-		request.addParameter("f", "vote");
-		request.addParameter("pid", "" + pageID);
-		request.addParameter("votevalue", "" + stars);
-		request.setRequestID(AppConstants.REQUEST_ID_RATE);
-		request.execute(requesthandler);
+		
+		Request req = ApiFactory.createSetStars(pageID, stars);
+		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+		arw.exec(new DataCall() { public void call() { justHideProgress();	} });
 	}
 
 	/**
@@ -142,11 +138,10 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	 */
 	public void cum() {
 		pbh.showProgressDialog("Cumming ...");
-		AjaxRequest request = new AjaxRequest();
-		request.addParameter("f", "cum");
-		request.addParameter("pid", "" + pageID);
-		request.setRequestID(AppConstants.REQUEST_ID_CUM);
-		request.execute(requesthandler);
+
+		Request req = ApiFactory.createCum(pageID);
+		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+		arw.exec(new DataCall() { public void call() { justHideProgress();	} });
 	}
 
 	/**
@@ -154,59 +149,38 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	 */
 	public void watch() {
 		pbh.showProgressDialog("Watching ...");
-		AjaxRequest request = new AjaxRequest();
-		request.addParameter("f", "addwatch");
-		request.addParameter("authorid", "" + authorId);
-		request.setRequestID(AppConstants.REQUEST_ID_WATCH);
-		request.execute(requesthandler);
+		
+		Request req = ApiFactory.createWatch(authorId);
+		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+		arw.exec(new DataCall() { public void call() { justHideProgress();	} });
 	}
 	/**
 	 * Watches the current user
 	 */
 	public void unwatch() {
 		pbh.showProgressDialog("Unwatching ...");
-		AjaxRequest request = new AjaxRequest();
-		request.addParameter("f", "remwatch");
-		request.addParameter("authorid", "" + authorId);
-		request.setRequestID(AppConstants.REQUEST_ID_WATCH);
-		request.execute(requesthandler);
+		
+		Request req = ApiFactory.createUnWatch(authorId);
+		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+		arw.exec(new DataCall() { public void call() { justHideProgress();	} });
 	}
 
 	/**
 	 * Shows more work by the specific user
 	 */
-	public void morefromuser(Class activity, int ActivityID) {
+	public void morefromuser(Class<?> activity, int ActivityID) {
 		Intent intent = new Intent(this, activity);
-		intent.putExtra("viewSource", AppConstants.VIEWSOURCE_USER);
+		intent.putExtra("viewSource", ViewSource.user.value);
 		intent.putExtra("viewSearch", "" + authorId  );
 		intent.putExtra("activityTitle", "" + authorName  );
 		startActivityForResult(intent, ActivityID);
 	}
-
-	@Override
-	public void onData(int id, JSONObject obj) throws Exception {
-		switch (id) {
-		case AppConstants.REQUEST_ID_CUM:
-			pbh.hideProgressDialog();
-			return;
-		case AppConstants.REQUEST_ID_FAV:
-			pbh.hideProgressDialog();
-			return;
-		case AppConstants.REQUEST_ID_UNFAV:
-			pbh.hideProgressDialog();
-			return;
-		case AppConstants.REQUEST_ID_RATE:
-			pbh.hideProgressDialog();
-			return;
-		case AppConstants.REQUEST_ID_WATCH:
-			pbh.hideProgressDialog();
-			return;
-		}
-		super.onData(id, obj);
-		
+	
+	/**
+	 * Method called by some requests, that do not handle the returned data.
+	 */
+	public void justHideProgress() {
+		pbh.hideProgressDialog();
 	}
-		
-	
-	
-	
+
 }

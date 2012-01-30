@@ -5,15 +5,12 @@ package com.sofurry;
  *
  */
 public class AppConstants {
-    /**
-     * Used in the construction of MP3 download links, and this is the end marker
-     */
-    public static final String MP3_DOWNLOAD_LINK_END_MARKER = "\">Download as MP3</a>";
-
-    /**
-     * Used in the construction of MP3 download links, and this is the opening marker
-     */
-    public static final String MP3_DOWNLOAD_LINK_START_MARKER = "<a href=\"";
+	
+	
+	/**
+	 * The prefix to be used when songs are fetched
+	 */
+	public static final String _SongURLPrefix = "http://www.sofurryfiles.com/std/content/";
 
     /**
      * Private Message contents needs to be wrapped, and this is the ending wrapper
@@ -54,7 +51,6 @@ public class AppConstants {
     public static final String PREFERENCE_SALT                      = "salt";
     public static final String PREFERENCE_USERNAME                  = "username";
     public static final String PREFERENCE_THUMB_SIZE                = "art_gallery_thumbnail_size";
-    
 
     /**
      * Name of the preference storage
@@ -169,32 +165,32 @@ public class AppConstants {
     /**
      * Request ID
      */
-    public static final int REQUEST_ID_CUM                 = 4508;
-    public static final int REQUEST_ID_DOWNLOADFILE        = 4510;
-    public static final int REQUEST_ID_DOWNLOADIMAGE       = 4511;
-    public static final int REQUEST_ID_ASYNCDOWNLOADIMAGE  = 4514;
-    public static final int REQUEST_ID_FAV                 = 4506;
-    public static final int REQUEST_ID_FETCHCONTENT        = 4503;
-    public static final int REQUEST_ID_FETCHDATA           = 4505;
-    public static final int REQUEST_ID_FETCHSUBMISSIONDATA = 4504;
-    public static final int REQUEST_ID_RATE                = 4509;
-    public static final int REQUEST_ID_ROOMLIST            = 4501;
-    public static final int REQUEST_ID_SEND                = 4513;
-    public static final int REQUEST_ID_UNFAV               = 4507;
-    public static final int REQUEST_ID_USERLIST            = 4502;
-    public static final int REQUEST_ID_WATCH               = 4512;
+//    public static final int REQUEST_ID_CUM                 = 4508;
+//    public static final int REQUEST_ID_DOWNLOADFILE        = 4510;
+//    public static final int REQUEST_ID_DOWNLOADIMAGE       = 4511;
+//    public static final int REQUEST_ID_ASYNCDOWNLOADIMAGE  = 4514;
+//    public static final int REQUEST_ID_FAV                 = 4506;
+//    public static final int REQUEST_ID_FETCHCONTENT        = 4503;
+//    public static final int REQUEST_ID_FETCHDATA           = 4505;
+//    public static final int REQUEST_ID_FETCHSUBMISSIONDATA = 4504;
+//    public static final int REQUEST_ID_RATE                = 4509;
+//    public static final int REQUEST_ID_ROOMLIST            = 4501;
+//    public static final int REQUEST_ID_SEND                = 4513;
+//    public static final int REQUEST_ID_UNFAV               = 4507;
+//    public static final int REQUEST_ID_USERLIST            = 4502;
+//    public static final int REQUEST_ID_WATCH               = 4512;
 
     /**
      * ViewSource
      */
-    public static final int VIEWSOURCE_ALL                = 0;
-    public static final int VIEWSOURCE_FAVORITES          = 1;
-    public static final int VIEWSOURCE_FEATURED           = 8;
-    public static final int VIEWSOURCE_GROUP              = 10;
-    public static final int VIEWSOURCE_SEARCH             = 5;
-    public static final int VIEWSOURCE_USER               = 7;
-    public static final int VIEWSOURCE_WATCHLIST          = 2;
-    public static final int VIEWSOURCE_WATCHLIST_COMBINED = 11;
+//    public static final int VIEWSOURCE_ALL                = 0;
+//    public static final int VIEWSOURCE_FAVORITES          = 1;
+//    public static final int VIEWSOURCE_FEATURED           = 8;
+//    public static final int VIEWSOURCE_GROUP              = 10;
+//    public static final int VIEWSOURCE_SEARCH             = 5;
+//    public static final int VIEWSOURCE_USER               = 7;
+//    public static final int VIEWSOURCE_WATCHLIST          = 2;
+//    public static final int VIEWSOURCE_WATCHLIST_COMBINED = 11;
 
     /**
      * Initial delay after boot before checking for PMs the first time
@@ -212,9 +208,6 @@ public class AppConstants {
     public static final long[] VIBRATE_PM_INCOMING = {
         0, 150, 100, 150, 100, 150
     };
-
-
-    //~--- get methods --------------------------------------------------------
 
     /**
      * Combines the site URL with the path to the request script

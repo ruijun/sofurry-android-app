@@ -1,32 +1,27 @@
 package com.sofurry.activities;
 
-//~--- imports ----------------------------------------------------------------
+
+import java.util.Date;
+
+import org.json.JSONObject;
 
 import android.app.AlertDialog;
-
 import android.content.Intent;
-
 import android.graphics.Typeface;
-
 import android.os.Bundle;
-
 import android.view.View;
-
 import android.widget.Button;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
-import com.sofurry.requests.AjaxRequest;
-import com.sofurry.util.Authentication;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.core.AuthenticationHandler;
+import com.sofurry.mobileapi.core.Request;
+import com.sofurry.requests.AndroidRequestWrapper;
+import com.sofurry.requests.DataCall;
 import com.sofurry.util.BootVersionChecker;
 
-import org.json.JSONObject;
-
-import java.util.Date;
-
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Main menu activity
@@ -44,7 +39,6 @@ public class MainMenuActivity
     private long    lastCheck_          = -1;
 
 
-    //~--- methods ------------------------------------------------------------
 
     /**
      * Method description
@@ -121,8 +115,8 @@ public class MainMenuActivity
     }
 
     private void checkButtonDisabledState() {
-        if ((Authentication.getUsername() == null) || (Authentication.getUsername().trim().length() <= 0)
-                || (Authentication.getPassword() == null) || (Authentication.getPassword().trim().length() <= 0)) {
+        if ((AuthenticationHandler.getUsername() == null) || (AuthenticationHandler.getUsername().trim().length() <= 0)
+                || (AuthenticationHandler.getPassword() == null) || (AuthenticationHandler.getPassword().trim().length() <= 0)) {
             buttonPMs_.setEnabled(false);
             buttonChat_.setEnabled(false);
         } else {
@@ -138,7 +132,11 @@ public class MainMenuActivity
          */
         if ((buttonPMs_.isEnabled()) && (new Date().getTime() > lastCheck_ + 300000)) {
             pbh.showProgressDialog("Fetching data...");
-            getCheckParameters().execute(requesthandler);
+            
+    		Request req = ApiFactory.createUnreadPMCount();
+    		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+    		arw.exec(new DataCall() { public void call() { handlePMCount((JSONObject)arg1);	} });
+
 
             lastCheck_ = new Date().getTime();
         }
@@ -190,7 +188,7 @@ public class MainMenuActivity
         super.onCreate(savedInstanceState);
 
         // Retrieve authentication info
-        Authentication.loadAuthenticationInformation(this);
+        AuthenticationHandler.loadAuthenticationInformation(this);
 
         mustReloadAuthInfo_ = false;
 
@@ -225,28 +223,23 @@ public class MainMenuActivity
     }
 
     /**
-     * Method description
-     *
-     *
-     * @param id
+     * Handles the feedback from the UnreadPMCountRequest
      * @param obj
-     *
      * @throws Exception
      */
-    @Override
-    public void onData(int id, JSONObject obj) throws Exception {
-        if (id == AppConstants.REQUEST_ID_FETCHDATA) {
+    public void handlePMCount(JSONObject obj) {
+    	
+    	try {
             // Hide progress bar
             pbh.hideProgressDialog();
-
             // Fetch the number
             messageCount_ = obj.getInt("unreadpmcount");
 
             // Update display
             updateButtons();
-        } else {
-            super.onData(id, obj);
-        }
+		} catch (Exception e) {
+			onError(e);
+		}
     }
 
     /**
@@ -258,7 +251,7 @@ public class MainMenuActivity
         super.onResume();
 
         if (mustReloadAuthInfo_) {
-            Authentication.loadAuthenticationInformation(this);
+            AuthenticationHandler.loadAuthenticationInformation(this);
         }
 
         checkButtonDisabledState();
@@ -301,24 +294,22 @@ public class MainMenuActivity
         buttonPMs_.setText("PMs (" + messageCount_ + ")");
     }
 
-    //~--- get methods --------------------------------------------------------
-
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
-    protected AjaxRequest getCheckParameters() {
-        AjaxRequest req = new AjaxRequest();
-
-        // Set request parameters
-        req.addParameter("f", "unreadpmcount");
-
-        // Set request ID
-        req.setRequestID(AppConstants.REQUEST_ID_FETCHDATA);
-
-        // Return result
-        return req;
-    }
+//    /**
+//     * Method description
+//     *
+//     *
+//     * @return
+//     */
+//    protected AjaxRequest getCheckParameters() {
+//        AjaxRequest req = new AjaxRequest();
+//
+//        // Set request parameters
+//        req.addParameter("f", "unreadpmcount");
+//
+//        // Set request ID
+//        req.setRequestID(AppConstants.REQUEST_ID_FETCHDATA);
+//
+//        // Return result
+//        return req;
+//    }
 }

@@ -16,42 +16,16 @@ import com.sofurry.AppConstants;
 import com.sofurry.adapters.SubmissionGalleryAdapter;
 import com.sofurry.base.classes.AbstractContentGallery;
 import com.sofurry.base.classes.ActivityManager;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
+import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
-import com.sofurry.requests.AjaxRequest;
 import com.sofurry.storage.ImageStorage;
 import com.sofurry.util.ErrorHandler;
 
 public class GalleryArtActivity extends AbstractContentGallery<Submission> {
-
-	/**
-	 * Creates a browse command, to be used with the AJax interface
-	 * @param page
-	 * The page to get
-	 * @param source
-	 * the viewsource
-	 * @param viewSearch
-	 * the tags
-	 * @param contentType
-	 * the contenttype
-	 * @param entries
-	 * the number of entries to return
-	 * @return
-	 * Returns an ajax request with parameters
-	 */
-	public static AjaxRequest createBrowse(int page, int source, String viewSearch, int contentType, int entries) {
-		AjaxRequest req = new AjaxRequest();
-		req.addParameter("f", "browse");
-		req.addParameter("viewSource", ""+source);
-		if (source == AppConstants.VIEWSOURCE_SEARCH)
-		  req.addParameter("search", viewSearch);
-		if (source == AppConstants.VIEWSOURCE_USER)
-		  req.addParameter("authorid", viewSearch);
-		req.addParameter("contentType", "" + contentType);
-		req.addParameter("entriesPerPage", "" + entries);
-		req.addParameter("page", "" + page);
-		return req;
-	}
 
 	/**
 	 * Converts Json-submission objects into a list of Submission objects
@@ -74,8 +48,9 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 	}
 
 	@Override
-	public AjaxRequest getFetchParameters(int page, int source) {
-		return createBrowse(page, source, man.getViewSearch(), AppConstants.CONTENTTYPE_ART, AppConstants.ENTRIESPERPAGE_GALLERY);
+	public Request getFetchParameters(int page, ViewSource source) throws Exception {
+		Request req = ApiFactory.createBrowse(source,null,ContentType.art,AppConstants.ENTRIESPERPAGE_GALLERY,page);
+		return req;
 	}
 	
 	/* (non-Javadoc)
@@ -85,7 +60,7 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 		try {
 			jsonToResultlist(obj, man, SUBMISSION_TYPE.ARTWORK);
 		} catch (Exception e) {
-			man.onError(-1,e);
+			man.onError(e);
 		}
 		// Start downloading the thumbnails
 		man.startThumbnailDownloader();
@@ -100,8 +75,6 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 		// allow viewer to know submissions list
 		i.putExtra("list", man.getResultList()); 
 		i.putExtra("listId", selectedIndex); 
-//		i.putExtra("manager", man); 
-//		man.getResultList().get(selectedIndex).feedIntent(i); // duplicate feedIntent from same submission
 		startActivity(i);
 	}
 
@@ -111,7 +84,7 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 		return new SubmissionGalleryAdapter(context, man.getResultList());
 	}
 
-	public void resetViewSourceExtra(int newViewSource) {
+	public void resetViewSourceExtra(ViewSource newViewSource) {
 	}
 
 	@Override
@@ -125,7 +98,7 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 		}
 		super.finish();
 	}
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -135,6 +108,7 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 		galleryView.setColumnWidth(prefs.getInt(AppConstants.PREFERENCE_THUMB_SIZE, 130));
 	}
 	
+
 	
 
 }

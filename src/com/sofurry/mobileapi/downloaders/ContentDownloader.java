@@ -1,4 +1,4 @@
-package com.sofurry.requests;
+package com.sofurry.mobileapi.downloaders;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -12,9 +12,10 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.sofurry.AppConstants;
-import com.sofurry.base.interfaces.IRequestHandler;
+import com.sofurry.mobileapi.SFConstants;
+import com.sofurry.mobileapi.core.CallBack;
+import com.sofurry.mobileapi.core.HttpRequestHandler;
 import com.sofurry.storage.FileStorage;
-import com.sofurry.util.ProgressSignal;
 
 public class ContentDownloader {
 
@@ -27,9 +28,9 @@ public class ContentDownloader {
 	 * @throws Exception
 	 */
 	public static Bitmap downloadBitmap(String url) throws Exception {
-		Log.d(AppConstants.TAG_STRING, "ContentDownloader: Fetching image...");
+		Log.d(SFConstants.TAG_STRING, "ContentDownloader: Fetching image...");
 		
-		URL myImageURL = new URL(HttpRequest.encodeURL(url));
+		URL myImageURL = new URL(HttpRequestHandler.encodeURL(url));
 		HttpURLConnection connection = null;
 		InputStream is = null;
 		Bitmap bitmap = null;
@@ -77,8 +78,10 @@ public class ContentDownloader {
 	 * @param req
 	 * The request handler to signal arrival to
 	 */
-	public static AsyncFileDownloader asyncDownload(String url, String absfilename, IRequestHandler req) {
-		return AsyncFileDownloader.doRequest(req, url, absfilename, AppConstants.REQUEST_ID_DOWNLOADFILE);
+	public static AsyncFileDownloader asyncDownload(String url, String absfilename, CallBack cb, PercentageFeedback feed) throws Exception {
+		AsyncFileDownloader afd = new AsyncFileDownloader(url, absfilename, cb, feed);
+		afd.start();
+		return afd;
 	}
 	
 	/**
@@ -87,15 +90,13 @@ public class ContentDownloader {
 	 * The URL to fetch the file from
 	 * @param filename
 	 * The filename to store the file to (absolute path required)
-	 * @param feedback
-	 * A Request handler that will be bombarded with ProgressSignal objects, to signal the progress of things.
-	 * @param parent
-	 * The Thread this is called from. If it exists, it can be checked for cancelation requests
+	 * @param feed
+	 * An object implementing the .signalPercentage method, which will be called periodically to signal feedback
 	 * @throws Exception
 	 */
-	public static void downloadFile(String url, String absfilename, IRequestHandler feedback) throws Exception {
-		Log.d(AppConstants.TAG_STRING, "ContentDownloader: Fetching file...");
-		URL myImageURL = new URL(HttpRequest.encodeURL(url));
+	public static void downloadFile(String url, String absfilename, PercentageFeedback feed) throws Exception {
+		Log.d(SFConstants.TAG_STRING, "ContentDownloader: Fetching file...");
+		URL myImageURL = new URL(HttpRequestHandler.encodeURL(url));
 		HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
 		connection.setDoInput(true);
 		connection.connect();
@@ -115,14 +116,12 @@ public class ContentDownloader {
 		      t+=l;
 		      
 		      // If feedback is signalable, we will report back the download percentage
-		      if (feedback != null) {
+		      if (feed != null) {
 
 		    	  if (cnt++ > 50) {
-		    		  feedback.postMessage(new ProgressSignal(t,0));
+		    		  feed.signalPercentage(t,0);
 		    		  cnt = 0;
 		    	  }
-		    	  
-		    	  if (feedback.isKilled()) throw new Exception("Transferthread was terminated by request handler.");
 		      }
 		      
 		    }

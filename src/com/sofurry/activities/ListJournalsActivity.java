@@ -11,15 +11,19 @@ import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.adapters.SubmissionListAdapter;
 import com.sofurry.base.classes.AbstractContentList;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
+import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
-import com.sofurry.requests.AjaxRequest;
 
 public class ListJournalsActivity extends AbstractContentList<Submission> {
 
 	@Override
-	public AjaxRequest getFetchParameters(int page, int source) {
-		return GalleryArtActivity.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_JOURNALS,AppConstants.ENTRIESPERPAGE_GALLERY);
+	public Request getFetchParameters(int page, ViewSource source) throws Exception {
+		Request req = ApiFactory.createBrowse(source,null,ContentType.art,AppConstants.ENTRIESPERPAGE_GALLERY,page);
+		return req;
 	}
 
 	/* (non-Javadoc)
@@ -30,19 +34,8 @@ public class ListJournalsActivity extends AbstractContentList<Submission> {
 	public void parseResponse(JSONObject obj) {
 		try {
 			GalleryArtActivity.jsonToResultlist(obj, man, SUBMISSION_TYPE.JOURNAL);
-//			JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
-//			JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
-//			for (int i = 0; i < items.length(); i++) {
-//				Submission s = new Submission();
-//				s.populate(items.getJSONObject(i));
-//				s.setType(SUBMISSION_TYPE.JOURNAL);
-//				//s.loadUserIcon();
-//
-//				man.getResultList().add(s);
-//				pageIDs.add("" + s.getId());
-//			}
 		} catch (Exception e) {
-			man.onError(-1,e);
+			man.onError(e);
 		}
 
 		// Start downloading the thumbnails
@@ -56,9 +49,6 @@ public class ListJournalsActivity extends AbstractContentList<Submission> {
 		Log.i(AppConstants.TAG_STRING, "ListJournals: Viewing journal ID: " + s.getId());
 		Intent i = new Intent(this, ViewJournalActivity.class);
 		s.feedIntent(i);
-//		i.putExtra("pageID", s.getId());
-//		i.putExtra("name", s.getName());
-		//i.putExtra("useAuthentication", useAuthentication());
 		startActivity(i);
 		
 	}
@@ -70,7 +60,7 @@ public class ListJournalsActivity extends AbstractContentList<Submission> {
 
 	
 	
-	public void resetViewSourceExtra(int newViewSource) {
+	public void resetViewSourceExtra(ViewSource newViewSource) {
 	}
 
 }

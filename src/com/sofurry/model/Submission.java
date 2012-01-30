@@ -12,8 +12,8 @@ import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IHasThumbnail;
-import com.sofurry.requests.ContentDownloader;
-import com.sofurry.requests.HttpRequest;
+import com.sofurry.mobileapi.core.HttpRequestHandler;
+import com.sofurry.mobileapi.downloaders.ContentDownloader;
 import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
 
@@ -110,7 +110,8 @@ public class Submission implements Serializable, IHasThumbnail {
 	public void setSaveFilename(String saveFilename) {
 		this.saveFilename = saveFilename;
 	}
-	//	public String getFilenameUrl() {
+
+//	public String getFilenameUrl() {
 //		return filenameUrl;
 //	}
 	/* (non-Javadoc)
@@ -240,7 +241,7 @@ public class Submission implements Serializable, IHasThumbnail {
 
     // build relative file name to look in cache
     public String getCacheName() {
-//        String filename = getName() + HttpRequest.extractExtension(getThumbnailUrl());
+//      String filename = getName() + HttpRequest.extractExtension(getThumbnailUrl());
         String filename = "content_" + getId() + FileExt;
         filename = FileStorage.sanitize(filename);
     	return filename;
@@ -295,10 +296,12 @@ public class Submission implements Serializable, IHasThumbnail {
 			default:
 				FileExt = "";
 		}
-		
+
 //		if (type == SUBMISSION_TYPE.MUSIC) {
-//			filenameUrl = datasource.getString("filename");
-//		}
+//		filenameUrl = datasource.getString("filename");
+//	}
+
+		
 	}
 	
 	/**
@@ -339,4 +342,6 @@ public class Submission implements Serializable, IHasThumbnail {
     	if (FileExt.equals(".wmv")) return true;
     	return false;
     }
+
+	
 }
