@@ -2643,6 +2643,7 @@ public class Quotes {
 		"If you didn't want that, then it's a feature! ",
 		"If you drop somethin clean and say \"It's still good It's still Good\" ",
 		"If you go to Z'ha'dum, you will die ",
+		"Growlf.",
 		"If you have any trouble sounding condescending, find a Unix user to show you how it's done. - Scott Adams ",
 		"If you knew where you stood, you'd be standing still. ",
 		"If you make it idiot proof, they just make better idiots.. ",

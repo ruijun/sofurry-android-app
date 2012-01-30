@@ -1,11 +1,10 @@
 package com.sofurry.activities;
 
+import org.json.JSONObject;
+
 import android.database.Cursor;
-
 import android.os.Bundle;
-
 import android.view.View;
-
 import android.widget.AutoCompleteTextView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -15,12 +14,12 @@ import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.adapters.NamesAcDbAdapter;
 import com.sofurry.base.classes.ActivityWithRequests;
-import com.sofurry.requests.AjaxRequest;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.core.Request;
+import com.sofurry.requests.AndroidRequestWrapper;
+import com.sofurry.requests.DataCall;
 
-import org.json.JSONObject;
 
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class description
@@ -28,8 +27,7 @@ import org.json.JSONObject;
  *
  * @author         SoFurry
  */
-public class SendPMActivity
-        extends ActivityWithRequests {
+public class SendPMActivity extends ActivityWithRequests {
     private AutoCompleteTextView sendTo_;
     private NamesAcDbAdapter     dbHelper_;
     private String               msgSubject_;
@@ -39,7 +37,6 @@ public class SendPMActivity
     private TextView             subject_;
 
 
-    //~--- methods ------------------------------------------------------------
 
     /**
      * Method description
@@ -50,10 +47,12 @@ public class SendPMActivity
     public void buttonClick(View v) {
         if (v.getId() == R.id.send) {
             if (sendTo_.getText().length() > 0) {
-                AjaxRequest req = getSendParameters();
 
                 pbh.showProgressDialog("Sending PM...");
-                req.execute(requesthandler);
+
+                AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, getSendParameters());
+                arw.exec(new DataCall() {public void call() throws Exception {handleSendReply((JSONObject)arg1);}});
+                
             } else {
                 Toast.makeText(this, "You need to specify a recipient.", Toast.LENGTH_LONG).show();
             }
@@ -128,17 +127,13 @@ public class SendPMActivity
     }
 
     /**
-     * Method description
-     *
-     *
-     * @param id Request ID
-     * @param obj Parsed JSON object
-     *
+     * Handles the reply sent by the sendPM command
+     * @param obj
+     * Data passed from the server
      * @throws Exception
      */
-    @Override
-    public void onData(int id, JSONObject obj) throws Exception {
-        if (id == AppConstants.REQUEST_ID_SEND) {
+    public void handleSendReply(JSONObject obj) {
+    	try {
             Boolean hadSuccess;
 
             // Hide progress dialog
@@ -164,9 +159,9 @@ public class SendPMActivity
 
                 showDialog(AppConstants.DIALOG_ERROR_ID);
             }
-        } else {
-            super.onData(id, obj);    // Handle inherited events
-        }
+		} catch (Exception e) {
+			onError(e);
+		}
     }
 
     /**
@@ -214,27 +209,36 @@ public class SendPMActivity
      *
      * @return A filled-out AjaxRequest object, ready to be executed
      */
-    protected AjaxRequest getSendParameters() {
-        AjaxRequest req         = new AjaxRequest();
-        String      messageText = messageText_.getText().toString();
-
-        // Prepare message text, because line-breaks aren't transmitted correctly
-        messageText = messageText.replaceAll("\n", "<br />").replaceAll("\r", "");
-
-        // Set request parameters
-        req.addParameter("f", "sendpm");
-        req.addParameter("toUserName", sendTo_.getText().toString());
-        req.addParameter("subject", subject_.getText().toString());
-        req.addParameter("message", messageText);
-        req.addParameter("parendId", "0");
-
+    protected Request getSendParameters() {
+        String messageText = messageText_.getText().toString();
+        String sendTo = sendTo_.getText().toString();
+        String subject = subject_.getText().toString();
+    	
         if ((toUserId_ != null) && (toUserId_.length() > 0)) {
-            req.addParameter("toUserId", toUserId_);
+        	return ApiFactory.createSendPM(sendTo, Integer.parseInt(toUserId_) , subject, messageText, 0);
+        } else {
+        	return ApiFactory.createSendPM(sendTo, subject, messageText,0);
         }
-
-        // Set the request ID, so we know which request we're managing later
-        req.setRequestID(AppConstants.REQUEST_ID_SEND);
-
-        return req;
+    	
+//        AjaxRequest req         = new AjaxRequest();
+//
+//        // Prepare message text, because line-breaks aren't transmitted correctly
+//        messageText = messageText.replaceAll("\n", "<br />").replaceAll("\r", "");
+//
+//        // Set request parameters
+//        req.addParameter("f", "sendpm");
+//        req.addParameter("toUserName", sendTo_.getText().toString());
+//        req.addParameter("subject", subject_.getText().toString());
+//        req.addParameter("message", messageText);
+//        req.addParameter("parendId", "0");
+//
+//        if ((toUserId_ != null) && (toUserId_.length() > 0)) {
+//            req.addParameter("toUserId", toUserId_);
+//        }
+//
+//        // Set the request ID, so we know which request we're managing later
+//        req.setRequestID(AppConstants.REQUEST_ID_SEND);
+//
+//        return req;
     }
 }

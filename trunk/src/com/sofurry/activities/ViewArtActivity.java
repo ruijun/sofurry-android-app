@@ -1,6 +1,5 @@
 package com.sofurry.activities;
 
-//~--- imports ----------------------------------------------------------------
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,8 +15,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-//import android.os.Debug;
-//import android.os.Debug.MemoryInfo;
 
 import android.preference.PreferenceManager;
 
@@ -43,8 +40,8 @@ import com.sofurry.AppConstants;
 import com.sofurry.FixedViewFlipper;
 import com.sofurry.R;
 import com.sofurry.base.classes.FavableActivity;
+import com.sofurry.mobileapi.downloaders.AsyncImageLoader;
 import com.sofurry.model.Submission;
-import com.sofurry.requests.AsyncImageLoader;
 import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
 
@@ -57,7 +54,6 @@ import android.view.animation.AnimationUtils;
 import java.lang.Math;
 
 
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class description
@@ -87,7 +83,7 @@ public class ViewArtActivity
 		
 		public PageHolder(Context c) {
 			context = c;
-/*			mutex1 = new Object();
+			/*			mutex1 = new Object();
 			myThumbLoader = new thumbLoader();
 			myThumbLoader.run();/**/
 		}
@@ -112,7 +108,7 @@ public class ViewArtActivity
 				}
 			}
 		}/**/
-		
+
 		public void adjustInfo() {
 //			MemoryInfo mi = new MemoryInfo(); // DEBUG
 //			Debug.getMemoryInfo(mi);
@@ -124,7 +120,7 @@ public class ViewArtActivity
 			
             // set description
             InfoText.setText(MakeTitle());
-//            InfoText.setText(MakeTitle()+" Dalvik: "+mi.dalvikPss+" Native: "+mi.nativePss+" Other: "+mi.otherPss);
+//          InfoText.setText(MakeTitle()+" Dalvik: "+mi.dalvikPss+" Native: "+mi.nativePss+" Other: "+mi.otherPss);
 
             // check if image already saved
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -184,10 +180,11 @@ public class ViewArtActivity
 				}
 			};
 			t.start();/**/
-			
+        	
             // start load thread
            	loadingIndicator.setVisibility(View.VISIBLE);
 			playIndicator.setVisibility(View.INVISIBLE);
+
             imageLoader = AsyncImageLoader.doLoad(context, this, submission, false, ! showImage, useOriginalScale);
 		}
 
@@ -205,6 +202,7 @@ public class ViewArtActivity
         		imageBitmap.recycle();
         		imageBitmap = null;
         	}/**/
+			
 			unloadPic();
         	
         	// === load new submission ===
@@ -213,7 +211,7 @@ public class ViewArtActivity
         	// set titles and indicators
         	adjustInfo(); // damn slowwwwwwwww (40-150ms)
         	
-/*        	// can cause unproper info loading in case of fast submission changes
+        	/*        	// can cause unproper info loading in case of fast submission changes
         	Thread t = new Thread() {
 				public void run() {
 		        	adjustInfo();
@@ -223,6 +221,7 @@ public class ViewArtActivity
 
         	imageLoaded = false;
 //        	loadPic(); // load only when needed
+
 		}
 
 		private void doRefresh() {
@@ -278,7 +277,7 @@ public class ViewArtActivity
 	    		imageLoader = null;
 	    	}
 	    	
-/*	    	myThumbLoader.cancelled = true;
+	    	/*	    	myThumbLoader.cancelled = true;
 	    	myThumbLoader.notify();
 	    	myThumbLoader = null;/**/
 	    	
@@ -308,7 +307,7 @@ public class ViewArtActivity
             } else if ((submission != null) && (submission.isVideo())) {
 				playIndicator.setVisibility(View.VISIBLE);
             }
-
+            
             // set titles and indicators
             if (submission != null) {
             	adjustInfo();
@@ -343,7 +342,7 @@ public class ViewArtActivity
 	            // create directories. alredy done by ensureDirectory
 //	            File td = new File(targetPath.substring(0, targetPath.lastIndexOf('/')));
 //	            td.mkdirs();
-
+	            
 	            File tf = new File(targetPath);
 	            FileStorage.ensureDirectory(tf.getParent());
 	            
@@ -356,7 +355,7 @@ public class ViewArtActivity
 	               	savedIndicator.setVisibility(View.VISIBLE);
 	            }
 	        } catch (Exception e) {
-	            onError(-1, e);
+	            onError(e);
 	        }
 	    }
 	}
@@ -482,6 +481,7 @@ public class ViewArtActivity
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator1);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator1);
         curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator1);
+
         pages.add(curpage);
 
         curpage = new PageHolder(this);
@@ -667,8 +667,8 @@ public class ViewArtActivity
      * @param e
      */
     @Override
-    public void onError(int id, Exception e) {
-        super.onError(id, e);
+    public void onError(Exception e) {
+        super.onError(e);
     }
 
     /**

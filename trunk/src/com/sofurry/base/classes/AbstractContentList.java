@@ -18,7 +18,8 @@ import android.widget.BaseAdapter;
 
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IManagedActivity;
-import com.sofurry.requests.AjaxRequest;
+import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.core.Request;
 import com.sofurry.storage.ManagerStore;
 
 /**
@@ -190,7 +191,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 	
 	public abstract void setSelectedIndex(int selectedIndex);
 
-	public abstract AjaxRequest getFetchParameters(int page, int source);
+	public abstract Request getFetchParameters(int page, ViewSource source) throws Exception;
 
 	public abstract BaseAdapter getAdapter(Context context);
 

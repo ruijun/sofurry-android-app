@@ -11,15 +11,20 @@ import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.adapters.SubmissionListAdapter;
 import com.sofurry.base.classes.AbstractContentList;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
+import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
-import com.sofurry.requests.AjaxRequest;
 
 public class ListStoriesActivity extends AbstractContentList<Submission> {
 
 	@Override
-	public AjaxRequest getFetchParameters(int page, int source) {
-		return GalleryArtActivity.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_STORIES,AppConstants.ENTRIESPERPAGE_GALLERY);
+	public Request getFetchParameters(int page, ViewSource source) throws Exception {
+		Request req = ApiFactory.createBrowse(source,null,ContentType.stories,AppConstants.ENTRIESPERPAGE_GALLERY,page);
+		return req;
+		//return GalleryArtActivity.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_STORIES,AppConstants.ENTRIESPERPAGE_GALLERY);
 	}
 	
 
@@ -28,7 +33,7 @@ public class ListStoriesActivity extends AbstractContentList<Submission> {
 		try {
 			GalleryArtActivity.jsonToResultlist(obj, man, SUBMISSION_TYPE.STORY);
 		} catch (Exception e) {
-			man.onError(-1,e);
+			man.onError(e);
 		}
 		// Start downloading the thumbnails
 		man.startThumbnailDownloader();
@@ -55,7 +60,7 @@ public class ListStoriesActivity extends AbstractContentList<Submission> {
 		return new SubmissionListAdapter(context, R.layout.listitemtwolineicon, man.getResultList());
 	}
 
-	public void resetViewSourceExtra(int newViewSource) {
+	public void resetViewSourceExtra(ViewSource newViewSource) {
 	}
 
 	

@@ -1,4 +1,4 @@
-package com.sofurry.base.interfaces;
+package com.sofurry.requests;
 
 import org.json.JSONObject;
 
@@ -27,7 +27,7 @@ public interface ICanHandleFeedback {
 	 * @param id
 	 * @param prg
 	 */
-//	public abstract void onProgress(int id, ProgressSignal prg) throws Exception;
+	public abstract void onProgress(int id, ProgressSignal prg) throws Exception;
 
 	/**
 	 * Method that is called when a refresh is called

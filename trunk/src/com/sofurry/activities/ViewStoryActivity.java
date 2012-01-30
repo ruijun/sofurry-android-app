@@ -1,41 +1,32 @@
 package com.sofurry.activities;
 
-//~--- imports ----------------------------------------------------------------
-
-import android.os.Bundle;
-
-import android.view.Menu;
-
-import android.webkit.WebView;
-
-import android.widget.Toast;
-
-import com.sofurry.AppConstants;
-import com.sofurry.base.classes.FavableActivity;
-import com.sofurry.requests.AjaxRequest;
-import com.sofurry.storage.FileStorage;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
+import org.json.JSONObject;
 
-//~--- classes ----------------------------------------------------------------
+import android.os.Bundle;
+import android.view.Menu;
+import android.webkit.WebView;
+import android.widget.Toast;
+
+import com.sofurry.base.classes.FavableActivity;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.core.Request;
+import com.sofurry.requests.AndroidRequestWrapper;
+import com.sofurry.requests.DataCall;
+import com.sofurry.storage.FileStorage;
 
 /**
  * @author SoFurry
  *
  * Activity that shows a single story
  */
-public class ViewStoryActivity
-        extends FavableActivity {
+public class ViewStoryActivity extends FavableActivity {
     private String  content;
     private WebView webview;
-
-
-    //~--- methods ------------------------------------------------------------
 
     /**
      * Method description
@@ -77,34 +68,29 @@ public class ViewStoryActivity
 
         // Check if we need to fetch
         if (mustFetch) {
-            AjaxRequest req = getFetchParameters(pageID);
-
             pbh.showProgressDialog("Fetching story...");
-            req.execute(requesthandler);
+
+			Request req = ApiFactory.createGetPageContent(pageID);
+    		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+    		arw.exec(new DataCall() { public void call() { handlePageData((JSONObject)arg1);	} });
         }
     }
 
     /**
-     * Method description
-     *
-     *
-     * @param id
+     * Handle the data returned by the getPageContent request
      * @param obj
-     *
-     * @throws Exception
      */
-    @Override
-    public void onData(int id, JSONObject obj) throws Exception {
-        pbh.hideProgressDialog();
+    public void handlePageData(JSONObject obj) {
+    	try {
+            pbh.hideProgressDialog();
 
-        if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
             content = obj.getString("content");
             content = content.replace("\u00a0", "");
 
             showContent();
-        } else {
-            super.onData(id, obj);    // Handle inherited events
-        }
+		} catch (Exception e) {
+			onError(e);
+		}
     }
 
     /**
@@ -140,7 +126,7 @@ public class ViewStoryActivity
             out.close();
             Toast.makeText(getApplicationContext(), "File saved to:\n" + targetPath, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            onError(-1, e);
+            onError(e);
         }
     }
 
@@ -151,21 +137,19 @@ public class ViewStoryActivity
         webview.loadData(content, "text/html", "utf-8");
     }
 
-    //~--- get methods --------------------------------------------------------
-
-    /**
-     * Returns a story request
-     * @param pageID
-     * The pageID of the story to be fetched
-     * @return
-     */
-    protected AjaxRequest getFetchParameters(int pageID) {
-        AjaxRequest req = new AjaxRequest();
-
-        req.addParameter("f", "getpagecontent");
-        req.addParameter("pid", "" + pageID);
-        req.setRequestID(AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA);
-
-        return req;
-    }
+//    /**
+//     * Returns a story request
+//     * @param pageID
+//     * The pageID of the story to be fetched
+//     * @return
+//     */
+//    protected AjaxRequest getFetchParameters(int pageID) {
+//        AjaxRequest req = new AjaxRequest();
+//
+//        req.addParameter("f", "getpagecontent");
+//        req.addParameter("pid", "" + pageID);
+//        req.setRequestID(AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA);
+//
+//        return req;
+//    }
 }

@@ -66,6 +66,5 @@
             sofurry:defaultValue="130" 
             sofurry:max="255" 
             android:title="Thumbnail size"/>
-		    
 	</PreferenceCategory>
 </PreferenceScreen>

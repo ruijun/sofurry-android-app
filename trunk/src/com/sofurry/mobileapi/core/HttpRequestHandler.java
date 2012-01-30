@@ -1,4 +1,4 @@
-package com.sofurry.requests;
+package com.sofurry.mobileapi.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -20,21 +21,31 @@ import com.sofurry.AppConstants;
 import android.util.Log;
 
 
-public class HttpRequest {
+/**
+ * @author Rangarig
+ *
+ * The HttpRequestHandler contains all the methods used to communicate via HTTP.
+ */
+public class HttpRequestHandler {
 
-	public static HttpResponse doPost(String url, Map<String, String> kvPairs)
-			throws ClientProtocolException, IOException {
+	/**
+	 * Does a POST Request and returns the response 
+	 * @param url
+	 * The URL to do the POST request
+	 * @param kvPairs
+	 * The parameters for the POST request
+	 * @return
+	 * Returns an HTTPResponse object
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 */
+	public static HttpResponse doPost(String url, Map<String, String> kvPairs) throws ClientProtocolException, IOException {
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		httpclient.getParams().setBooleanParameter("http.protocol.expect-continue", false); // Disable EXPECT because lighttpd doesn't like it
 
-/*		httpclient.getCredentialsProvider().setCredentials(
-                new AuthScope("dev.sofurry.com", 80), 
-                new UsernamePasswordCredentials("sofurry", "l"));
-*/
 		HttpPost httppost = new HttpPost(url);
 		if (kvPairs != null && kvPairs.isEmpty() == false) {
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(
-					kvPairs.size());
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(kvPairs.size());
 			String k, v;
 			Iterator<String> itKeys = kvPairs.keySet().iterator();
 			while (itKeys.hasNext()) {
@@ -49,6 +60,24 @@ public class HttpRequest {
 		}
 		HttpResponse response;
 		response = httpclient.execute(httppost);
+		return response;
+	}
+	
+	/**
+	 * Does a GET Request to a webserver and returns the response
+	 * @param url
+	 * The URL for the GET Request
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 */
+	public static HttpResponse doGet(String url) throws ClientProtocolException, IOException {
+		DefaultHttpClient httpclient = new DefaultHttpClient();
+		httpclient.getParams().setBooleanParameter("http.protocol.expect-continue", false); // Disable EXPECT because lighttpd doesn't like it
+
+		HttpGet httpget = new HttpGet(url);
+		HttpResponse response;
+		response = httpclient.execute(httpget);
 		return response;
 	}
 	

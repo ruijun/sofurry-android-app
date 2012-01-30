@@ -1,7 +1,5 @@
 package com.sofurry.base.classes;
 
-//~--- imports ----------------------------------------------------------------
-
 import android.os.Bundle;
 
 import android.view.KeyEvent;
@@ -11,9 +9,6 @@ import android.view.MenuItem;
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.model.Submission;
-
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * @author Rangarig
@@ -29,9 +24,6 @@ public abstract class SubmissionViewActivity
     protected String thumbURL;
     protected int    authorId;
     protected int    pageID;
-
-
-    //~--- methods ------------------------------------------------------------
 
     /**
      * Allows for the implementing view to add extra menu options to the menu
@@ -102,9 +94,9 @@ public abstract class SubmissionViewActivity
      * @param e
      */
     @Override
-    public void onError(int id, Exception e) {
+    public void onError(Exception e) {
         pbh.hideProgressDialog();
-        super.onError(id, e);
+        super.onError(e);
     }
 
     /**

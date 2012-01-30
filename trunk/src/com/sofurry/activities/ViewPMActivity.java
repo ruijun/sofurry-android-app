@@ -18,13 +18,14 @@ import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.adapters.NamesAcDbAdapter;
 import com.sofurry.base.classes.ActivityWithRequests;
-import com.sofurry.requests.AjaxRequest;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.core.Request;
+import com.sofurry.requests.AndroidRequestWrapper;
+import com.sofurry.requests.DataCall;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class description
@@ -35,7 +36,9 @@ import org.json.JSONObject;
 public class ViewPMActivity
         extends ActivityWithRequests
         implements SlidingDrawer.OnDrawerCloseListener, SlidingDrawer.OnDrawerOpenListener {
-    private ImageView     drawerHandle_;
+    
+	
+	private ImageView     drawerHandle_;
     private SlidingDrawer replyDrawer_;
     private String        content_ = null;
     private String        fromUserId_;
@@ -48,8 +51,6 @@ public class ViewPMActivity
     private int           pmId_;
 
 
-    //~--- methods ------------------------------------------------------------
-
     /**
      * Method description
      *
@@ -57,12 +58,22 @@ public class ViewPMActivity
      * @param v
      */
     public void buttonClick(View v) {
-        if (v.getId() == R.id.reply) {
-            AjaxRequest req = getReplyParameters();
+    	try {
+            if (v.getId() == R.id.reply) {
+                pbh.showProgressDialog("Sending reply...");
+                
+                String      messageText = messageText_.getText().toString();
+                // Prepare message text, because line-breaks aren't transmitted correctly
+                messageText = messageText.replaceAll("\n", "<br />").replaceAll("\r", "");
 
-            pbh.showProgressDialog("Sending reply...");
-            req.execute(requesthandler);
-        }
+                Request req = ApiFactory.createSendPM(fromUserName_,Integer.parseInt(fromUserId_),subject_.getText().toString(),messageText,pmId_);
+        		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+        		arw.exec(new DataCall() { public void call() { handlePMContent((JSONObject)arg1);	} });
+                
+            }
+		} catch (Exception e) {
+			onError(e);
+		}
     }
 
     /**
@@ -130,10 +141,12 @@ public class ViewPMActivity
             if (extras != null) {
                 pmId_ = extras.getInt("PMID");
 
-                AjaxRequest req = getFetchParameters(pmId_);
-
                 pbh.showProgressDialog("Fetching data...");
-                req.execute(requesthandler);
+
+    			Request req = ApiFactory.createGetPmContent(pmId_);
+        		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+        		arw.exec(new DataCall() { public void call() { handlePMContent((JSONObject)arg1);	} });
+
             }
         } else {
             boolean drawerOpened;
@@ -160,19 +173,13 @@ public class ViewPMActivity
             showContent();
         }
     }
-
+    
     /**
-     * Method description
-     *
-     *
-     * @param id Request ID
-     * @param obj Parsed JSON object
-     *
-     * @throws Exception
+     * Handles the feedback data from fetch PM Content
+     * @param obj
      */
-    @Override
-    public void onData(int id, JSONObject obj) throws Exception {
-        if (id == AppConstants.REQUEST_ID_FETCHCONTENT) {
+    public void handlePMContent(JSONObject obj) {
+    	try {
             JSONArray  items;
             JSONObject jsonItem;
 
@@ -204,7 +211,17 @@ public class ViewPMActivity
                     subject_.setText(msgSubject_);
                 }
             }
-        } else if (id == AppConstants.REQUEST_ID_SEND) {
+		} catch (Exception e) {
+			onError(e);
+		}
+    }
+    
+    /**
+     * Handles the date Returned from SendPM
+     * @param obj
+     */
+    public void handleSendData(JSONObject obj) {
+    	try {
             Boolean hadSuccess;
 
             // Hide progress dialog
@@ -232,9 +249,9 @@ public class ViewPMActivity
 
                 showDialog(AppConstants.DIALOG_ERROR_ID);
             }
-        } else {
-            super.onData(id, obj);    // Handle inherited events
-        }
+		} catch (Exception e) {
+			onError(e);
+		}
     }
 
     /**
@@ -301,53 +318,4 @@ public class ViewPMActivity
         webview_.loadData(content_, "text/html", "utf-8");
     }
 
-    //~--- get methods --------------------------------------------------------
-
-    /**
-     * Prepares the parameters used to fetch a PM from the server
-     *
-     *
-     * @param id The ID of the PM in question
-     *
-     * @return A filled-out AjaxRequest object, ready to be executed
-     */
-    protected AjaxRequest getFetchParameters(int id) {
-        AjaxRequest req = new AjaxRequest();
-
-        // Set request parameters
-        req.addParameter("f", "pmcontent");
-        req.addParameter("id", "" + id);
-
-        // Set the request ID, so we know which request we're managing later
-        req.setRequestID(AppConstants.REQUEST_ID_FETCHCONTENT);
-
-        return req;
-    }
-
-    /**
-     * Prepares an AjaxRequest object for sending a PM reply
-     *
-     *
-     * @return A filled-out AjaxRequest object, ready to be executed
-     */
-    protected AjaxRequest getReplyParameters() {
-        AjaxRequest req         = new AjaxRequest();
-        String      messageText = messageText_.getText().toString();
-
-        // Prepare message text, because line-breaks aren't transmitted correctly
-        messageText = messageText.replaceAll("\n", "<br />").replaceAll("\r", "");
-
-        // Set request parameters
-        req.addParameter("f", "sendpm");
-        req.addParameter("toUserId", fromUserId_);
-        req.addParameter("toUserName", fromUserName_);
-        req.addParameter("parentId", "" + pmId_);
-        req.addParameter("subject", subject_.getText().toString());
-        req.addParameter("message", messageText);
-
-        // Set the request ID, so we know which request we're managing later
-        req.setRequestID(AppConstants.REQUEST_ID_SEND);
-
-        return req;
-    }
 }

@@ -11,15 +11,20 @@ import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.adapters.SubmissionListAdapter;
 import com.sofurry.base.classes.AbstractContentList;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
+import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
-import com.sofurry.requests.AjaxRequest;
 
 public class ListMusicActivity extends AbstractContentList<Submission> {
 
 	@Override
-	public AjaxRequest getFetchParameters(int page, int source) {
-		return GalleryArtActivity.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_MUSIC,AppConstants.ENTRIESPERPAGE_GALLERY);
+	public Request getFetchParameters(int page, ViewSource source) throws Exception {
+		Request req = ApiFactory.createBrowse(source,null,ContentType.music,AppConstants.ENTRIESPERPAGE_GALLERY,page);
+		return req;
+		//return GalleryArtActivity.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_MUSIC,AppConstants.ENTRIESPERPAGE_GALLERY);
 	}
 	
 
@@ -49,7 +54,7 @@ public class ListMusicActivity extends AbstractContentList<Submission> {
 		return new SubmissionListAdapter(context, R.layout.listitemtwolineicon, man.getResultList());
 	}
 
-	public void resetViewSourceExtra(int newViewSource) {
+	public void resetViewSourceExtra(ViewSource newViewSource) {
 	}
 
 

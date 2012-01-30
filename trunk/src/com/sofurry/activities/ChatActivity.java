@@ -31,9 +31,7 @@ import android.widget.Toast;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
-import com.sofurry.requests.AjaxRequest;
-import com.sofurry.requests.RequestThread;
-import com.sofurry.util.Authentication;
+import com.sofurry.mobileapi.core.AuthenticationHandler;
 import com.sofurry.util.ErrorHandler;
 
 public class ChatActivity extends ActivityWithRequests {
@@ -62,12 +60,13 @@ public class ChatActivity extends ActivityWithRequests {
 		
 	@Override
 	public void onData(int id, JSONObject obj) throws Exception {
-		if (id == AppConstants.REQUEST_ID_ROOMLIST) {
-			populateRoomList(obj);
-		}
-		if (id == AppConstants.REQUEST_ID_USERLIST) {
-			populateUserList(obj);
-		}
+		// FIXME:
+//		if (id == AppConstants.REQUEST_ID_ROOMLIST) {
+//			populateRoomList(obj);
+//		}
+//		if (id == AppConstants.REQUEST_ID_USERLIST) {
+//			populateUserList(obj);
+//		}
 	}
 
 	@Override
@@ -182,7 +181,7 @@ public class ChatActivity extends ActivityWithRequests {
 	        	try {
 	     		   changeRoom(roomIdToIdx(roomId));
 				} catch (Exception e) {
-				   onError(-1, e);
+				   onError(e);
 				}
 			}
         }
@@ -256,10 +255,12 @@ public class ChatActivity extends ActivityWithRequests {
 		// Do we need to fetch the room list?
 		if (roomIds == null) {
 			pbh.showProgressDialog("Fetching rooms");
-			AjaxRequest getRooms = new AjaxRequest();
-			getRooms.addParameter("f", "chatrooms");
-			getRooms.setRequestID(AppConstants.REQUEST_ID_ROOMLIST); // Mark this request, so the return value handler knows what to do with the result
-			getRooms.execute(requesthandler);
+			
+			// FIXME:
+//			AjaxRequest getRooms = new AjaxRequest();
+//			getRooms.addParameter("f", "chatrooms");
+//			getRooms.setRequestID(AppConstants.REQUEST_ID_ROOMLIST); // Mark this request, so the return value handler knows what to do with the result
+//			getRooms.execute(requesthandler);
 		} else { // No we already have it, call dialog directly
 			roomSelect();
 		}
@@ -336,11 +337,12 @@ public class ChatActivity extends ActivityWithRequests {
 	 */
 	private void getUserList() {
 		pbh.showProgressDialog("Fetching users");
-		AjaxRequest getRooms = new AjaxRequest();
-		getRooms.addParameter("f", "onlineUsers");
-		getRooms.addParameter("roomid", "" + ChatActivity.roomId);
-		getRooms.setRequestID(AppConstants.REQUEST_ID_USERLIST); // Mark this request, so the return value handler knows what to do with the result
-		getRooms.execute(requesthandler);
+		// FIXME:
+//		AjaxRequest getRooms = new AjaxRequest();
+//		getRooms.addParameter("f", "onlineUsers");
+//		getRooms.addParameter("roomid", "" + ChatActivity.roomId);
+//		getRooms.setRequestID(AppConstants.REQUEST_ID_USERLIST); // Mark this request, so the return value handler knows what to do with the result
+//		getRooms.execute(requesthandler);
 	}
 
 	/**
@@ -395,21 +397,22 @@ public class ChatActivity extends ActivityWithRequests {
 	 */
 	protected String pollChat(int roomId) {
 		//Send chat poll request, return result
-		AjaxRequest req = new AjaxRequest(requestUrl);
-		
-		//Map<String, String> requestParameters = new HashMap<String, String>();
-		req.addParameter("f", "chatfetch");
-		req.addParameter("lastid", ""+chatSequence);
-		req.addParameter("roomid", ""+roomId);
-
-		try {
-			String httpResult = RequestThread.authenticadedHTTPRequest(req);
-			RequestThread.parseErrorMessage(new JSONObject(httpResult));
-			return httpResult;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		//FIXME:
+//		AjaxRequest req = new AjaxRequest(requestUrl);
+//		
+//		//Map<String, String> requestParameters = new HashMap<String, String>();
+//		req.addParameter("f", "chatfetch");
+//		req.addParameter("lastid", ""+chatSequence);
+//		req.addParameter("roomid", ""+roomId);
+//
+//		try {
+//			String httpResult = RequestThread.authenticadedHTTPRequest(req);
+//			RequestThread.parseErrorMessage(new JSONObject(httpResult));
+//			return httpResult;
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 		return null;
 	}
@@ -467,26 +470,27 @@ public class ChatActivity extends ActivityWithRequests {
 			while (keepRunning) {
 				String message = chatSendQueue.poll();
 				if (message != null) {
-					AjaxRequest req = new AjaxRequest();
-					//Build the request and send it
-					
-					// Check if message is meant to be a command and set the function accordingly
-					if(message.substring(0,1).contains("/")) {
-						req.addParameter("f", "chatcommand");
-					}
-					else {
-						req.addParameter("f", "chatpost");
-					}
-
-					req.addParameter("message", ""+message);
-					req.addParameter("roomid", ""+roomId);
-
-					try {
-						String httpResult = RequestThread.authenticadedHTTPRequest(req);
-						RequestThread.parseErrorMessage(new JSONObject(httpResult));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					// FIXME:
+//					AjaxRequest req = new AjaxRequest();
+//					//Build the request and send it
+//					
+//					// Check if message is meant to be a command and set the function accordingly
+//					if(message.substring(0,1).contains("/")) {
+//						req.addParameter("f", "chatcommand");
+//					}
+//					else {
+//						req.addParameter("f", "chatpost");
+//					}
+//
+//					req.addParameter("message", ""+message);
+//					req.addParameter("roomid", ""+roomId);
+//
+//					try {
+//						String httpResult = RequestThread.authenticadedHTTPRequest(req);
+//						RequestThread.parseErrorMessage(new JSONObject(httpResult));
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
 				
 				}
 				try {
@@ -514,7 +518,7 @@ public class ChatActivity extends ActivityWithRequests {
         else if (text.toString().startsWith("***"))
             color = Color.LTGRAY;
         /* cite color */
-        else if (!text.toString().startsWith(Authentication.getUsername()) && text.toString().toLowerCase().contains(Authentication.getUsername().toLowerCase())) {
+        else if (!text.toString().startsWith(AuthenticationHandler.getUsername()) && text.toString().toLowerCase().contains(AuthenticationHandler.getUsername().toLowerCase())) {
             color = Color.CYAN;
             Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             v.vibrate(200);

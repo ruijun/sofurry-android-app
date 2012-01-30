@@ -160,7 +160,7 @@ public abstract class ActivityWithRequests
      * @param id
      * @param e
      */
-    public void onError(int id, Exception e) {
+    public void onError(Exception e) {
         pbh.hideProgressDialog();
         ErrorHandler.showError(this, e);
     }

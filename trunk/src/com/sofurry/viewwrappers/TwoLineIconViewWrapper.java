@@ -35,8 +35,6 @@ public class TwoLineIconViewWrapper {
     private View      base_;
 
 
-    //~--- constructors -------------------------------------------------------
-
     /**
      * Constructs ...
      *
@@ -46,8 +44,6 @@ public class TwoLineIconViewWrapper {
     public TwoLineIconViewWrapper(View base) {
         base_ = base;
     }
-
-    //~--- get methods --------------------------------------------------------
 
     /**
      * Method description
