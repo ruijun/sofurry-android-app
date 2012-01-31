@@ -24,8 +24,6 @@ import com.sofurry.util.ProgressSignal;
 import org.json.JSONObject;
 
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * @author Rangarig
  *
@@ -55,7 +53,6 @@ public abstract class ActivityWithRequests
     protected long   uniquestoragekey = System.nanoTime();
 
 
-    //~--- methods ------------------------------------------------------------
 
     /**
      * Method description
@@ -138,20 +135,20 @@ public abstract class ActivityWithRequests
         return dialog;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     * @param obj
-     *
-     * @throws Exception
-     */
-    public void onData(int id, JSONObject obj) throws Exception {
-        pbh.hideProgressDialog();
-
-        throw new Exception("JSONObject received, but no handler implemented.");
-    }
+//    /**
+//     * Method description
+//     *
+//     *
+//     * @param id
+//     * @param obj
+//     *
+//     * @throws Exception
+//     */
+//    public void onData(int id, JSONObject obj) throws Exception {
+//        pbh.hideProgressDialog();
+//
+//        throw new Exception("JSONObject received, but no handler implemented.");
+//    }
 
     /**
      * Method description
@@ -264,7 +261,6 @@ public abstract class ActivityWithRequests
         ItemStorage.get().store(uniquestoragekey, key, obj);
     }
 
-    //~--- get methods --------------------------------------------------------
 
     /**
      * A quick shortcut to determine if the device is in landscape or portrait

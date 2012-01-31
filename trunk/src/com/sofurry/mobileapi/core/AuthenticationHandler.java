@@ -48,7 +48,6 @@ public class AuthenticationHandler {
             return;
         }
 
-        // Map<String, String> result = new HashMap<String, String>(queryParams);
         queryParams.put("otpuser", username);
         queryParams.put("otphash", generateRequestHash());
         queryParams.put("otpsequence", "" + currentAuthenticationSequence);

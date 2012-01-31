@@ -37,7 +37,8 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 			pbh.showProgressDialog("Fetching journal...");
 			
 			
-			Request req = ApiFactory.createGetPageContent(pageID);
+			//Request req = ApiFactory.createGetPageContent(pageID);
+			Request req = ApiFactory.createGetSubmissionData(pageID);
     		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
     		arw.exec(new DataCall() { public void call() { handlePageContent((JSONObject)arg1);	} });
 
@@ -76,7 +77,10 @@ public class ViewJournalActivity extends SubmissionViewActivity  {
 	public void handlePageContent(JSONObject obj)  {
 		try {
 			pbh.hideProgressDialog();
-			content = obj.getString("content");
+		    if (obj.has("description"))
+			  content = obj.getString("description");
+			else 
+			  content = "-";
 			content = content.replace("\u00a0", "");
 			viewContent();
 		} catch (Exception e) {

@@ -10,9 +10,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
+
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IHasThumbnail;
-import com.sofurry.mobileapi.core.HttpRequestHandler;
 import com.sofurry.mobileapi.downloaders.ContentDownloader;
 import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;

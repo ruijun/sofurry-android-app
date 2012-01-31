@@ -101,7 +101,6 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		
         SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(this);

@@ -72,7 +72,7 @@ public class ViewArtActivity
 		private ImageView image = null; 
 		private ImageView savedIndicator = null;
 		private ImageView playIndicator = null;
-		private TextView  InfoText = null;
+		private TextView  infoText = null;
 		private View 	  loadingIndicator = null;
 		private View	  myview = null;	
 		
@@ -119,7 +119,7 @@ public class ViewArtActivity
 			long availableMegs = mi.availMem / 1048576L; /**/
 			
             // set description
-            InfoText.setText(MakeTitle());
+            infoText.setText(MakeTitle());
 //          InfoText.setText(MakeTitle()+" Dalvik: "+mi.dalvikPss+" Native: "+mi.nativePss+" Other: "+mi.otherPss);
 
             // check if image already saved
@@ -286,7 +286,7 @@ public class ViewArtActivity
 	    	image = null;
 	    	submission = null;
 	    	savedIndicator = null;
-	    	InfoText = null;
+	    	infoText = null;
 	    	context = null;
 	    	myview = null;
 	    }
@@ -477,7 +477,7 @@ public class ViewArtActivity
         curpage = new PageHolder(this);
         curpage.myview = (View) findViewById(R.id.page1);
         curpage.image           = (ImageView) findViewById(R.id.imagepreview1);
-        curpage.InfoText = (TextView) findViewById(R.id.InfoText1);
+        curpage.infoText = (TextView) findViewById(R.id.InfoText1);
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator1);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator1);
         curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator1);
@@ -487,7 +487,7 @@ public class ViewArtActivity
         curpage = new PageHolder(this);
         curpage.myview = (View) findViewById(R.id.page2);
         curpage.image           = (ImageView) findViewById(R.id.imagepreview2);
-        curpage.InfoText = (TextView) findViewById(R.id.InfoText2);
+        curpage.infoText = (TextView) findViewById(R.id.InfoText2);
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator2);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator2);
         curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator2);
@@ -496,7 +496,7 @@ public class ViewArtActivity
         curpage = new PageHolder(this);
         curpage.myview = (View) findViewById(R.id.page3);
         curpage.image           = (ImageView) findViewById(R.id.imagepreview3);
-        curpage.InfoText = (TextView) findViewById(R.id.InfoText3);
+        curpage.infoText = (TextView) findViewById(R.id.InfoText3);
         curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator3);
         curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator3);
         curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator3);

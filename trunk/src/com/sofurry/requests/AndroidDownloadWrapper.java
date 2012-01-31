@@ -32,6 +32,8 @@ public class AndroidDownloadWrapper {
 	public DataCall callFinish = null;
 	
 	public AndroidDownloadWrapper(RequestHandler reqHandler, String url, String targetFile) {
+		this.url = url;
+		this.targetFile = targetFile;
 		this.req = reqHandler;
 	}
 	
@@ -83,6 +85,14 @@ public class AndroidDownloadWrapper {
 		} catch (Exception e) {
 			req.onError(e);
 		}
+	}
+	
+	/**
+	 * Will try its best to stop the download currently in progress
+	 */
+	public void cancel() throws Exception {
+		if (downloader != null)
+		  downloader.cancel();
 	}
 	
 	/**

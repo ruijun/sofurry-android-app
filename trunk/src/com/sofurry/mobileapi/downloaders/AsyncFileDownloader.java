@@ -15,6 +15,7 @@ public class AsyncFileDownloader extends Thread {
 	private String filename = null;
 	private CallBack callback = null;
 	private PercentageFeedback feed = null;
+	private DownloadCancler downcancel = null;
 	//private int id = 0; // The ID to recognize the file feedback by
 	
 	/**
@@ -41,12 +42,21 @@ public class AsyncFileDownloader extends Thread {
 	 */
 	public void run() {
 		try {
-			ContentDownloader.downloadFile(url, filename, feed);
-			callback.success(new JSONObject());
+			downcancel = new DownloadCancler();
+			ContentDownloader.downloadFile(url, filename, feed, downcancel);
+			if (!downcancel.isCanceled()) // Only call the success callback routine if the download was not canceled
+			  callback.success(new JSONObject());
 			//req.postMessage(id, this);
 		} catch (Exception e) {
 			callback.fail(e);
 		}
+	}
+	
+	/**
+	 * cancels the download
+	 */
+	public void cancel() {
+		downcancel.doCancel();
 	}
 	
 	

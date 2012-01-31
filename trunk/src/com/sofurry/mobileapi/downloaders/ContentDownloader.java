@@ -1,6 +1,7 @@
 package com.sofurry.mobileapi.downloaders;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -78,10 +79,26 @@ public class ContentDownloader {
 	 * @param req
 	 * The request handler to signal arrival to
 	 */
-	public static AsyncFileDownloader asyncDownload(String url, String absfilename, CallBack cb, PercentageFeedback feed) throws Exception {
+	public static AsyncFileDownloader asyncDownload(String url, String absfilename, CallBack cb, PercentageFeedback feed, DownloadCancler downcancel) throws Exception {
 		AsyncFileDownloader afd = new AsyncFileDownloader(url, absfilename, cb, feed);
 		afd.start();
 		return afd;
+	}
+
+	/**
+	 * Downloads a file, and signals the complete download
+	 * @param url
+	 * The URL to fetch the file from
+	 * @param filename
+	 * The filename to store the file to (absolute path required)
+	 * @param feed
+	 * An object implementing the .signalPercentage method, which will be called periodically to signal feedback
+	 * @param canceler
+	 * And object that is passed by the caller, allowing the caller to cancel the download
+	 * @throws Exception
+	 */
+	public static void downloadFile(String url, String absfilename, PercentageFeedback feed) throws Exception {
+		downloadFile(url,absfilename,feed,new DownloadCancler());
 	}
 	
 	/**
@@ -92,10 +109,13 @@ public class ContentDownloader {
 	 * The filename to store the file to (absolute path required)
 	 * @param feed
 	 * An object implementing the .signalPercentage method, which will be called periodically to signal feedback
+	 * @param canceler
+	 * And object that is passed by the caller, allowing the caller to cancel the download
 	 * @throws Exception
 	 */
-	public static void downloadFile(String url, String absfilename, PercentageFeedback feed) throws Exception {
+	public static void downloadFile(String url, String absfilename, PercentageFeedback feed,DownloadCancler canceler) throws Exception {
 		Log.d(SFConstants.TAG_STRING, "ContentDownloader: Fetching file...");
+		Log.d(SFConstants.TAG_STRING, "ContentDownloader: " + url);
 		URL myImageURL = new URL(HttpRequestHandler.encodeURL(url));
 		HttpURLConnection connection = (HttpURLConnection) myImageURL.openConnection();
 		connection.setDoInput(true);
@@ -124,6 +144,8 @@ public class ContentDownloader {
 		    	  }
 		      }
 		      
+		      if (canceler.isCanceled()) break;
+		      
 		    }
 	        // I positively HATE this workaround. But as of now, after a day of fiddeling, I cannot do any better :(
 		} catch (SocketException se) {
@@ -139,6 +161,14 @@ public class ContentDownloader {
 			  os.flush();
 	          os.close();
 			}
+		}
+		// If the download was canceled, remove the file that we have written
+		try {
+			if (canceler.isCanceled()) {
+				File fi = new File(absfilename);
+			    fi.delete();
+			}
+		} catch (Exception e) {
 		}
 	}
 

@@ -14,13 +14,13 @@ public interface ICanHandleFeedback {
 	 */
 	public abstract void onError(Exception e);
 
-	/**
-	 * Method that is called when data is returned
-	 * @param obj
-	 * @param id
-	 * Ajax Request ID
-	 */
-	public abstract void onData(int id, JSONObject obj) throws Exception;
+//	/**
+//	 * Method that is called when data is returned
+//	 * @param obj
+//	 * @param id
+//	 * Ajax Request ID
+//	 */
+//	public abstract void onData(int id, JSONObject obj) throws Exception;
 
 	/**
 	 * This is called when some process signals some progress
