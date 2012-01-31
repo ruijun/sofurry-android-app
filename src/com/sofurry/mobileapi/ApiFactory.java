@@ -75,7 +75,7 @@ public class ApiFactory {
      */
     public static final String API_URL = "http://chat.sofurry.com";
     
-    public static final String API2_URL = "http://api2.sofurry.com/std/";
+    public static final String API2_URL = "http://api2.sofurry.com";
 
     /**
 	
@@ -99,14 +99,14 @@ public class ApiFactory {
 	public static Request createBrowse(ViewSource source, String extra, ContentType contentType, int entriesPerPage, int page) throws Exception {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "browse");
-		req.setParamter("viewSource", Integer.toString(source.value));
+		req.setParameter("f", "browse");
+		req.setParameter("viewSource", Integer.toString(source.value));
 		if (extra != null)
 		  if ((source != ViewSource.search) && (source != ViewSource.user))
 			  throw new Exception("The extra parameter can only be used with the modes 'search' and 'user' otherwise it has to be null.");
-		req.setParamter("contentType", Integer.toString(contentType.value));
-		req.setParamter("entriesPerPage", Integer.toString(entriesPerPage));
-		req.setParamter("page", Integer.toString(page));
+		req.setParameter("contentType", Integer.toString(contentType.value));
+		req.setParameter("entriesPerPage", Integer.toString(entriesPerPage));
+		req.setParameter("page", Integer.toString(page));
 		return req;
 	}
 	
@@ -119,8 +119,8 @@ public class ApiFactory {
 	public static Request createGetPageContent(int pageID) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "getpagecontent");
-		req.setParamter("pid", "" + pageID);
+		req.setParameter("f", "getpagecontent");
+		req.setParameter("pid", "" + pageID);
 		return req;
 	}
 	
@@ -132,9 +132,11 @@ public class ApiFactory {
 	 */
 	public static Request createGetSubmissionData(int pageID) {
 		Request req = new Request();
-		req.setURL(API2_URL + "getSubmissionDetails/?id=" + pageID);
+//		req.setURL(API2_URL);//   /?id=" + pageID);
+//		req.setParameter("id", "" + pageID);
+//		req.setParameter("r", "std/getSubmissionDetails");
+		req.setURL(API2_URL + "/std/getSubmissionDetails/?id=" + pageID);
 		req.setMode(HttpMode.get);
-		//req.setParamter("id", "" + pageID);
 		return req;
 	}
 	
@@ -147,8 +149,8 @@ public class ApiFactory {
 	public static Request createAddFav(int pid) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "addfav");
-		req.setParamter("pid", "" + pid);
+		req.setParameter("f", "addfav");
+		req.setParameter("pid", "" + pid);
 		return req;
 	}
 	
@@ -161,8 +163,8 @@ public class ApiFactory {
 	public static Request createRemFav(int pid) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "remfav");
-		req.setParamter("pid", "" + pid);
+		req.setParameter("f", "remfav");
+		req.setParameter("pid", "" + pid);
 		return req;
 	}
 	
@@ -177,9 +179,9 @@ public class ApiFactory {
 	public static Request createSetStars(int pid,int numberOfStars) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "vote");
-		req.setParamter("pid", "" + pid);
-		req.setParamter("votevalue", "" + numberOfStars);
+		req.setParameter("f", "vote");
+		req.setParameter("pid", "" + pid);
+		req.setParameter("votevalue", "" + numberOfStars);
 		return req;
 	}
 	
@@ -192,8 +194,8 @@ public class ApiFactory {
 	public static Request createCum(int pid) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "cum");
-		req.setParamter("pid", "" + pid);
+		req.setParameter("f", "cum");
+		req.setParameter("pid", "" + pid);
 		return req;
 	}
 	
@@ -206,8 +208,8 @@ public class ApiFactory {
 	public static Request createWatch(int authorid) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "addwatch");
-		req.setParamter("authorid", "" + authorid);
+		req.setParameter("f", "addwatch");
+		req.setParameter("authorid", "" + authorid);
 		return req;
 	}
 	
@@ -220,8 +222,8 @@ public class ApiFactory {
 	public static Request createUnWatch(int authorid) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "remwatch");
-		req.setParamter("authorid", "" + authorid);
+		req.setParameter("f", "remwatch");
+		req.setParameter("authorid", "" + authorid);
 		return req;
 	}
 	
@@ -236,9 +238,9 @@ public class ApiFactory {
 	public static Request createListPMs(int page, int entriesPerPage) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "remwatch");
-		req.setParamter("page", "" + page);
-		req.setParamter("entriesPerPage", "" + entriesPerPage);
+		req.setParameter("f", "remwatch");
+		req.setParameter("page", "" + page);
+		req.setParameter("entriesPerPage", "" + entriesPerPage);
 		return req;
 	}
 	
@@ -257,11 +259,11 @@ public class ApiFactory {
 	public static Request createSendPM(String toUserName, String subject, String message, int parentId) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "sendpm");
-		req.setParamter("toUserName", toUserName);
-		req.setParamter("subject", subject);
-		req.setParamter("message", message);
-		req.setParamter("parendId", "" + parentId );
+		req.setParameter("f", "sendpm");
+		req.setParameter("toUserName", toUserName);
+		req.setParameter("subject", subject);
+		req.setParameter("message", message);
+		req.setParameter("parendId", "" + parentId );
 		return req;
 	}
 		
@@ -282,7 +284,7 @@ public class ApiFactory {
 	 */
 	public static Request createSendPM(String toUserName, int toUserId, String subject, String message, int parentId) {
 		Request req = createSendPM(toUserName,subject,message,parentId);
-		req.setParamter("toUserId", "" + toUserId);
+		req.setParameter("toUserId", "" + toUserId);
 		return req;
 	}
 	
@@ -297,9 +299,9 @@ public class ApiFactory {
 	public static Request createUnreadPMCount(long since) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "unreadpmcount");
+		req.setParameter("f", "unreadpmcount");
 		if (since != -1)
-		  req.setParamter("since", "" + since);
+		  req.setParameter("since", "" + since);
 		return req;
 	}
 
@@ -322,8 +324,8 @@ public class ApiFactory {
 	public static Request createGetPmContent(int pmid) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParamter("f", "pmcontent");
-  	    req.setParamter("id", "" + pmid);
+		req.setParameter("f", "pmcontent");
+  	    req.setParameter("id", "" + pmid);
 		return req;
 	}
 

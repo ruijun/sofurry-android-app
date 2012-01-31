@@ -34,6 +34,13 @@ import com.sofurry.base.classes.ActivityWithRequests;
 import com.sofurry.mobileapi.core.AuthenticationHandler;
 import com.sofurry.util.ErrorHandler;
 
+/**
+ * @author --
+ * 
+ * This needs to be fixed, as soon as the new chat api is in place. Right now this is not
+ * functional.
+ *
+ */
 public class ChatActivity extends ActivityWithRequests {
     
 	private ScrollView scrollView;
@@ -58,16 +65,16 @@ public class ChatActivity extends ActivityWithRequests {
 	//private static String MESSAGETYPE_MESSAGE = "message";
 	private static String MESSAGETYPE_WHISPER = "whisper";
 		
-	@Override
-	public void onData(int id, JSONObject obj) throws Exception {
-		// FIXME:
+//	@Override
+//	public void onData(int id, JSONObject obj) throws Exception {
+//		// FIXME:
 //		if (id == AppConstants.REQUEST_ID_ROOMLIST) {
 //			populateRoomList(obj);
 //		}
 //		if (id == AppConstants.REQUEST_ID_USERLIST) {
 //			populateUserList(obj);
 //		}
-	}
+//	}
 
 	@Override
 	public void onOther(int id, Object obj) throws Exception {

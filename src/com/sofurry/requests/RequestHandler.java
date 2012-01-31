@@ -52,12 +52,11 @@ public class RequestHandler implements IRequestHandler {
                 }
                 
 
-                // TODO: Check if still needed
-                if (msg.obj instanceof JSONObject) {
-                    onData(msg.arg1, (JSONObject) msg.obj);
-
-                    return;
-                }
+//                if (msg.obj instanceof JSONObject) {
+//                    onData(msg.arg1, (JSONObject) msg.obj);
+//
+//                    return;
+//                }
 
 //                if (msg.obj instanceof ProgressSignal) {
 //                    onProgress(msg.arg1, (ProgressSignal) msg.obj);
@@ -91,18 +90,18 @@ public class RequestHandler implements IRequestHandler {
     }
 
     
-    /**
-     * See if this can be replaced with DataCall instead.
-     * @param id
-     * @param obj
-     */
-    public void onData(int id, JSONObject obj) {
-        try {
-            feedback.onData(id, obj);
-        } catch (Exception e) {
-            feedback.onError(e);
-        }
-    }
+//    /**
+//     * See if this can be replaced with DataCall instead.
+//     * @param id
+//     * @param obj
+//     */
+//    public void onData(int id, JSONObject obj) {
+//        try {
+//            feedback.onData(id, obj);
+//        } catch (Exception e) {
+//            feedback.onError(e);
+//        }
+//    }
 
     /*
      *  (non-Javadoc)

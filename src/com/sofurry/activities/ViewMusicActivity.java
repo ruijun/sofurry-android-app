@@ -37,18 +37,17 @@ public class ViewMusicActivity extends FavableActivity  {
 	// Variables to store, in case of orientation change
 	private String playPath = null;
 	private String filename = null;
+	private String url = null;
 	private String content = null;
 	private boolean notwice = false;
-	private AsyncFileDownloader down = null; // Placeholder for the downloader thread if it would be used.
-	private int downloadandplaymode = 1;
+	private AndroidDownloadWrapper down = null; // Placeholder for the downloader thread if it would be used.
+	private DownMode downloadandplaymode = DownMode.play;
 	
 	private WebView webview;
 	private Button buttondownload;
 	
-	private static int downmode_play = 1;
-	private static int downmode_save = 2;
+	enum DownMode {play, save};
 	
-
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);	
 		
@@ -57,7 +56,7 @@ public class ViewMusicActivity extends FavableActivity  {
 		
 		buttondownload.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View arg0) {
-				downloadAndDo(downmode_play);
+				downloadAndDo(DownMode.play);
 			}});
 
 
@@ -66,18 +65,22 @@ public class ViewMusicActivity extends FavableActivity  {
 	    if (savedInstanceState == null) {
 			pbh.showProgressDialog("Fetching desc...");
 
-			Request req = ApiFactory.createGetPageContent(pageID);
+			Request req = ApiFactory.createGetSubmissionData(pageID);
     		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
-    		arw.exec(new DataCall() { public void call() { handleFetchContent((JSONObject)arg1);	} });
+    		arw.exec(new DataCall() { public void call() { handleGetSubmissionData((JSONObject)arg1);	} });
 
 	    } else {
 	    	try {
 		    	content = (String) retrieveObject("content");
 		    	playPath = (String) retrieveObject("playPath");
 		    	filename = (String) retrieveObject("filename");
+		    	url = (String) retrieveObject("url");
 		    	notwice = (Boolean) retrieveObject("notwice");
-		    	down = (AsyncFileDownloader) retrieveObject("down");
-		    	downloadandplaymode = (Integer) retrieveObject("downloadandplaymode");
+		    	down = (AndroidDownloadWrapper) retrieveObject("down");
+		    	if (down!=null) initializeADWFeedback(); // Redirect feedback messages
+		    	//downloadandplaymode = (Integer) retrieveObject("downloadandplaymode");
+		    	String tmp = (String) retrieveObject("downloadandplaymode");
+		    	downloadandplaymode = DownMode.valueOf(tmp);
 		    	showContent();
 		    	
 		    	if (down != null) pbh.showProgressDialog("Downloading Song...");
@@ -91,10 +94,16 @@ public class ViewMusicActivity extends FavableActivity  {
 	 * Handles the return values from the getPageContent request
 	 * @param obj
 	 */
-	public void handleFetchContent(JSONObject obj) {
+	public void handleGetSubmissionData(JSONObject obj) {
 		try {
 		  pbh.hideProgressDialog();
-		  content = obj.getString("content");
+		  if (obj.has("description"))
+		    content = obj.getString("description");
+		  else 
+			content = "-";
+		  filename = obj.getString("fileName");
+		  url =  obj.getString("contentSourceUrl");
+
 		  showContent();
 		} catch (Exception e) {
 		  onError(e);
@@ -119,9 +128,10 @@ public class ViewMusicActivity extends FavableActivity  {
 		storeObject("content", content);
 		storeObject("playPath", playPath);
 		storeObject("filename", filename);
+		storeObject("url", filename);
 		storeObject("notwice", notwice);
 		storeObject("down", down);
-		storeObject("downloadandplaymode", downloadandplaymode);
+		storeObject("downloadandplaymode", downloadandplaymode.name());
 		//storeObject("handler", requesthandler);
 
 		super.onSaveInstanceState(outState);
@@ -143,16 +153,18 @@ public class ViewMusicActivity extends FavableActivity  {
 	/**
 	 * Downloads the music file, and replays it
 	 */
-	public void downloadAndDo(int mode) {
+	public void downloadAndDo(DownMode mode) {
 		if (notwice) return;
 		notwice = true;
+		
 		downloadandplaymode = mode;
 		
 		pbh.showProgressDialog("Fetching song data...");
 		
-		Request req = ApiFactory.createGetSubmissionData(pageID);
-		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
-		arw.exec(new DataCall() { public void call() { downloadFile((JSONObject)arg1);	} });
+		//Request req = ApiFactory.createGetSubmissionData(pageID);
+		//AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+		//arw.exec(new DataCall() { public void call() { downloadFile((JSONObject)arg1);	} });
+		downloadFile();
 	}
 	
 	@Override
@@ -164,7 +176,7 @@ public class ViewMusicActivity extends FavableActivity  {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case AppConstants.MENU_PLAY:
-			downloadAndDo(downmode_play);
+			downloadAndDo(DownMode.play);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -175,14 +187,13 @@ public class ViewMusicActivity extends FavableActivity  {
 	 * Extracts the file URL from the fetched data, and downloads the file
 	 * @param obj
 	 */
-	public void downloadFile(JSONObject submissionData)  {
+	public void downloadFile()  {
 		try {
 			
-			String fname = submissionData.getString("fileName");
 			
 			playPath = FileStorage.getPathRoot() + FileStorage.MUSIC_PATH;
 			FileStorage.ensureDirectory(playPath);
-			playPath += fname;
+			playPath += filename;
 			
 			File f = new File(playPath);
 			if (f.exists()) {
@@ -190,30 +201,34 @@ public class ViewMusicActivity extends FavableActivity  {
 				return;
 			}
 			
-			String url = AppConstants._SongURLPrefix + submissionData.getString("contentSourceUrl");
-			
-			
+			// AppConstants._SongURLPrefix +
 			pbh.hideProgressDialog();
 			pbh.showProgressDialog("Downloading Song...");
 			
 			// Prepare async download
-			AndroidDownloadWrapper adw = new AndroidDownloadWrapper(requesthandler, url, playPath);
-			adw.setFinishFeedback(new DataCall() {
-				public void call() throws Exception {
-					handlemusic();
-				}
-			});
-			adw.setPercentageFeedback(new DataCall() {
-				public void call() throws Exception {
-					int i = (Integer)arg1;
-					showProgress(i);
-				}
-			});
-			adw.start(); // Starts the download
-			
+			down = new AndroidDownloadWrapper(requesthandler, url, playPath);
+			initializeADWFeedback();
+			down.start(); // Starts the download
 		} catch (Exception e) {
 			onError(e);
 		}
+	}
+	
+	/**
+	 * Sets the callbacks to be used for the download feedback
+	 */
+	private void initializeADWFeedback() {
+		down.setFinishFeedback(new DataCall() {
+			public void call() throws Exception {
+				handlemusic();
+			}
+		});
+		down.setPercentageFeedback(new DataCall() {
+			public void call() throws Exception {
+				int i = (Integer)arg1;
+				showProgress(i);
+			}
+		});
 	}
 	
 	/**
@@ -234,48 +249,15 @@ public class ViewMusicActivity extends FavableActivity  {
 	public void handlemusic() {
 		try {
 			pbh.hideProgressDialog();
-			if (downloadandplaymode == downmode_play)
+			down = null; // Destroy the downloader since, its no longer referenced
+			if (downloadandplaymode == DownMode.play)
 			  playmusic();
-			if (downloadandplaymode == downmode_save)
+			if (downloadandplaymode == DownMode.save)
 			  save();
 		} catch (Exception e) {
 			onError(e);
 		}
 	}
-	
-//	/**
-//	 * Returns the filename of the mp3 file as it resides on device
-//	 * @return
-//	 */
-//	public String getFname() {
-//		return "/m" + pageID + ".mp3";
-//	}
-	
-//	@Override
-//	public void onProgress(int id, ProgressSignal prg) {
-//		pbh.setMessage("Downloaded " + prg.progress / 1024 + " kbyte...");
-//	}
-
-//	/* (non-Javadoc)
-//	 * @see com.sofurry.ActivityWithRequests#sonOther(int, java.lang.Object)
-//	 * 
-//	 * Step Three 
-//	 */
-//	@Override
-//	public void onOther(int id, Object obj) throws Exception {
-//		if (id == AppConstants.REQUEST_ID_FETCHSUBMISSIONDATA) {
-//			String str = (String)obj;
-//			downloadFile(str);
-//			return; // Important :/
-//		}
-//		
-//		// Filedownload is finished, the the android play the file
-//		if (obj.getClass().equals(AsyncFileDownloader.class)) {
-//			handlemusic();
-//			return;
-//		}
-//		super.onOther(id, obj);
-//	}
 	
 	/**
 	 * Plays the music file submitted
@@ -298,7 +280,7 @@ public class ViewMusicActivity extends FavableActivity  {
 	@Override
 	public void save() {
 		if (playPath == null) {
-			downloadAndDo(downmode_save); // If the file has not been downloaded yet, download will be triggered here
+			downloadAndDo(DownMode.save); // If the file has not been downloaded yet, download will be triggered here
 			return;
 		}
 		try {
@@ -323,6 +305,22 @@ public class ViewMusicActivity extends FavableActivity  {
 		  notwice = false; // Just in case
 		super.onError(e);
 	}
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.base.classes.SubmissionViewActivity#finish()
+	 */
+	@Override
+	public void finish() {
+		if (notwice) {
+			try {
+				down.cancel(); // Cancels the running download
+			} catch (Exception e) {
+			}
+		}
+		super.finish();
+	}
+	
+	
 	
 	
 	

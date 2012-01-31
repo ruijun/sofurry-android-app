@@ -58,7 +58,7 @@ public class Request {
 	 * The value of the parameter
 	 * If the passed value is NULL, the parameter pair will be ignored.
 	 */
-	public void setParamter(String name, String value) {
+	public void setParameter(String name, String value) {
 		if (null == value) return;
 		parameters.put(name, value);
 	}
