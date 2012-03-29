@@ -16,6 +16,7 @@ import com.sofurry.R;
 import com.sofurry.adapters.PrivateMessageAdapter;
 import com.sofurry.base.classes.AbstractContentList;
 import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.PrivateMessage;
@@ -27,8 +28,11 @@ import com.sofurry.model.PrivateMessage;
  *
  * @author SoFurry
  */
-public class ListPMActivity
-        extends AbstractContentList<PrivateMessage> {
+/**
+ * @author f034561
+ *
+ */
+public class ListPMActivity extends AbstractContentList<PrivateMessage> {
 
     /**
      * Suppresses the default options menu, and replaces it with one that makes
@@ -100,7 +104,6 @@ public class ListPMActivity
     /**
      * Method description
      *
-     *
      * @param newViewSource
      */
     public void resetViewSourceExtra(ViewSource newViewSource) {}
@@ -118,17 +121,12 @@ public class ListPMActivity
         return new PrivateMessageAdapter(context, R.layout.listitemtwolineicon, man.getResultList());
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param page
-     * @param source
-     *
-     * @return
+    /* (non-Javadoc)
+     * @see com.sofurry.base.classes.AbstractContentList#getFetchRequest(int)
+     * Overrides the getFetchRequest method, so this call is not handled
+     * by the activity manager (which usually happens for the media oriented lists)
      */
-    @Override
-    public Request getFetchParameters(int page, ViewSource source) throws Exception {
+    public Request getFetchRequest(int page) throws Exception {
     	return ApiFactory.createListPMs(page, AppConstants.ENTRIESPERPAGE_LIST);
     }
 
@@ -156,4 +154,8 @@ public class ListPMActivity
         	updateView();
         }
     }
+
+	public ContentType getContentType() {
+		return null;
+	}
 }

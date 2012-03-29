@@ -1,14 +1,10 @@
 package com.sofurry.base.classes;
 
-//~--- imports ----------------------------------------------------------------
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-
 import android.content.Intent;
 import android.content.res.Configuration;
-
 import android.os.Bundle;
 
 import com.sofurry.AppConstants;
@@ -19,10 +15,6 @@ import com.sofurry.requests.RequestHandler;
 import com.sofurry.storage.ItemStorage;
 import com.sofurry.util.DialogFactory;
 import com.sofurry.util.ErrorHandler;
-import com.sofurry.util.ProgressSignal;
-
-import org.json.JSONObject;
-
 
 /**
  * @author Rangarig
@@ -192,18 +184,18 @@ public abstract class ActivityWithRequests
         }
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     * @param prg
-     *
-     * @throws Exception
-     */
-    public void onProgress(int id, ProgressSignal prg) throws Exception {
-        pbh.setProgress(prg);
-    }
+//    /**
+//     * Method description
+//     *
+//     *
+//     * @param id
+//     * @param prg
+//     *
+//     * @throws Exception
+//     */
+//    public void onProgress(int id, ProgressSignal prg) throws Exception {
+//        pbh.setProgress(prg);
+//    }
 
     /**
      * Method description

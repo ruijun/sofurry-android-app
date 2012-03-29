@@ -20,12 +20,11 @@ import com.sofurry.model.Submission.SUBMISSION_TYPE;
 
 public class ListStoriesActivity extends AbstractContentList<Submission> {
 
-	@Override
-	public Request getFetchParameters(int page, ViewSource source) throws Exception {
-		Request req = ApiFactory.createBrowse(source,null,ContentType.stories,AppConstants.ENTRIESPERPAGE_GALLERY,page);
-		return req;
-		//return GalleryArtActivity.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_STORIES,AppConstants.ENTRIESPERPAGE_GALLERY);
-	}
+//	public Request getFetchParameters(int page) throws Exception {
+//		Request req = ApiFactory.createBrowse(man.getViewSource(),man.getViewSearch(),ContentType.stories,AppConstants.ENTRIESPERPAGE_GALLERY,page);
+//		return req;
+//		//return GalleryArtActivity.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_STORIES,AppConstants.ENTRIESPERPAGE_GALLERY);
+//	}
 	
 
 	@Override
@@ -61,6 +60,10 @@ public class ListStoriesActivity extends AbstractContentList<Submission> {
 	}
 
 	public void resetViewSourceExtra(ViewSource newViewSource) {
+	}
+
+	public ContentType getContentType() {
+		return ContentType.stories; 
 	}
 
 	

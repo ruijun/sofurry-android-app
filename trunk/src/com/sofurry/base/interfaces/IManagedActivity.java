@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.BaseAdapter;
 
 import com.sofurry.base.classes.ActivityManager;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 
@@ -26,7 +27,7 @@ public interface IManagedActivity<T> {
 
 	public abstract void setSelectedIndex(int selectedIndex);
 
-	public abstract Request getFetchParameters(int page, ViewSource source) throws Exception;
+	public abstract Request getFetchRequest(int page) throws Exception;
 
 	public abstract BaseAdapter getAdapter(Context context);
 
@@ -43,5 +44,7 @@ public interface IManagedActivity<T> {
 	public abstract void setUniqueKey(long key);
 	
 	public abstract void onSaveInstanceState(Bundle outState);
+	
+	public abstract ContentType getContentType();
 	
 }

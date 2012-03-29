@@ -20,9 +20,8 @@ import com.sofurry.model.Submission.SUBMISSION_TYPE;
 
 public class ListJournalsActivity extends AbstractContentList<Submission> {
 
-	@Override
-	public Request getFetchParameters(int page, ViewSource source) throws Exception {
-		Request req = ApiFactory.createBrowse(source,null,ContentType.art,AppConstants.ENTRIESPERPAGE_GALLERY,page);
+	public Request getFetchParameters(int page, String search) throws Exception {
+		Request req = ApiFactory.createBrowse(man.getViewSource(),search,ContentType.art,AppConstants.ENTRIESPERPAGE_GALLERY,page);
 		return req;
 	}
 
@@ -61,6 +60,13 @@ public class ListJournalsActivity extends AbstractContentList<Submission> {
 	
 	
 	public void resetViewSourceExtra(ViewSource newViewSource) {
+	}
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.base.interfaces.IManagedActivity#getContentType()
+	 */
+	public ContentType getContentType() {
+		return ContentType.journals;
 	}
 
 }
