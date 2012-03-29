@@ -31,6 +31,15 @@ import com.sofurry.storage.ManagerStore;
  */
 public abstract class AbstractContentList<T> extends ListActivity implements IManagedActivity<T> {
 
+	/* (non-Javadoc)
+	 * @see com.sofurry.base.interfaces.IManagedActivity#getFetchParameters(int)
+	 * As a Default the Manager Class creates the Parameters for fetching, but this behaviour might be changed.
+	 */
+	public Request getFetchRequest(int page) throws Exception {
+		return man.getFetchRequest(page);
+	}
+
+
 	protected ActivityManager<T> man = null;
 	private boolean finished = false;
 	
@@ -191,7 +200,7 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 	
 	public abstract void setSelectedIndex(int selectedIndex);
 
-	public abstract Request getFetchParameters(int page, ViewSource source) throws Exception;
+	//public abstract Request getFetchParameters(int page, ViewSource source) throws Exception;
 
 	public abstract BaseAdapter getAdapter(Context context);
 

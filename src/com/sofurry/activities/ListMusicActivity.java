@@ -20,13 +20,10 @@ import com.sofurry.model.Submission.SUBMISSION_TYPE;
 
 public class ListMusicActivity extends AbstractContentList<Submission> {
 
-	@Override
-	public Request getFetchParameters(int page, ViewSource source) throws Exception {
-		Request req = ApiFactory.createBrowse(source,null,ContentType.music,AppConstants.ENTRIESPERPAGE_GALLERY,page);
+	public Request getFetchParameters(int page, String search) throws Exception {
+		Request req = ApiFactory.createBrowse(man.getViewSource(),search,ContentType.music,AppConstants.ENTRIESPERPAGE_GALLERY,page);
 		return req;
-		//return GalleryArtActivity.createBrowse(page,source,man.getViewSearch(),AppConstants.CONTENTTYPE_MUSIC,AppConstants.ENTRIESPERPAGE_GALLERY);
 	}
-	
 
 	@Override
 	public void parseResponse(JSONObject obj) throws Exception {
@@ -62,6 +59,13 @@ public class ListMusicActivity extends AbstractContentList<Submission> {
 	public void finish() {
 		
 		super.finish();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.sofurry.base.interfaces.IManagedActivity#getContentType()
+	 */
+	public ContentType getContentType() {
+		return ContentType.music;
 	}
 
 	

@@ -34,6 +34,13 @@ import com.sofurry.storage.ManagerStore;
  */
 public abstract class AbstractContentGallery<T> extends Activity implements IManagedActivity<T> {
 
+	/* (non-Javadoc)
+	 * @see com.sofurry.base.interfaces.IManagedActivity#getFetchParameters(int)
+	 */
+	public Request getFetchRequest(int page) throws Exception {
+		return man.getFetchRequest(page);
+	}
+
 	protected long uniqueKey = 0;  // The key to be used by the storage manager to recognize this particular activity
 	protected int lastUpdateListSize = 0; // temp variable to keep track of how many submissions were added by the next page loading
 	
@@ -199,10 +206,10 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	 */
 	public abstract void setSelectedIndex(int selectedIndex);
 
-	/* (non-Javadoc)
-	 * @see com.sofurry.IManagedActivity#getFetchParameters(int, int)
-	 */
-	public abstract Request getFetchParameters(int page, ViewSource source) throws Exception;
+//	/* (non-Javadoc)
+//	 * @see com.sofurry.IManagedActivity#getFetchParameters(int, int)
+//	 */
+//	public abstract Request getFetchParameters(int page, String search) throws Exception;
 
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#getAdapter(android.content.Context)
@@ -237,6 +244,5 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 
         return super.onKeyDown(keyCode, event);
     }
-
 
 }

@@ -16,10 +16,8 @@ import com.sofurry.AppConstants;
 import com.sofurry.adapters.SubmissionGalleryAdapter;
 import com.sofurry.base.classes.AbstractContentGallery;
 import com.sofurry.base.classes.ActivityManager;
-import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
-import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.Submission;
 import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.storage.ImageStorage;
@@ -47,11 +45,10 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 		}
 	}
 
-	@Override
-	public Request getFetchParameters(int page, ViewSource source) throws Exception {
-		Request req = ApiFactory.createBrowse(source,null,ContentType.art,AppConstants.ENTRIESPERPAGE_GALLERY,page);
-		return req;
-	}
+//	public Request getFetchParameters(int page, String viewSearch) throws Exception {
+//		Request req = ApiFactory.createBrowse(man.getViewSource(),viewSearch,ContentType.art,AppConstants.ENTRIESPERPAGE_GALLERY,page);
+//		return req;
+//	}
 	
 	/* (non-Javadoc)
 	 * @see com.sofurry.AbstractContentGallery#parseResponse(org.json.JSONObject)
@@ -106,8 +103,12 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
         SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(this);
 		galleryView.setColumnWidth(prefs.getInt(AppConstants.PREFERENCE_THUMB_SIZE, 130));
 	}
-	
 
-	
+	/* (non-Javadoc)
+	 * @see com.sofurry.base.interfaces.IManagedActivity#getContentType()
+	 */
+	public ContentType getContentType() {
+		return ContentType.art;
+	}
 
 }

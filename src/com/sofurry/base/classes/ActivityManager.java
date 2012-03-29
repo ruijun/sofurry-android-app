@@ -21,6 +21,8 @@ import com.sofurry.base.interfaces.ICanHandleFeedback;
 import com.sofurry.base.interfaces.IHasThumbnail;
 import com.sofurry.base.interfaces.IManagedActivity;
 import com.sofurry.helpers.ProgressBarHelper;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.requests.AndroidRequestWrapper;
@@ -28,7 +30,6 @@ import com.sofurry.requests.DataCall;
 import com.sofurry.requests.RequestHandler;
 import com.sofurry.requests.ThumbnailDownloaderThread;
 import com.sofurry.util.ErrorHandler;
-import com.sofurry.util.ProgressSignal;
 
 
 /**
@@ -118,13 +119,13 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		this.resultList = resultList;
 	}
 	
-//	public ArrayList<String> getPageIDs() {
-//		return pageIDs;
-//	}
-//
-//	public void setPageIDs(ArrayList<String> pageIDs) {
-//		this.pageIDs = pageIDs;
-//	}
+	/**
+	 * Returns the contenttype the Activity is showing
+	 * @return the contentType
+	 */
+	public ContentType getContentType() {
+		return myAct.getContentType();
+	}
 
 	/**
 	 * Is called after the Activity Initialization is finished
@@ -136,7 +137,7 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	    
 	    Bundle extras = getAct().getIntent().getExtras();
 	    if (extras != null) {
-	    	viewSource.value = extras.getInt("viewSource");
+	    	viewSource = ViewSource.valueOf(extras.getString("viewSource"));
 	    	viewSearch = extras.getString("viewSearch");
 	    	currentTitle = extras.getString("activityTitle");
 /*	    	if (currentTitle.length() > 0) {
@@ -148,7 +149,21 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	    
 		loadPage(true);
 	}
-
+	
+	
+	/**
+	 * Creates the Fetch request for the attached activity
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 */
+	public Request getFetchRequest(int page) throws Exception {
+		String search = null;
+		if (!"".equals(getViewSearch()))
+			search = getViewSearch();
+		Request req = ApiFactory.createBrowse(getViewSource(),search,getContentType(),AppConstants.ENTRIESPERPAGE_GALLERY,page);
+		return req;
+	}
 	
 	/**
 	 * Used for Unique ID storage
@@ -220,8 +235,8 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		hideProgressDialog();
 	}
 
-	public void onProgress(int id, ProgressSignal prg) {
-	}
+//	public void onProgress(int id, ProgressSignal prg) {
+//	}
 
 	/* (non-Javadoc)
 	 * @see com.sofurry.requests.CanHandleFeedback#refresh()
@@ -334,7 +349,9 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		}
 
 		try {
-			Request request = myAct.getFetchParameters(currentPage, viewSource);
+			// The method getFetch request will per default relay this call to the localGetFetchRequest routine,
+			// it may however be overriden by the implemented activity class. (Currently used in ListPM activity)
+			Request request = myAct.getFetchRequest(currentPage);
 			// Okay, this is a little bit of excessive anonymous classing, but I am sure it could be worse!
 			// However since I am going to look back at this and will think, WTF did I smoke when I... and so on.
 			//
@@ -447,10 +464,6 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 	public void cancel() {
 		requesthandler.killThreads(); // We instruct all running threads to terminate
 		myAct.finish(); // We instruct the Activity to close
-	}
-
-	public void onData(int id, JSONObject obj) throws Exception {
-		
 	}
 
 }

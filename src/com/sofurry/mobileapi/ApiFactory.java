@@ -101,13 +101,35 @@ public class ApiFactory {
 		req.setURL(API_URL + DEFAULT_API);
 		req.setParameter("f", "browse");
 		req.setParameter("viewSource", Integer.toString(source.value));
-		if (extra != null)
+		if (extra != null) {
 		  if ((source != ViewSource.search) && (source != ViewSource.user))
 			  throw new Exception("The extra parameter can only be used with the modes 'search' and 'user' otherwise it has to be null.");
+		  if (source == ViewSource.user)
+		    req.setParameter("authorid", extra);
+		  if (source == ViewSource.search)
+			req.setParameter("search", extra);
+		}
 		req.setParameter("contentType", Integer.toString(contentType.value));
 		req.setParameter("entriesPerPage", Integer.toString(entriesPerPage));
 		req.setParameter("page", Integer.toString(page));
 		return req;
+	}
+	
+	/**
+	 * Creates a search command, allowing to browse for keywoards
+	 * @param searchparameter
+	 * The keywords, separated by komma ','
+	 * @param contentType
+	 * The type of content to be returned
+	 * @param entriesPerPage
+	 * The entries per returned page
+	 * @param page
+	 * The page to fetch
+	 * @return
+	 * @throws Exception
+	 */
+	public static Request createSearch(String searchparameter, ContentType contentType, int entriesPerPage, int page) throws Exception {
+		return createBrowse(ViewSource.search, searchparameter, contentType, entriesPerPage, page);
 	}
 	
 	/**
@@ -135,8 +157,9 @@ public class ApiFactory {
 //		req.setURL(API2_URL);//   /?id=" + pageID);
 //		req.setParameter("id", "" + pageID);
 //		req.setParameter("r", "std/getSubmissionDetails");
-		req.setURL(API2_URL + "/std/getSubmissionDetails/?id=" + pageID);
-		req.setMode(HttpMode.get);
+		req.setURL(API2_URL + "/std/getSubmissionDetails"); //"/?id=" + pageID);
+//		req.setMode(HttpMode.get);
+		req.setParameter("id", "" + pageID);
 		return req;
 	}
 	
@@ -238,7 +261,7 @@ public class ApiFactory {
 	public static Request createListPMs(int page, int entriesPerPage) {
 		Request req = new Request();
 		req.setURL(API_URL + DEFAULT_API);
-		req.setParameter("f", "remwatch");
+		req.setParameter("f", "pm");
 		req.setParameter("page", "" + page);
 		req.setParameter("entriesPerPage", "" + entriesPerPage);
 		return req;
@@ -326,6 +349,19 @@ public class ApiFactory {
 		req.setURL(API_URL + DEFAULT_API);
 		req.setParameter("f", "pmcontent");
   	    req.setParameter("id", "" + pmid);
+		return req;
+	}
+	
+	/**
+	 * Returns the profile information of a user
+	 * @param userid
+	 * The user's userid. If the userid is your own, extra parameters are passed.
+	 * @return
+	 */
+	public static Request createGetUserProfile(int userid) {
+		Request req = new Request();
+		req.setURL(API2_URL + "std/getUserProfile");
+		req.setParameter("id", "" + userid);
 		return req;
 	}
 

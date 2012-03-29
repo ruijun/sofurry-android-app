@@ -80,7 +80,7 @@ public class AppConstants {
     public static final int ACTIVITY_JOURNALSLIST = 3;
     public static final int ACTIVITY_MUSICLIST    = 7;
     public static final int ACTIVITY_PMLIST       = 1;
-    public static final int ACTIVITY_RATE         = 7;
+    public static final int ACTIVITY_RATE         = 9;
     public static final int ACTIVITY_SETTINGS     = 2;
     public static final int ACTIVITY_STORIESLIST  = 0;
     public static final int ACTIVITY_TAGS         = 6;
@@ -96,13 +96,13 @@ public class AppConstants {
      */
     public static final int AJAXTYPE_OTPAUTH = 6;
 
-    /**
-     * One of several Content Types
-     */
-    public static final int CONTENTTYPE_ART      = 1;
-    public static final int CONTENTTYPE_JOURNALS = 3;
-    public static final int CONTENTTYPE_MUSIC    = 2;
-    public static final int CONTENTTYPE_STORIES  = 0;
+//    /**
+//     * One of several Content Types
+//     */
+//    public static final int CONTENTTYPE_ART      = 1;
+//    public static final int CONTENTTYPE_JOURNALS = 3;
+//    public static final int CONTENTTYPE_MUSIC    = 2;
+//    public static final int CONTENTTYPE_STORIES  = 0;
 
     /**
      * Dialog ID: Error Dialog
@@ -129,10 +129,10 @@ public class AppConstants {
     public static final int MENU_FILTER_FAVORITES          = 9090902;
     public static final int MENU_FILTER_FEATURED           = 9090901;
     public static final int MENU_FILTER_GROUP              = 9090904;
-    public static final int MENU_FILTER_KEYWORDS           = 4204;
+    public static final int MENU_FILTER_KEYWORDS           = 9090906;
     public static final int MENU_FILTER_WATCHLIST          = 9090903;
     public static final int MENU_FILTER_WATCHLIST_COMBINED = 9090905;
-    public static final int MENU_HD                        = 4204;
+    public static final int MENU_HD                        = 4504; // Double usage
     public static final int MENU_REFRESH                   = 4213;
     public static final int MENU_PLAY                      = 4205;
     public static final int MENU_RATE                      = 4300;

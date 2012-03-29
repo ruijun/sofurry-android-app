@@ -424,7 +424,7 @@ public class ViewArtActivity
     }
 
     /**
-     * Views the button using the acitivty that is associated with images
+     * Views the button using the activity that is associated with images
      */
     public void doHdView(Submission s) {
     	File f = null;
