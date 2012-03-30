@@ -1,5 +1,7 @@
 package com.sofurry.activities;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.json.JSONArray;
@@ -10,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Message;
 import android.os.Vibrator;
 import android.text.Html;
 import android.text.SpannableString;
@@ -31,7 +34,11 @@ import android.widget.Toast;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
+import com.sofurry.mobileapi.ChatApiFactory;
 import com.sofurry.mobileapi.core.AuthenticationHandler;
+import com.sofurry.mobileapi.core.Request;
+import com.sofurry.requests.AndroidRequestWrapper;
+import com.sofurry.requests.DataCall;
 import com.sofurry.util.ErrorHandler;
 
 /**
@@ -66,24 +73,13 @@ public class ChatActivity extends ActivityWithRequests {
 	private static String MESSAGETYPE_WHISPER = "whisper";
 		
 //	@Override
-//	public void onData(int id, JSONObject obj) throws Exception {
-//		// FIXME:
-//		if (id == AppConstants.REQUEST_ID_ROOMLIST) {
-//			populateRoomList(obj);
-//		}
-//		if (id == AppConstants.REQUEST_ID_USERLIST) {
-//			populateUserList(obj);
-//		}
+//	public void onOther(int id, Object obj) throws Exception {
+//		// If the object is text, it will be handled by the texthandler
+//		if (String.class.isAssignableFrom(obj.getClass())) {
+//			addTextToChatLog((String)obj);
+//		} else
+//		    super.onOther(id,obj);
 //	}
-
-	@Override
-	public void onOther(int id, Object obj) throws Exception {
-		// If the object is text, it will be handled by the texthandler
-		if (String.class.isAssignableFrom(obj.getClass())) {
-			addTextToChatLog((String)obj);
-		} else
-		    super.onOther(id,obj);
-	}
 	
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onPause()
@@ -121,10 +117,10 @@ public class ChatActivity extends ActivityWithRequests {
 	 * Adds text that was received from the AJAX Api, to the displayed chatlog
 	 * @param str
 	 */
-	public void addTextToChatLog(String str) throws JSONException {
-        CharSequence serverResponse = (CharSequence) str;
-		JSONObject jsonParser = new JSONObject(serverResponse.toString());
-		JSONArray items = new JSONArray(jsonParser.getString("data"));
+	public void addTextToChatLog(JSONObject messages) throws JSONException {
+		//JSONObject messages = new JSONObject(serverResponse.toString());
+		//JSONArray items = new JSONArray(jsonParser.getString("data"));
+		JSONArray items = messages.optJSONArray("data");
 
 		int numResults = items.length();
 		for (int i = 0; i < numResults; i++) {
@@ -263,7 +259,10 @@ public class ChatActivity extends ActivityWithRequests {
 		if (roomIds == null) {
 			pbh.showProgressDialog("Fetching rooms");
 			
-			// FIXME:
+			Request getRooms = ChatApiFactory.createRoomList();
+            AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, getRooms);
+            arw.exec(new DataCall() {public void call() throws Exception {populateRoomList((JSONObject)arg1);}});
+			
 //			AjaxRequest getRooms = new AjaxRequest();
 //			getRooms.addParameter("f", "chatrooms");
 //			getRooms.setRequestID(AppConstants.REQUEST_ID_ROOMLIST); // Mark this request, so the return value handler knows what to do with the result
@@ -279,17 +278,44 @@ public class ChatActivity extends ActivityWithRequests {
 	 */
 	private void populateRoomList(JSONObject obj) {
 		try {
-			JSONArray items = obj.getJSONArray("items");
-			int cnt = items.length();
-			roomNames = new String[cnt];
-			roomIds = new int[cnt];
-			for (int i = 0; i < cnt; i++) {
-				JSONObject item = items.getJSONObject(i);
-				Log.d(AppConstants.TAG_STRING, "Item: " + item.getString("name") + " " + item.getString("id"));
-				roomNames[i] = Html.fromHtml(item.getString("name")).toString();
-				roomIds[i] = Integer.parseInt(item.getString("id")); 
+			ArrayList<JSONObject> collect = new ArrayList<JSONObject>();
+			
+			// Parse to data location
+			JSONObject data = obj.getJSONObject("data");
+
+			JSONObject inbetween = data.getJSONObject("list"); 
+			
+			JSONArray list = inbetween.toJSONArray(inbetween.names());
+			
+			int cntlist = data.getInt("count");
+			
+			for (int j = 0; j < cntlist; j++) {
+				JSONObject listitem = list.getJSONObject(j);
+
+				inbetween = listitem.getJSONObject("rooms");
+				
+				JSONArray rooms = inbetween.toJSONArray(inbetween.names());
+				
+				int cnt = rooms.length();
+				roomNames = new String[cnt];
+				roomIds = new int[cnt];
+				for (int i = 0; i < cnt; i++) {
+					JSONObject item = rooms.getJSONObject(i);
+					collect.add(item);
+				}
 			}
 			
+			int cnt = collect.size();
+			int i = 0;
+			roomNames = new String[cnt];
+			roomIds = new int[cnt];
+			for (JSONObject item:collect) {
+				Log.d(AppConstants.TAG_STRING, "Item: " + item.getString("name") + " " + item.getString("id"));
+				roomNames[i] = Html.fromHtml(item.getString("name")).toString();
+				roomIds[i] = item.getInt("id");
+				i++;
+			}
+
 			roomSelect();
 			
 		} catch (Exception e) {
@@ -329,13 +355,21 @@ public class ChatActivity extends ActivityWithRequests {
 		chatSequence = 0;
 		chatView.setText(""); // Clear chat window
 		
+		// Join the room
+		Request getRooms = ChatApiFactory.createJoin(roomId);
+        AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, getRooms);
+        arw.exec(new DataCall() {public void call() throws Exception {changeRoomStartPolling((JSONObject)arg1);}});
+
+		
+	}
+	
+	private void changeRoomStartPolling(JSONObject poll) {
 		// Start the polling for our new room
 		chatPollThread = new ChatPollThread(ChatActivity.roomId);
 		chatPollThread.start();
 		chatSendQueue = new LinkedBlockingQueue<String>();
 		chatSendThread = new ChatSendThread(ChatActivity.roomId);
 		chatSendThread.start();
-		
 	}
 
 	/**
@@ -344,7 +378,11 @@ public class ChatActivity extends ActivityWithRequests {
 	 */
 	private void getUserList() {
 		pbh.showProgressDialog("Fetching users");
-		// FIXME:
+		
+		Request getUsers = ChatApiFactory.createUserList(roomId);
+        AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, getUsers);
+        arw.exec(new DataCall() {public void call() throws Exception {populateUserList((JSONObject)arg1);}});
+
 //		AjaxRequest getRooms = new AjaxRequest();
 //		getRooms.addParameter("f", "onlineUsers");
 //		getRooms.addParameter("roomid", "" + ChatActivity.roomId);
@@ -395,34 +433,34 @@ public class ChatActivity extends ActivityWithRequests {
 		userNames = null; // Since the list will be recreated, we don't need this anymore.
 	}
 	
-	
-	/**
-	 * Polls the Server for new messages to display
-	 * @param roomId
-	 * The ID of the currently selected room
-	 * @return
-	 */
-	protected String pollChat(int roomId) {
-		//Send chat poll request, return result
-		//FIXME:
-//		AjaxRequest req = new AjaxRequest(requestUrl);
+//	/**
+//	 * Polls the Server for new messages to display
+//	 * @param roomId
+//	 * The ID of the currently selected room
+//	 * @return
+//	 */
+//	protected String pollChat(int roomId) {
+//		//Send chat poll request, return result
+//		return ChatApiFactory.createChatFetch(chatSequence, roomId).toString();
 //		
-//		//Map<String, String> requestParameters = new HashMap<String, String>();
-//		req.addParameter("f", "chatfetch");
-//		req.addParameter("lastid", ""+chatSequence);
-//		req.addParameter("roomid", ""+roomId);
+////		AjaxRequest req = new AjaxRequest(requestUrl);
+////		
+////		//Map<String, String> requestParameters = new HashMap<String, String>();
+////		req.addParameter("f", "chatfetch");
+////		req.addParameter("lastid", ""+chatSequence);
+////		req.addParameter("roomid", ""+roomId);
+////
+////		try {
+////			String httpResult = RequestThread.authenticadedHTTPRequest(req);
+////			RequestThread.parseErrorMessage(new JSONObject(httpResult));
+////			return httpResult;
+////
+////		} catch (Exception e) {
+////			e.printStackTrace();
+////		}
 //
-//		try {
-//			String httpResult = RequestThread.authenticadedHTTPRequest(req);
-//			RequestThread.parseErrorMessage(new JSONObject(httpResult));
-//			return httpResult;
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-
-		return null;
-	}
+//		return null;
+//	}
 
 	//This is the main message polling thread. This is necessary because we can't block the UI with our http requests 
 	private class ChatPollThread extends Thread {
@@ -440,13 +478,30 @@ public class ChatActivity extends ActivityWithRequests {
 
 		public void run() {
 			while (keepRunning) {
-				String result = pollChat(roomId);
-				if (result != null) {
-					requesthandler.postMessage(result);
-				}
 				try {
+					Request pollMessages = ChatApiFactory.createChatPoll(chatSequence, roomId);
+					JSONObject result = pollMessages.execute();
+					
+					// Prepare a callback call to the method that will handle the poll data
+					DataCall toCall = new DataCall() {
+						public void call() throws Exception {
+							addTextToChatLog((JSONObject)arg1);
+						}
+					};
+		    		toCall.arg1 = result;
+
+		    		// Post the callback into the request handler
+		    		Message msg = new Message();
+		    		msg.obj = toCall;
+		    		requesthandler.postMessage(msg);
+
+					//String result = ChatApiFactory.createChatFetch(chatSequence, roomId).toString();
+//					if (result != null) {
+//						requesthandler.postMessage(result);
+//					}
+					
 					Thread.sleep(3000);
-				} catch (InterruptedException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -475,9 +530,13 @@ public class ChatActivity extends ActivityWithRequests {
 		 */
 		public void run() {
 			while (keepRunning) {
-				String message = chatSendQueue.poll();
-				if (message != null) {
-					// FIXME:
+				try {
+					Thread.sleep(500);
+					String message = chatSendQueue.poll();
+					if (message == null) continue; 
+
+					ChatApiFactory.createSendMessage(message, roomId).execute();
+					
 //					AjaxRequest req = new AjaxRequest();
 //					//Build the request and send it
 //					
@@ -498,11 +557,8 @@ public class ChatActivity extends ActivityWithRequests {
 //					} catch (Exception e) {
 //						e.printStackTrace();
 //					}
-				
 				}
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
+				catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
