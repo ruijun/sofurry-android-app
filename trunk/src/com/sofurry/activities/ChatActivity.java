@@ -1,7 +1,6 @@
 package com.sofurry.activities;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.json.JSONArray;
@@ -56,7 +55,7 @@ public class ChatActivity extends ActivityWithRequests {
     private EditText chatEntry;
     private Button sendButton;
 	
-    private static int chatSequence = 0;
+    private static int chatSequence = -1;
 	private static int roomId = -1;
 	
 	private static int roomIds[] = null;
@@ -101,6 +100,7 @@ public class ChatActivity extends ActivityWithRequests {
 		if (textSave != null)
 		  chatView.setText(textSave);
 		textSave = null;
+		startThreads();
 		super.onResume();
 	}
 
@@ -112,31 +112,50 @@ public class ChatActivity extends ActivityWithRequests {
 	public void showError(Exception e) {
 		ErrorHandler.showError(this, e);
 	}
+
+	/**
+	 * Forwards the text returned by either the poll command or the send text command to the chatlog
+	 * @param obj
+	 */
+	public void forwardTextToChatLog(JSONObject obj) {
+		DataCall toCall = new DataCall() {
+			public void call() throws Exception {
+				addTextToChatLog((JSONObject)arg1);
+			}
+		};
+		toCall.arg1 = obj;
+
+		// Post the callback into the request handler
+		Message msg = new Message();
+		msg.obj = toCall;
+		requesthandler.postMessage(msg);
+	}
 	
 	/**
 	 * Adds text that was received from the AJAX Api, to the displayed chatlog
 	 * @param str
 	 */
-	public void addTextToChatLog(JSONObject messages) throws JSONException {
+	private void addTextToChatLog(JSONObject messages) throws JSONException {
 		//JSONObject messages = new JSONObject(serverResponse.toString());
 		//JSONArray items = new JSONArray(jsonParser.getString("data"));
-		JSONArray items = messages.optJSONArray("data");
+		JSONArray msgitems = messages.optJSONArray("messages");
 
-		int numResults = items.length();
+		int numResults = msgitems.length();
 		for (int i = 0; i < numResults; i++) {
-			JSONObject jsonItem = items.getJSONObject(i);
-			String id = jsonItem.getString("id");
-			String fromUserName = jsonItem.getString("fromUserName");
-			String type = jsonItem.getString("type"); //can be message or whisper
-			//String date = jsonItem.getString("timestamp");
-			//String toUserName = jsonItem.getString("toUserName");
-			String message = jsonItem.getString("message");
+			JSONObject message = msgitems.getJSONObject(i);
+			
+			// Extract the json objects
+			String id = message.getString("id");
+			String fromUserName = message.getString("fromname");
+			String type = message.getString("msgtype"); //can be message or whisper
+
+			String text = message.getString("text");
 			if (Integer.parseInt(id) > chatSequence) {
 				chatSequence = Integer.parseInt(id);
 			}
 			chatView.append(fromUserName);
 			chatView.append(": ");
-            SpannableString sstr = colorText(message, type);
+            SpannableString sstr = colorText(text, type);
             chatView.append(sstr);
             Linkify.addLinks(chatView, Linkify.ALL);
             chatView.append("\n");
@@ -218,6 +237,18 @@ public class ChatActivity extends ActivityWithRequests {
 		chatPollThread = null;
 		chatSendThread = null;
     }
+    
+    /**
+     * Starts all the threads for this chat session
+     */
+    private void startThreads() {
+		// Start the polling for our new room
+		chatPollThread = new ChatPollThread(ChatActivity.roomId);
+		chatPollThread.start();
+		chatSendQueue = new LinkedBlockingQueue<String>();
+		chatSendThread = new ChatSendThread(ChatActivity.roomId);
+		chatSendThread.start();
+    }
 
 	
 	/* (non-Javadoc)
@@ -256,7 +287,7 @@ public class ChatActivity extends ActivityWithRequests {
 	 */
 	private void getRoomList() {
 		// Do we need to fetch the room list?
-		if (roomIds == null) {
+		if ((roomIds == null) || (roomIds.length == 0)) {
 			pbh.showProgressDialog("Fetching rooms");
 			
 			Request getRooms = ChatApiFactory.createRoomList();
@@ -335,8 +366,6 @@ public class ChatActivity extends ActivityWithRequests {
 		builder.setItems(roomNames, new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int item) {
 		    	changeRoom(item);
-				// Let us know we changed the room some more
-		    	Toast.makeText(getApplicationContext(), "Selected:" + roomNames[item] + "("+roomIds[item]+")", Toast.LENGTH_SHORT).show();
 		    }
 		});
 		AlertDialog roomchooser = builder.create();
@@ -350,26 +379,64 @@ public class ChatActivity extends ActivityWithRequests {
 	 */
 	private void changeRoom(int idx) {
 		killThreads(); // For recalls
-		roomView.setText("Your Room:" + roomNames[idx]);
+		// Leave the old room
+		if (roomId != -1) {
+			Request leaveRoom = ChatApiFactory.createPart(roomId);
+	        AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, leaveRoom);
+	        arw.exec(new DataCall() {public void call() throws Exception {roomLeft((JSONObject)arg1);}});
+		}
+        // Update the information for the new room
 		roomId = roomIds[idx];
-		chatSequence = 0;
+		chatSequence = -1;
 		chatView.setText(""); // Clear chat window
-		
-		// Join the room
-		Request getRooms = ChatApiFactory.createJoin(roomId);
-        AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, getRooms);
-        arw.exec(new DataCall() {public void call() throws Exception {changeRoomStartPolling((JSONObject)arg1);}});
 
-		
+		// Join the room
+		Request joinRoom = ChatApiFactory.createJoin(roomId);
+        AndroidRequestWrapper arw2 = new AndroidRequestWrapper(requesthandler, joinRoom);
+        arw2.exec(new DataCall() {public void call() throws Exception {changeRoomStartPolling((JSONObject)arg1);}});
 	}
 	
+	/**
+	 * Joins the room once leaving the room is complete
+	 */
+	private void roomLeft(JSONObject leave) {
+		try {
+			checkReplyForError(leave);
+		} catch (Exception e) {
+	    	Toast.makeText(getApplicationContext(), "Error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	
+	/**
+	 * Checks a JSON Replay for an error message
+	 * @param reply
+	 * @throws Exception
+	 */
+	private void checkReplyForError(JSONObject reply) throws Exception {
+		String message = reply.optString("message","unknown");
+		String type = reply.optString("type","none");
+		// Check for error.
+		if ("error".equals(type))
+		  throw new Exception(message);
+	}
+	
+	/**
+	 * Is called once the join command returns
+	 * @param poll
+	 */
 	private void changeRoomStartPolling(JSONObject poll) {
-		// Start the polling for our new room
-		chatPollThread = new ChatPollThread(ChatActivity.roomId);
-		chatPollThread.start();
-		chatSendQueue = new LinkedBlockingQueue<String>();
-		chatSendThread = new ChatSendThread(ChatActivity.roomId);
-		chatSendThread.start();
+		try {
+			checkReplyForError(poll);
+			
+			startThreads();
+
+			roomView.setText("Your Room:" + roomNames[roomIdToIdx(roomId)]);
+
+	    	Toast.makeText(getApplicationContext(), "Joined:" + roomNames[roomIdToIdx(roomId)] + "("+roomIdToIdx(roomId)+")", Toast.LENGTH_SHORT).show();
+		} catch (Exception e) {
+	    	Toast.makeText(getApplicationContext(), "Error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	/**
@@ -396,16 +463,18 @@ public class ChatActivity extends ActivityWithRequests {
 	 */
 	private void populateUserList(JSONObject obj) {
 		try {
-			JSONArray items = obj.getJSONArray("items");
+			checkReplyForError(obj);
+			
+			JSONArray items = obj.getJSONArray("users");
 			int cnt = items.length();
 			userNames = new String[cnt];
 			for (int i = 0; i < cnt; i++) {
 				JSONObject item = items.getJSONObject(i);
-				userNames[i] = Html.fromHtml(item.getString("name")).toString();
+				userNames[i] = Html.fromHtml(item.getString("useralias")).toString();
 			}
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Select user to add:");
+			builder.setTitle("Select user:");
 			builder.setItems(userNames, new DialogInterface.OnClickListener() {
 			    public void onClick(DialogInterface dialog, int item) {
 			    	addUserName(item);
@@ -476,24 +545,22 @@ public class ChatActivity extends ActivityWithRequests {
 			keepRunning = false;
 		}
 
+		
+
+		/* (non-Javadoc)
+		 * @see java.lang.Thread#run()
+		 * Polls for text to appear in the selected chatroom
+		 */
 		public void run() {
 			while (keepRunning) {
 				try {
-					Request pollMessages = ChatApiFactory.createChatPoll(chatSequence, roomId);
+					// Poll for text
+					Request pollMessages = ChatApiFactory.createChatBacklog(chatSequence, roomId);
 					JSONObject result = pollMessages.execute();
 					
-					// Prepare a callback call to the method that will handle the poll data
-					DataCall toCall = new DataCall() {
-						public void call() throws Exception {
-							addTextToChatLog((JSONObject)arg1);
-						}
-					};
-		    		toCall.arg1 = result;
-
-		    		// Post the callback into the request handler
-		    		Message msg = new Message();
-		    		msg.obj = toCall;
-		    		requesthandler.postMessage(msg);
+					Log.d("chat",result.toString());
+					// Forward the returned text into the chatlog
+					forwardTextToChatLog(result);
 
 					//String result = ChatApiFactory.createChatFetch(chatSequence, roomId).toString();
 //					if (result != null) {
@@ -535,8 +602,14 @@ public class ChatActivity extends ActivityWithRequests {
 					String message = chatSendQueue.poll();
 					if (message == null) continue; 
 
-					ChatApiFactory.createSendMessage(message, roomId).execute();
+					// Send the text into the channel
+					JSONObject reply = ChatApiFactory.createSendMessage(message, roomId).execute();
 					
+					// Forward text to chatlog
+					forwardTextToChatLog(reply);
+
+					
+//					Log.d("sf", reply.toString());
 //					AjaxRequest req = new AjaxRequest();
 //					//Build the request and send it
 //					
