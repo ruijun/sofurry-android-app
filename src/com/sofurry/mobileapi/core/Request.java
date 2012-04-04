@@ -5,7 +5,13 @@ import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.sofurry.mobileapi.SFConstants;
+
+import android.util.Log;
 
 /**
  * @author Rangarig
@@ -21,10 +27,10 @@ public class Request {
 	public enum HttpMode {post,get};
 
 	
-	private Map<String, String> parameters = new HashMap<String, String>(); // The request parameters to be used
-	private String url = null; // The requests's URL to use
-	private int id = -1;	  // The specific request ID
-	private HttpMode mode = HttpMode.post; // The mode of this request
+	protected Map<String, String> parameters = new HashMap<String, String>(); // The request parameters to be used
+	protected String url = null; // The requests's URL to use
+	protected int id = -1;	  // The specific request ID
+	protected HttpMode mode = HttpMode.post; // The mode of this request
 
     /**
      * Adds or updates authentification information to this request
@@ -105,16 +111,63 @@ public class Request {
 			}
 		}
 		
+		tmp = postProcessString(tmp); // Allows customized post-processing of the result string
+		
 		JSONObject pagecontents = null;
 		// Parse the result
 		try {
-			pagecontents = new JSONObject(tmp);
+			try {
+				pagecontents = new JSONObject(tmp);
+			} catch (JSONException jse) { // in case the returned value is a JSON Array, not an object
+				JSONArray arr = new JSONArray(tmp); 
+				pagecontents = new JSONObject();
+				pagecontents.accumulate("array", arr);
+			}
 		} catch (Exception e) {
+			Log.d(SFConstants.TAG_STRING, "Error parsing result data");
+			Log.d(SFConstants.TAG_STRING, e.getMessage());
+			Log.d(SFConstants.TAG_STRING, url);
 			throw new RequestParsingException("Error Parsing result data", e);
 		}
-		pagecontents.accumulate("request_id", "" + id);
 		
-		return pagecontents;
+		checkError(pagecontents); // User specified error checking
+
+		JSONObject post = postProcess(pagecontents); // User specified post processing on the result 
+		
+		post.accumulate("request_id", "" + id);
+		return post;
+	}
+	
+	/**
+	 * Allows to transform the string before it is fed into the JSONParser... just
+	 * in case the returned string is not JSONCompliant. Can be overriden by the 
+	 * implementation of an api call
+	 * @param toprocess
+	 * The passed string, to be transformed
+	 * @return
+	 * Returns the string so it can be parsed by the JSON Parser
+	 * @throws Exception
+	 */
+	protected String postProcessString(String toprocess) throws Exception { 
+		return toprocess;
+	}
+	
+	/**
+	 * Checks the returned json object for error messages. Is overridable, to perform special error checking
+	 * @param object
+	 */
+	protected void checkError(JSONObject object) throws Exception {
+		// Intentionally left blank. This method is to be overriden bei the implementation
+	}
+	
+	/**
+	 * Can be overriden to have the request perform post processing operations on the result from the api call.
+	 * @param object
+	 * The post processed object
+	 * @return
+	 */
+	protected JSONObject postProcess(JSONObject object) throws Exception {
+		return object; // NOP
 	}
 	
 	/**
