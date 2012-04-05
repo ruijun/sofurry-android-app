@@ -23,8 +23,6 @@ public class PrivateMessage implements Serializable, IHasThumbnail {
 	private String subject;
 	private String message;
 	private String status;
-	//private Bitmap thumbnail;
-	
 	
 	public int getId() {
 		return id;

@@ -86,16 +86,6 @@ public class AppConstants {
     public static final int ACTIVITY_TAGS         = 6;
     public static final int ACTIVITY_VIEWPM       = 5;
 
-    /**
-     * TODO: Document this!
-     */
-    public static final int AJAXTYPE_APIERROR = 5;
-
-    /**
-     * TODO: Document this!
-     */
-    public static final int AJAXTYPE_OTPAUTH = 6;
-
 //    /**
 //     * One of several Content Types
 //     */

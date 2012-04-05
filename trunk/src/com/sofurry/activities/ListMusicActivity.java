@@ -16,7 +16,6 @@ import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.Submission;
-import com.sofurry.model.Submission.SUBMISSION_TYPE;
 
 public class ListMusicActivity extends AbstractContentList<Submission> {
 
@@ -27,7 +26,7 @@ public class ListMusicActivity extends AbstractContentList<Submission> {
 
 	@Override
 	public void parseResponse(JSONObject obj) throws Exception {
-		GalleryArtActivity.jsonToResultlist(obj, man, SUBMISSION_TYPE.MUSIC);
+		GalleryArtActivity.jsonToResultlist(obj, man);
 		// Start downloading the thumbnails
 		man.startThumbnailDownloader();
 	}

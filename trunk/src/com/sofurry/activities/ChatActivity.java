@@ -136,8 +136,6 @@ public class ChatActivity extends ActivityWithRequests {
 	 * @param str
 	 */
 	private void addTextToChatLog(JSONObject messages) throws JSONException {
-		//JSONObject messages = new JSONObject(serverResponse.toString());
-		//JSONArray items = new JSONArray(jsonParser.getString("data"));
 		JSONArray msgitems = messages.optJSONArray("messages");
 
 		int numResults = msgitems.length();
@@ -242,6 +240,7 @@ public class ChatActivity extends ActivityWithRequests {
      * Starts all the threads for this chat session
      */
     private void startThreads() {
+    	if (roomId == -1) return; // If no room is selected yet, we do not need to bother to poll for messages
 		// Start the polling for our new room
 		chatPollThread = new ChatPollThread(ChatActivity.roomId);
 		chatPollThread.start();
@@ -378,6 +377,7 @@ public class ChatActivity extends ActivityWithRequests {
 	 * The index in the two arrays roomNames and roomIDs
 	 */
 	private void changeRoom(int idx) {
+		
 		killThreads(); // For recalls
 		// Leave the old room
 		if (roomId != -1) {
@@ -389,6 +389,7 @@ public class ChatActivity extends ActivityWithRequests {
 		roomId = roomIds[idx];
 		chatSequence = -1;
 		chatView.setText(""); // Clear chat window
+		roomView.setText("Changing room...");
 
 		// Join the room
 		Request joinRoom = ChatApiFactory.createJoin(roomId);
@@ -431,9 +432,9 @@ public class ChatActivity extends ActivityWithRequests {
 			
 			startThreads();
 
-			roomView.setText("Your Room:" + roomNames[roomIdToIdx(roomId)]);
-
-	    	Toast.makeText(getApplicationContext(), "Joined:" + roomNames[roomIdToIdx(roomId)] + "("+roomIdToIdx(roomId)+")", Toast.LENGTH_SHORT).show();
+			roomView.setText("Room:" + roomNames[roomIdToIdx(roomId)]);
+			//+ "("+roomIdToIdx(roomId)+")"
+	    	Toast.makeText(getApplicationContext(), "Joined:" + roomNames[roomIdToIdx(roomId)] , Toast.LENGTH_SHORT).show();
 		} catch (Exception e) {
 	    	Toast.makeText(getApplicationContext(), "Error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
@@ -609,27 +610,6 @@ public class ChatActivity extends ActivityWithRequests {
 					forwardTextToChatLog(reply);
 
 					
-//					Log.d("sf", reply.toString());
-//					AjaxRequest req = new AjaxRequest();
-//					//Build the request and send it
-//					
-//					// Check if message is meant to be a command and set the function accordingly
-//					if(message.substring(0,1).contains("/")) {
-//						req.addParameter("f", "chatcommand");
-//					}
-//					else {
-//						req.addParameter("f", "chatpost");
-//					}
-//
-//					req.addParameter("message", ""+message);
-//					req.addParameter("roomid", ""+roomId);
-//
-//					try {
-//						String httpResult = RequestThread.authenticadedHTTPRequest(req);
-//						RequestThread.parseErrorMessage(new JSONObject(httpResult));
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
 				}
 				catch (Exception e) {
 					e.printStackTrace();

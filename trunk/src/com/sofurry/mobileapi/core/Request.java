@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import com.sofurry.mobileapi.SFConstants;
 
+import android.content.SyncResult;
 import android.util.Log;
 
 /**
@@ -26,6 +27,7 @@ public class Request {
 	 */
 	public enum HttpMode {post,get};
 
+	private static Object requestSync = new Object();
 	
 	protected Map<String, String> parameters = new HashMap<String, String>(); // The request parameters to be used
 	protected String url = null; // The requests's URL to use
@@ -77,7 +79,7 @@ public class Request {
 	 * @throws Exception
 	 */
 	private String doRequest() throws Exception {
-		authenticate(); // Authenticates the request (adding a parameter to the parameters)
+		authenticate(); // Authenticates the request (adding oth parameters to the parameters)
 
 		String localurl = HttpRequestHandler.encodeURL(this.url);
         HttpResponse response = null;
@@ -99,18 +101,22 @@ public class Request {
 	 * @return
 	 */
 	public JSONObject execute() throws Exception {
+
+		String tmp = null;
 		
-		String tmp = doRequest();
-		
-		if (!AuthenticationHandler.parseResponse(tmp)) { // Try authentification again, in case the first request fails
-			// Retry request with new otp sequence if it failed for the first time
+		synchronized (mode) { // Synchronize requests, so that the authorization will not fail because of sequence errors.
 			
 			tmp = doRequest();
-			if (!AuthenticationHandler.parseResponse(tmp)) {
-			  throw new Exception("Authentification Failed (2nd attempt)."); // Check the sequence reply
+			
+			if (!AuthenticationHandler.parseResponse(tmp)) { // Try authentification again, in case the first request fails
+				// Retry request with new otp sequence if it failed for the first time
+				tmp = doRequest();
+				if (!AuthenticationHandler.parseResponse(tmp)) {
+				  throw new Exception("Authentification Failed (2nd attempt)."); // Check the sequence reply
+				}
 			}
-		}
 		
+		}
 		tmp = postProcessString(tmp); // Allows customized post-processing of the result string
 		
 		JSONObject pagecontents = null;

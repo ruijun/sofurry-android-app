@@ -66,7 +66,7 @@ public abstract class SubmissionViewActivity
     	name = s.getName();
     	authorId = s.getAuthorID();
     	authorName = s.getAuthorName();
-    	thumbURL = s.getThumbnailUrl();
+    	thumbURL = s.getThumbURL();
     }
     
     /**

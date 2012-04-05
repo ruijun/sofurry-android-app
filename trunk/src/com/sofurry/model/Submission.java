@@ -13,6 +13,8 @@ import android.preference.PreferenceManager;
 
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IHasThumbnail;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.downloaders.ContentDownloader;
 import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
@@ -21,9 +23,7 @@ public class Submission implements Serializable, IHasThumbnail {
 
 	private static final long serialVersionUID = -3841250259233075462L;
 
-	public enum SUBMISSION_TYPE {ARTWORK, STORY, JOURNAL, MUSIC};
-	
-	private SUBMISSION_TYPE type;
+	private ContentType type;
 	private int id = -1;
 	private String name;
 	private String content;
@@ -32,17 +32,16 @@ public class Submission implements Serializable, IHasThumbnail {
 	private int authorID;
 	private String contentLevel;
 	private String date;
-	private String thumbnailUrl;
 	private String SavedNameCache = "";
 	public  String FileExt = "";
 	private String saveFilename;
 
 	private byte attempts = 0;
 	
-	public SUBMISSION_TYPE getType() {
+	public ContentType getType() {
 		return type;
 	}
-	public void setType(SUBMISSION_TYPE type) {
+	public void setType(ContentType type) {
 		this.type = type;
 	}
 	/* (non-Javadoc)
@@ -97,13 +96,6 @@ public class Submission implements Serializable, IHasThumbnail {
 		this.date = date;
 	}
 
-	public String getThumbnailUrl() {
-		return thumbnailUrl;
-	}
-	public void setThumbnailUrl(String thumbnailUrl) {
-		this.thumbnailUrl = thumbnailUrl;
-	}
-	
 	public String getSaveFilename() {
 		return saveFilename;
 	}
@@ -123,7 +115,7 @@ public class Submission implements Serializable, IHasThumbnail {
 	}
 	
 	public Boolean checkThumbnail() {
-		if (type == SUBMISSION_TYPE.ARTWORK) {
+		if (type == ContentType.art) {
 			return ImageStorage.checkSubmissionIcon(getId());
 		} else {
 			return ImageStorage.checkUserIcon(getAuthorID());
@@ -131,7 +123,7 @@ public class Submission implements Serializable, IHasThumbnail {
 	} /**/
 
 	public Bitmap loadIconFromStorage() {
-		if (type == SUBMISSION_TYPE.ARTWORK) {
+		if (type == ContentType.art) {
 			return ImageStorage.loadSubmissionIcon(getId());
 		} else {
 			return ImageStorage.loadUserIcon(getAuthorID());
@@ -170,13 +162,13 @@ public class Submission implements Serializable, IHasThumbnail {
 		if (getId() == -1) return;
 		if (fastmode) return; // In fastmode we will not try downloading the thumb.
 
-		if (type == SUBMISSION_TYPE.ARTWORK) {
+		if (type == ContentType.art) {
 			if (!ImageStorage.checkSubmissionIcon(getId()) ) {
-				ContentDownloader.downloadFile(thumbnailUrl, ImageStorage.getSubmissionIconPath(getId()), null);
+				ContentDownloader.downloadFile(getThumbURL(), ImageStorage.getSubmissionIconPath(getId()), null);
 			}
 		} else {
 			if (! ImageStorage.checkUserIcon(getAuthorID()) ) {
-				ContentDownloader.downloadFile(thumbnailUrl, ImageStorage.getUserIconPath(getAuthorID()), null);
+				ContentDownloader.downloadFile(getThumbURL(), ImageStorage.getUserIconPath(getAuthorID()), null);
 			}
 		}
 			
@@ -247,12 +239,30 @@ public class Submission implements Serializable, IHasThumbnail {
     	return filename;
     }
 
+    
+    /**
+     * Returns the preview URL
+     * @return
+     */
     public String getPreviewURL() {
-		return "http://beta.sofurry.com/std/preview?page="+getId();
+		return ApiFactory.getPreviewURL(getId());
 	}
 	
+    
+	/**
+	 * Returns the full URL
+	 * @return
+	 */
 	public String getFullURL() {
-		return "http://beta.sofurry.com/std/content?page="+getId();
+		return ApiFactory.getFullURL(getId());
+	}
+	
+	/**
+	 * Returns the ThumbURL
+	 * @return
+	 */
+	public String getThumbURL() {
+		return ApiFactory.getThumbURL(getId());
 	}
 	
 	/**
@@ -269,12 +279,11 @@ public class Submission implements Serializable, IHasThumbnail {
 		setAuthorID(Integer.parseInt(datasource.getString("authorId")));
 		setContentLevel(datasource.getString("contentLevel"));
 		setTags(datasource.getString("keywords"));
-		setThumbnailUrl("http://beta.sofurry.com/std/thumb?page="+getId()); // force load thumbnails for video???
 //		setThumbnailUrl(datasource.getString("thumb")); // thumbnails for video have different URL
 		setSaveFilename(datasource.getString("thumb"));
 		
 		switch (type) {
-			case ARTWORK: {
+			case art: {
 		        if (datasource.getString("thumb").contains("/video.png")) {
 		        	FileExt = ".swf";
 		        } else {
@@ -283,12 +292,12 @@ public class Submission implements Serializable, IHasThumbnail {
 		        break;
 			}
 			
-			case MUSIC: {
+			case music: {
 				FileExt = ".mp3";
 		        break;
 			}
 			
-			case STORY: {
+			case stories: {
 				FileExt = ".txt";
 		        break;
 			}
@@ -315,7 +324,7 @@ public class Submission implements Serializable, IHasThumbnail {
 		intent.putExtra("tags", getTags());
 		intent.putExtra("authorName", getAuthorName());
 		intent.putExtra("authorId", getAuthorID());
-		intent.putExtra("thumbnail", getThumbnailUrl());
+		intent.putExtra("thumbnail", getThumbURL());
 		intent.putExtra("date", getDate());
 		intent.putExtra("level", getContentLevel());
 	}
