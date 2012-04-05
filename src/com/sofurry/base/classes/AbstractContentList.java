@@ -124,11 +124,6 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	// Goes back to the main menu
-	private void closeList() {
-		man.closeList();
-	}
-	
 	/* (non-Javadoc)
 	 * @see com.sofurry.IManagedActivity#plugInAdapter()
 	 * 
@@ -199,8 +194,6 @@ public abstract class AbstractContentList<T> extends ListActivity implements IMa
 	}
 	
 	public abstract void setSelectedIndex(int selectedIndex);
-
-	//public abstract Request getFetchParameters(int page, ViewSource source) throws Exception;
 
 	public abstract BaseAdapter getAdapter(Context context);
 

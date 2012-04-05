@@ -16,7 +16,6 @@ import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.Submission;
-import com.sofurry.model.Submission.SUBMISSION_TYPE;
 
 public class ListJournalsActivity extends AbstractContentList<Submission> {
 
@@ -32,7 +31,7 @@ public class ListJournalsActivity extends AbstractContentList<Submission> {
 	@Override
 	public void parseResponse(JSONObject obj) {
 		try {
-			GalleryArtActivity.jsonToResultlist(obj, man, SUBMISSION_TYPE.JOURNAL);
+			GalleryArtActivity.jsonToResultlist(obj, man);
 		} catch (Exception e) {
 			man.onError(e);
 		}

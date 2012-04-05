@@ -29,11 +29,16 @@ import java.util.Map;
  * The Authentification Handler contains all the Methods used to handle Authentification for the SOFurry api
  */
 public class AuthenticationHandler {
+	
+	
+    public static final int AJAXTYPE_OTPAUTH = 6;		// Message reply if there is an authentification failure
+	
     private static String authenticationPadding         = "@6F393fk6FzVz9aM63CfpsWE0J1Z7flEl9662X";
     private static String password                      = null;
     private static String salt                          = "";
     private static String username                      = null;
     private static long   currentAuthenticationSequence = 0;
+    private static Object authSyncDummy = new Object();
 
 
     /**
@@ -48,14 +53,13 @@ public class AuthenticationHandler {
             return;
         }
 
-        queryParams.put("otpuser", username);
-        queryParams.put("otphash", generateRequestHash());
-        queryParams.put("otpsequence", "" + currentAuthenticationSequence);
-//        queryParams.put("otpuser", "gargelblargh");
-//        queryParams.put("otphash", "");
-//        queryParams.put("otpsequence", "" + currentAuthenticationSequence);
+        synchronized (authSyncDummy) {
+            queryParams.put("otpuser", username);
+            queryParams.put("otphash", generateRequestHash());
+            queryParams.put("otpsequence", "" + currentAuthenticationSequence);
 
-        currentAuthenticationSequence = currentAuthenticationSequence + 1;
+            currentAuthenticationSequence += 1;
+		}
     }
 
     // Create a hash using the current authentication sequence counter, thus "salting" the hash.
@@ -66,7 +70,7 @@ public class AuthenticationHandler {
      *
      * @return
      */
-    public static String generateRequestHash() {
+    private static String generateRequestHash() {
         String hashedPassword = getMd5Hash(password + salt);
         String hash           = getMd5Hash(hashedPassword + authenticationPadding + currentAuthenticationSequence);
 
@@ -86,9 +90,11 @@ public class AuthenticationHandler {
     public static void loadAuthenticationInformation(final Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        username = prefs.getString(AppConstants.PREFERENCE_USERNAME, "");
-        password = prefs.getString(AppConstants.PREFERENCE_PASSWORD, "");
-        salt     = prefs.getString(AppConstants.PREFERENCE_SALT, "");
+        synchronized (authSyncDummy) {
+        	username = prefs.getString(AppConstants.PREFERENCE_USERNAME, "");
+        	password = prefs.getString(AppConstants.PREFERENCE_PASSWORD, "");
+            salt     = prefs.getString(AppConstants.PREFERENCE_SALT, "");
+		}
     }
 
     /**
@@ -103,23 +109,30 @@ public class AuthenticationHandler {
             Log.d(AppConstants.TAG_STRING, "Auth.parseResponse: " + httpResult);
 
             JSONObject jsonParser;
-
-            jsonParser = new JSONObject(httpResult);
-
+            try {
+                jsonParser = new JSONObject(httpResult);
+			} catch (JSONException j) {
+				return true; // If the reply is not even a json structure, it cannot be an auth resync request
+			}
+                
             int messageType = jsonParser.getInt("messageType");
 
-            if (messageType == AppConstants.AJAXTYPE_OTPAUTH) {
+            if (messageType == AJAXTYPE_OTPAUTH) {
                 int    newSequence = jsonParser.getInt("newSequence");
                 String newPadding  = jsonParser.getString("newPadding");
                 String newSalt     = jsonParser.getString("salt");
                 String otpVersion  = jsonParser.getString("version");
 
+                
                 Log.d(AppConstants.TAG_STRING,
                       "Auth.parseResponse: OTP Version: " + otpVersion + " new Sequence: " + newSequence
                       + " new Padding: " + newPadding + " new salt: " + newSalt);
-                setCurrentAuthenticationSequence(newSequence);
-                setCurrentAuthenticationPadding(newPadding);
-                setCurrentAuthenticationSalt(newSalt);
+
+                synchronized (authSyncDummy) {
+                    authenticationPadding = newPadding;
+                    salt = newSalt;
+                    currentAuthenticationSequence = newSequence;
+				}
 
                 return false;
             }
@@ -140,26 +153,28 @@ public class AuthenticationHandler {
         SharedPreferences        prefs  = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
 
-        editor.putString(AppConstants.PREFERENCE_USERNAME, username);
-        editor.putString(AppConstants.PREFERENCE_PASSWORD, password);
-        editor.putString(AppConstants.PREFERENCE_SALT, salt);
+        synchronized (authSyncDummy) {
+            editor.putString(AppConstants.PREFERENCE_USERNAME, username);
+            editor.putString(AppConstants.PREFERENCE_PASSWORD, password);
+            editor.putString(AppConstants.PREFERENCE_SALT, salt);
+		}
         editor.commit();
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param activity
-     * @param newUsername
-     * @param newPassword
-     */
-    public static void updateAuthenticationInformation(Activity activity, String newUsername, String newPassword) {
-        username = newUsername;
-        password = newPassword;
-
-        savePreferences(activity);
-    }
+//    /**
+//     * Method description
+//     *
+//     *
+//     * @param activity
+//     * @param newUsername
+//     * @param newPassword
+//     */
+//    public static void updateAuthenticationInformation(Activity activity, String newUsername, String newPassword) {
+//        username = newUsername;
+//        password = newPassword;
+//
+//        savePreferences(activity);
+//    }
 
     /**
      * Returns true, if Authentification Parameters are available
@@ -167,18 +182,6 @@ public class AuthenticationHandler {
      */
     public static boolean useAuthentication() {
         return ((getUsername() != null) && (getUsername().trim().length() > 0));
-    }
-
-    //~--- get methods --------------------------------------------------------
-
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
-    public static long getCurrentAuthenticationSequence() {
-        return currentAuthenticationSequence;
     }
 
     // Get the MD5 sum of a given input string
@@ -221,33 +224,33 @@ public class AuthenticationHandler {
         return username;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param newPadding
-     */
-    public static void setCurrentAuthenticationPadding(String newPadding) {
-        authenticationPadding = newPadding;
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param newSalt
-     */
-    public static void setCurrentAuthenticationSalt(String newSalt) {
-        salt = newSalt;
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param newSequence
-     */
-    public static void setCurrentAuthenticationSequence(long newSequence) {
-        currentAuthenticationSequence = newSequence;
-    }
+//    /**
+//     * Method description
+//     *
+//     *
+//     * @param newPadding
+//     */
+//    public static void setCurrentAuthenticationPadding(String newPadding) {
+//        authenticationPadding = newPadding;
+//    }
+//
+//    /**
+//     * Method description
+//     *
+//     *
+//     * @param newSalt
+//     */
+//    public static void setCurrentAuthenticationSalt(String newSalt) {
+//        salt = newSalt;
+//    }
+//
+//    /**
+//     * Method description
+//     *
+//     *
+//     * @param newSequence
+//     */
+//    public static void setCurrentAuthenticationSequence(long newSequence) {
+//        currentAuthenticationSequence = newSequence;
+//    }
 }

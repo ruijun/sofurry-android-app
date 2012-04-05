@@ -19,8 +19,6 @@ import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.core.AuthenticationHandler;
 import com.sofurry.mobileapi.core.Request;
 
-
-
 /**
  *
  *
@@ -29,11 +27,6 @@ public class PmNotificationService extends WakefulIntentService {
     private static long lastCheck_ = 0;
     private SharedPreferences prefs;
 
-    //private RequestHandler requestHandler_;
-
-
-
-    // private long uniqueStorageKey_;
 
     /**
      * Constructs the PM Notification Service
@@ -41,8 +34,6 @@ public class PmNotificationService extends WakefulIntentService {
      */
     public PmNotificationService() {
         super("PmNotificationService");
-
-        // uniqueStorageKey_ = System.nanoTime();
     }
 
     /**
@@ -55,15 +46,16 @@ public class PmNotificationService extends WakefulIntentService {
     @Override
     protected void doWakefulWork(Intent intent) {
         // Load auth information from server
-        AuthenticationHandler.loadAuthenticationInformation(this);
+    	if (!hasAuthInformation()) // Then the authentification handler is already initialized, we do not need to do that again.
+          AuthenticationHandler.loadAuthenticationInformation(this); 
 
         if (hasAuthInformation()) {
             Log.i(AppConstants.TAG_STRING, "Requesting PM count (Authorized)...");
             
             try {
-                handleUnreadPMData(getRequestParameters().execute());
+                handleUnreadPMData(createRequest().execute());
 			} catch (Exception e) {
-				onError(e);
+		        Log.e(AppConstants.TAG_STRING, "Error occurred: " + e.getLocalizedMessage());
 			}
         }
     }
@@ -128,57 +120,9 @@ public class PmNotificationService extends WakefulIntentService {
      * Method description
      *
      *
-     * @param id
-     * @param e
-     */
-    public void onError(Exception e) {
-        Log.e(AppConstants.TAG_STRING, "Error occurred: " + e.getLocalizedMessage());
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     * @param obj
-     *
-     * @throws Exception
-     */
-    public void onOther(int id, Object obj) throws Exception {
-        Log.w(AppConstants.TAG_STRING, "Unexpected object type: " + obj.getClass().getName() + " received");
-    }
-
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @throws Exception
-//     */
-//    public void refresh() throws Exception {
-//        // Nothing to do here
-//    }
-
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @return
-//     */
-//    protected RequestHandler getRequestHandler() {
-//        if ((requestHandler_ == null) || (requestHandler_.isKilled())) {
-//            requestHandler_ = new RequestHandler(this);
-//        }
-//
-//        return requestHandler_;
-//    }
-
-    /**
-     * Method description
-     *
-     *
      * @return
      */
-    protected Request getRequestParameters() {
+    protected Request createRequest() {
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         prefs         = PreferenceManager.getDefaultSharedPreferences(this);
@@ -186,17 +130,6 @@ public class PmNotificationService extends WakefulIntentService {
         PmNotificationService.lastCheck_ = prefs.getLong(AppConstants.PREFERENCE_LAST_PM_CHECK_TIME, 0);
 
     	return ApiFactory.createUnreadPMCount(PmNotificationService.lastCheck_);
-//    	AjaxRequest req = new AjaxRequest();
-//
-//        // Set request parameters
-//        req.addParameter("f", "unreadpmcount");
-//        req.addParameter("since", ""+PmNotificationService.lastCheck_);
-//
-//        // Set request ID
-//        req.setRequestID(AppConstants.REQUEST_ID_FETCHDATA);
-//
-//        // Return result
-//        return req;
     }
 
     /**

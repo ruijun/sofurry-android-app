@@ -19,7 +19,6 @@ import com.sofurry.base.classes.ActivityManager;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.model.Submission;
-import com.sofurry.model.Submission.SUBMISSION_TYPE;
 import com.sofurry.storage.ImageStorage;
 import com.sofurry.util.ErrorHandler;
 
@@ -31,13 +30,13 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 	 * The base JSON object as returned by the fetcher thread
 	 * @throws JSONException
 	 */
-	public static void jsonToResultlist(JSONObject obj, ActivityManager<Submission> man, SUBMISSION_TYPE typ) throws JSONException {
+	public static void jsonToResultlist(JSONObject obj, ActivityManager<Submission> man) throws JSONException {
 		JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
 		man.totalPages = Integer.parseInt(obj.getString("totalpages"));
 		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
 		for (int i = 0; i < items.length(); i++) {
 			Submission s = new Submission();
-			s.setType(typ);
+			s.setType(man.getContentType());
 			s.populate(items.getJSONObject(i));
 
 			man.getResultList().add(s);
@@ -55,7 +54,7 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 	 */
 	public void parseResponse(JSONObject obj) {
 		try {
-			jsonToResultlist(obj, man, SUBMISSION_TYPE.ARTWORK);
+			jsonToResultlist(obj, man);
 		} catch (Exception e) {
 			man.onError(e);
 		}

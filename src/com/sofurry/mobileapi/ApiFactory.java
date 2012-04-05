@@ -74,10 +74,35 @@ public class ApiFactory {
      * URL of the SoFurry API site
      */
     public static final String API_URL = "http://chat.sofurry.com";
-    
     public static final String API2_URL = "http://api2.sofurry.com";
 
     /**
+     * URL for all the resources like thumbnails, preview images, images
+     */
+    public static final String RESOURCE_URL = "http://www.sofurry.com/std";
+    
+    /**
+     * Returns the url to the preview sized submission image
+     * @param id
+     * @return
+     */
+    public static String getPreviewURL(int id) {
+		return RESOURCE_URL + "/preview?page="+id;
+	}
+	
+	/**
+	 * Returns the url to the full sized submission image
+	 * @param id
+	 * @return
+	 */
+	public static String getFullURL(int id) {
+		return RESOURCE_URL + "/content?page="+id;
+	}
+	
+	public static String getThumbURL(int id) {
+		return RESOURCE_URL + "/thumb?page="+id;
+	}
+	
 	
 	/**
 	 * Creates a Browse command. (the command will still have to be executed, either by execute or by executeasync.
