@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="fill_parent" 
+    android:layout_width="fill_parent" >
+
+            <ImageView
+                android:id="@+id/imagepreview"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:adjustViewBounds="true"
+                android:clickable="true"
+                android:scaleType="matrix" >
+</ImageView>
+            <LinearLayout android:gravity="center_horizontal" android:layout_width="fill_parent" android:orientation="horizontal" android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/savedIndicator"
+                    android:layout_width="20px"
+                    android:layout_height="20px"
+                    android:scaleType="fitXY"
+                    android:src="@android:drawable/ic_menu_save"
+                    android:visibility="invisible" >
+</ImageView>
+
+                <TextView
+                    android:id="@+id/InfoText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="0px"
+                    android:gravity="center_horizontal|center"
+                    android:padding="0px"
+                    android:shadowColor="#000000"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="2"
+                    android:text=" Artist Gallery test wrap long names here as described in howto"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="16px" >
+</TextView>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/playIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/video_play"
+                android:visibility="invisible" >
+</ImageView>
+
+            <ProgressBar
+                android:id="@+id/loadingIndicator"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:background="@android:color/transparent"
+                android:indeterminate="true"
+                android:indeterminateBehavior="cycle"
+                android:visibility="invisible" >
+</ProgressBar>
+</RelativeLayout>
+        
