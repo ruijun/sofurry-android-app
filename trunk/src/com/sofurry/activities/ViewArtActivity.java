@@ -19,6 +19,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 
 import android.util.FloatMath;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -294,7 +295,7 @@ public class ViewArtActivity
 	    public void retreive(String num) {
             context = (Context)  retrieveObject("pholder_context_"+num);
             imageLoader = (AsyncImageLoader)  retrieveObject("pholder_loader_"+num);
-            imageBitmap = (Bitmap)  retrieveObject("pholder_binmap_"+num);
+            imageBitmap = (Bitmap)  retrieveObject("pholder_bitmap_"+num);
             submission = (Submission) retrieveObject("pholder_submission_"+num);
 
             if (imageBitmap != null) {
@@ -317,7 +318,7 @@ public class ViewArtActivity
 	    public void store(String num) {
             storeObject("pholder_context_"+num, context);
             storeObject("pholder_loader_"+num, imageLoader);
-            storeObject("pholder_binmap_"+num, imageBitmap);
+            storeObject("pholder_bitmap_"+num, imageBitmap);
             storeObject("pholder_submission_"+num, submission);
 	    }
 
@@ -361,6 +362,8 @@ public class ViewArtActivity
 	}
 	
 	// ---------------------------------------------------------
+	private LayoutInflater mInflater = null;
+	
 	private ArrayList<PageHolder> pages = null;
 	private int curpageId = 0;
     
@@ -474,34 +477,38 @@ public class ViewArtActivity
         FixedViewFlipper imageFlipper = (FixedViewFlipper) findViewById(R.id.viewFlipper1);
 
         // init pages for flipper
-        curpage = new PageHolder(this);
-        curpage.myview = (View) findViewById(R.id.page1);
-        curpage.image           = (ImageView) findViewById(R.id.imagepreview1);
-        curpage.infoText = (TextView) findViewById(R.id.InfoText1);
-        curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator1);
-        curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator1);
-        curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator1);
-
-        pages.add(curpage);
-
-        curpage = new PageHolder(this);
-        curpage.myview = (View) findViewById(R.id.page2);
-        curpage.image           = (ImageView) findViewById(R.id.imagepreview2);
-        curpage.infoText = (TextView) findViewById(R.id.InfoText2);
-        curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator2);
-        curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator2);
-        curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator2);
-        pages.add(curpage);
-
-        curpage = new PageHolder(this);
-        curpage.myview = (View) findViewById(R.id.page3);
-        curpage.image           = (ImageView) findViewById(R.id.imagepreview3);
-        curpage.infoText = (TextView) findViewById(R.id.InfoText3);
-        curpage.savedIndicator = (ImageView) findViewById(R.id.savedIndicator3);
-        curpage.loadingIndicator = (View) findViewById(R.id.loadingIndicator3);
-        curpage.playIndicator = (ImageView) findViewById(R.id.playIndicator3);
-        pages.add(curpage);
+        mInflater = LayoutInflater.from(this);
         
+        curpage = new PageHolder(this);
+        curpage.myview = mInflater.inflate(R.layout.artdetails_page_tmpl, null);
+        curpage.image    		= (ImageView) 	curpage.myview.findViewById(R.id.imagepreview);
+        curpage.infoText 		= (TextView) 	curpage.myview.findViewById(R.id.InfoText);
+        curpage.savedIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.savedIndicator);
+        curpage.loadingIndicator = (View) 		curpage.myview.findViewById(R.id.loadingIndicator);
+        curpage.playIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.playIndicator);
+        imageFlipper.addView(curpage.myview);
+        pages.add(curpage);
+
+        curpage = new PageHolder(this);
+        curpage.myview = mInflater.inflate(R.layout.artdetails_page_tmpl, null);
+        curpage.image    		= (ImageView) 	curpage.myview.findViewById(R.id.imagepreview);
+        curpage.infoText 		= (TextView) 	curpage.myview.findViewById(R.id.InfoText);
+        curpage.savedIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.savedIndicator);
+        curpage.loadingIndicator = (View) 		curpage.myview.findViewById(R.id.loadingIndicator);
+        curpage.playIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.playIndicator);
+        imageFlipper.addView(curpage.myview);
+        pages.add(curpage);
+
+        curpage = new PageHolder(this);
+        curpage.myview = mInflater.inflate(R.layout.artdetails_page_tmpl, null);
+        curpage.image    		= (ImageView) 	curpage.myview.findViewById(R.id.imagepreview);
+        curpage.infoText 		= (TextView) 	curpage.myview.findViewById(R.id.InfoText);
+        curpage.savedIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.savedIndicator);
+        curpage.loadingIndicator = (View) 		curpage.myview.findViewById(R.id.loadingIndicator);
+        curpage.playIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.playIndicator);
+        imageFlipper.addView(curpage.myview);
+        pages.add(curpage);
+
         curpage = pages.get(0);
 
         // init side menu

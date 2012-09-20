@@ -122,6 +122,13 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 				setSelectedIndex(position);
 			}
 		});
+		galleryView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView parentView, View childView, int position, long id) {
+				return showPreview(position);
+			}
+		});
 		galleryView.setOnScrollListener(new OnScrollListener() {
 			public void onScroll(final AbsListView view, final int first, final int visible, final int total) {
 				man.onScroll(view, first, visible, total);
@@ -206,6 +213,11 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 	 */
 	public abstract void setSelectedIndex(int selectedIndex);
 
+	// show item fast preview / description
+	public boolean showPreview(int position) {
+		return false;
+	}
+	
 //	/* (non-Javadoc)
 //	 * @see com.sofurry.IManagedActivity#getFetchParameters(int, int)
 //	 */

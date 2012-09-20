@@ -7,12 +7,24 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnLongClickListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.sofurry.AppConstants;
+import com.sofurry.R;
 import com.sofurry.adapters.SubmissionGalleryAdapter;
 import com.sofurry.base.classes.AbstractContentGallery;
 import com.sofurry.base.classes.ActivityManager;
@@ -110,4 +122,66 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 		return ContentType.art;
 	}
 
+// Following code show image info and scaled thumbnail on long click on submission in gallery
+// for now have a better idea of preview so disabling this code for future use
+// -= Night_Gryphon =-	
+/*	
+	private View OverlayInfo = null;
+	
+	@Override
+	public boolean showPreview(int selectedIndex) {
+		if (OverlayInfo != null) {
+			return false;
+		}
+		
+		Submission s = getDataItem(selectedIndex);
+		Bitmap thumb = s.getThumbnail();
+		
+		if (thumb != null) {
+			RelativeLayout main_view = (RelativeLayout) findViewById(R.id.gallery_main_layout);
+
+			LayoutInflater mInflater = LayoutInflater.from(this);
+			OverlayInfo = mInflater.inflate(R.layout.art_preview_overlay, null);
+			main_view.addView(OverlayInfo);
+
+			// text info
+			TextView nfo = (TextView) OverlayInfo.findViewById(R.id.InfoText);
+			if (nfo != null) {
+				nfo.setText(s.getAuthorName()+": "+s.getName());
+			}
+			
+			// image preview
+			ImageView im = (ImageView) OverlayInfo.findViewById(R.id.PreviewImage);
+
+			im.setImageBitmap(thumb);
+			im.setScaleType(ImageView.ScaleType.FIT_CENTER);
+	        im.setAdjustViewBounds(true);
+	        
+	        im.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+		    		RelativeLayout main_view = (RelativeLayout) findViewById(R.id.gallery_main_layout);
+					main_view.removeView(OverlayInfo);
+
+					ImageView im = (ImageView) OverlayInfo.findViewById(R.id.PreviewImage);
+					if (im != null) {
+						Drawable toRecycle = im.getDrawable();
+			            if (toRecycle != null) {
+			            	if ((toRecycle instanceof BitmapDrawable) && ( ((BitmapDrawable) toRecycle).getBitmap() != null )) {
+			            		((BitmapDrawable) toRecycle).getBitmap().recycle();
+			            	}
+			                ((ImageView) v).setImageBitmap(null);
+			            }
+					}
+					
+					OverlayInfo = null;
+				}
+			});
+		}
+
+		return true;
+	}
+*/
+	
 }
