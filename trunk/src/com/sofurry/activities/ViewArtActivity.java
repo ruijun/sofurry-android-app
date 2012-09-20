@@ -629,6 +629,7 @@ public class ViewArtActivity
     	};
     	
     	submissions_list = null;
+		findViewById(R.id.viewFlipper1).getViewTreeObserver().removeOnPreDrawListener(this);
 
         super.finish();
         System.gc();
@@ -649,7 +650,9 @@ public class ViewArtActivity
 
 	public boolean onPreDraw() {
 		findViewById(R.id.viewFlipper1).getViewTreeObserver().removeOnPreDrawListener(this);
-		pages.get(curpageId).loadPic(true);
+    	if (pages != null) {
+    		pages.get(curpageId).loadPic(true);
+    	}
 
 		return true;
 	}
