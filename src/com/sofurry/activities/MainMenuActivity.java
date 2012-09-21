@@ -7,10 +7,13 @@ import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
@@ -18,8 +21,10 @@ import com.sofurry.base.classes.ActivityWithRequests;
 import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.core.AuthenticationHandler;
 import com.sofurry.mobileapi.core.Request;
+import com.sofurry.mobileapi.downloaders.ContentDownloader;
 import com.sofurry.requests.AndroidRequestWrapper;
 import com.sofurry.requests.DataCall;
+import com.sofurry.storage.ImageStorage;
 import com.sofurry.util.BootVersionChecker;
 
 
@@ -37,7 +42,9 @@ public class MainMenuActivity
     private boolean mustReloadAuthInfo_ = true;
     private int     messageCount_       = -1;
     private long    lastCheck_          = -1;
-
+    
+    private int		user_id = -1;
+    private String	user_nickname = "";
 
 
     /**
@@ -142,6 +149,61 @@ public class MainMenuActivity
         }
     }
 
+    // user profile support
+    private void checkProfile() {
+    		Request req = ApiFactory.createGetUserProfile();
+    		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
+    		arw.exec(new DataCall() { public void call() { handleProfileRequest((JSONObject)arg1);	} });
+    }
+
+    /**
+     * Handles the feedback from the UnreadPMCountRequest
+     * @param obj
+     * @throws Exception
+     */
+    public void handleProfileRequest(JSONObject obj) {
+    	try {
+    		user_id = obj.getInt("userID"); 
+    		user_nickname = obj.getString("username");
+
+    		updateProfile();
+    		
+		} catch (Exception e) {
+			onError(e);
+		}
+    }
+
+    public void updateProfile() {
+    	if (user_id <=0) {
+    		return;
+    	}
+    	
+    	try {
+    		TextView nickname = (TextView) findViewById(R.id.user_profile_nickname);
+    		if (nickname != null) {
+    			nickname.setVisibility(View.VISIBLE);
+    			nickname.setText(user_nickname);
+    		}
+
+    		Bitmap bmp = ImageStorage.loadUserIcon(user_id);
+    		
+    		if (bmp == null) {
+    			ContentDownloader.downloadFile(ApiFactory.getUserIconURL(user_id), ImageStorage.getUserIconPath(user_id), null);
+
+    			bmp = ImageStorage.loadUserIcon(user_id);
+    		}
+    		if (bmp != null) {
+    			ImageView image = (ImageView) findViewById(R.id.user_profile_avatar);
+    			if (image != null) {
+    				image.setVisibility(View.VISIBLE);
+    				image.setImageBitmap(bmp);
+    			}
+    		}
+		} catch (Exception e) {
+			onError(e);
+		}
+    }
+    
     /**
      * Method description
      *
@@ -196,7 +258,8 @@ public class MainMenuActivity
         setupAlarmIfNeeded();
 
         // Set the content view
-        setContentView(R.layout.mainmenu);
+//        setContentView(R.layout.mainmenu);
+        setContentView(R.layout.mainmenu_with_profile);
 
         // Find the buttons we'll be using
         buttonPMs_     = (Button) findViewById(R.id.pms);
@@ -214,11 +277,15 @@ public class MainMenuActivity
         // Retrieve information from the instance state object, if need be
         if (savedInstanceState != null) {
             messageCount_ = (Integer) retrieveObject("messageCount");
+            user_id = (Integer) retrieveObject("user_id");
+            user_nickname = (String) retrieveObject("user_nickname");
 
             updateButtons();
+            updateProfile();
         } else {
             // Fetch the information from the server instead
             checkPmCount();
+            checkProfile();
         }
     }
 
@@ -252,6 +319,7 @@ public class MainMenuActivity
 
         if (mustReloadAuthInfo_) {
             AuthenticationHandler.loadAuthenticationInformation(this);
+        	checkProfile();
         }
 
         checkButtonDisabledState();
@@ -268,6 +336,8 @@ public class MainMenuActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         storeObject("messageCount", (Integer) messageCount_);
+        storeObject("user_id", (Integer) user_id);
+        storeObject("user_nickname", (String) user_nickname);
     }
 
     /**

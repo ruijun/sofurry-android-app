@@ -103,6 +103,10 @@ public class ApiFactory {
 		return RESOURCE_URL + "/thumb?page="+id;
 	}
 	
+	public static String getUserIconURL(int id) {
+		return RESOURCE_URL + "/avatar?user="+id;
+	}
+	
 	
 	/**
 	 * Creates a Browse command. (the command will still have to be executed, either by execute or by executeasync.
@@ -255,9 +259,13 @@ public class ApiFactory {
 	 */
 	public static Request createWatch(int authorid) {
 		Request req = new Request();
+		req.setURL(API2_URL + "/user/action/watch");
+		req.setParameter("id", "" + authorid);
+/*
 		req.setURL(API_URL + DEFAULT_API);
 		req.setParameter("f", "addwatch");
 		req.setParameter("authorid", "" + authorid);
+*/
 		return req;
 	}
 	
@@ -269,9 +277,13 @@ public class ApiFactory {
 	 */
 	public static Request createUnWatch(int authorid) {
 		Request req = new Request();
+		req.setURL(API2_URL + "/user/action/unwatch");
+		req.setParameter("id", "" + authorid);
+/*
 		req.setURL(API_URL + DEFAULT_API);
 		req.setParameter("f", "remwatch");
 		req.setParameter("authorid", "" + authorid);
+*/
 		return req;
 	}
 	
@@ -385,8 +397,21 @@ public class ApiFactory {
 	 */
 	public static Request createGetUserProfile(int userid) {
 		Request req = new Request();
-		req.setURL(API2_URL + "std/getUserProfile");
+		req.setURL(API2_URL + "/std/getUserProfile");
 		req.setParameter("id", "" + userid);
+		return req;
+	}
+
+	/**
+	 * Returns the profile information of a current user
+	 * @param userid
+	 * The user's userid. If the userid is your own, extra parameters are passed.
+	 * @return
+	 */
+	public static Request createGetUserProfile() {
+		Request req = new Request();
+		req.setURL(API2_URL + "/std/getUserProfile");
+//		req.setParameter("id", "" + userid);
 		return req;
 	}
 
