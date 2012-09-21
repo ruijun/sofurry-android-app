@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+>
+
+    <TextView
+        android:id="@+id/user_profile_nickname"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:layout_gravity="center_vertical|center_horizontal" android:visibility="gone" android:gravity="center_horizontal" android:textSize="10pt" android:text="name"/>
+
+    <ImageView
+        android:id="@+id/user_profile_avatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:adjustViewBounds="true"
+        android:src="@drawable/loadingicon" android:visibility="gone"/>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:gravity="center_horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+	>
+		<Button
+			android:id="@+id/stories"
+			android:onClick="buttonClick"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Stories"
+			android:drawableTop="@drawable/menustories" />
+		<Button
+			android:id="@+id/art"
+			android:onClick="buttonClick"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Art"
+			android:drawableTop="@drawable/menuart" />
+		<Button
+			android:id="@+id/music"
+			android:onClick="buttonClick"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Music"
+			android:drawableTop="@drawable/menumusic" />
+		<Button
+			android:id="@+id/journals"
+			android:onClick="buttonClick"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Journals"
+			android:drawableTop="@drawable/menujournals" />
+	</LinearLayout>
+	<LinearLayout
+		android:orientation="horizontal"
+		android:gravity="center_horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+	>
+		<Button
+			android:id="@+id/chat"
+			android:onClick="buttonClick"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Chat"
+			android:drawableTop="@drawable/menuchat" />
+		<Button
+			android:id="@+id/forums"
+			android:onClick="buttonClick"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Forums"
+			android:drawableTop="@drawable/menuforums" />
+		<Button
+			android:id="@+id/logbook"
+			android:onClick="buttonClick"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="Notes"
+			android:drawableTop="@drawable/menumessages" />
+		<Button
+			android:id="@+id/pms"
+			android:onClick="buttonClick"
+			android:gravity="center_horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_marginTop="20dip"
+			android:text="PMs"
+			android:drawableTop="@drawable/menumessages" />
+	</LinearLayout>
+	<LinearLayout
+		android:orientation="horizontal"
+		android:gravity="center_horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+	>
+		<Button
+			android:layout_height="wrap_content"
+			android:id="@+id/settings"
+			android:onClick="buttonClick"
+			android:layout_marginTop="20dip"
+			android:text="Settings"
+			android:layout_width="fill_parent"
+			android:layout_weight="1" />
+	</LinearLayout>
+
+</LinearLayout>
