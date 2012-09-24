@@ -261,9 +261,9 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_ALL, 0, "All Submissions");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FEATURED, 0, "Featured");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_FAVORITES, 0, "Your Favorites");
-		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST, 0, "Watchlist");
+//		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST, 0, "Watchlist");
 		viewSourceMenu.add(0, AppConstants.MENU_FILTER_GROUP, 0, "Your Groups");
-		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST_COMBINED, 0, "Watches + Groups");
+//		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST_COMBINED, 0, "Watches + Groups");
 		//menu.add(0, AppConstants.MENU_FILTER_KEYWORDS, 0, "Keywords");
 	}
 	
