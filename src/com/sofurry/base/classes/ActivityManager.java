@@ -295,13 +295,15 @@ public class ActivityManager<T> implements ICanHandleFeedback,ICanCancel {
 			currentTitle = "Watchlist";
 			resetViewSource(ViewSource.watchlist);
 			return true;
+		/*
 		case AppConstants.MENU_FILTER_GROUP:
 			currentTitle = "Group";
 			resetViewSource(ViewSource.group);
-			return true;
+			return true; // not supported anymore
+			*/
 		case AppConstants.MENU_FILTER_WATCHLIST_COMBINED:
 			currentTitle = "Combined";
-			resetViewSource(ViewSource.watchlist_combined);
+			resetViewSource(ViewSource.combinedwatch);
 			return true;
 		default:
 			return false;

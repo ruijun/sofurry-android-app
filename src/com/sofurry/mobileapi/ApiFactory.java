@@ -1,7 +1,14 @@
 package com.sofurry.mobileapi;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.sofurry.base.classes.ActivityManager;
+import com.sofurry.base.interfaces.IAddSubmission;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.mobileapi.core.Request.HttpMode;
+import com.sofurry.model.Submission;
 
 /**
  * @author Rangarig
@@ -33,12 +40,16 @@ public class ApiFactory {
 	public enum ViewSource {
 		all(0), // Does not filter the submission type
 		favorites(1), // Returns all favorites
-		featured(8),  // Returns all featured
-		group(10),
-		search(5),	  // Returns everything with the tags specified in the "extra" field
-		user(7),	  
 		watchlist(2),
-		watchlist_combined(11);
+		folder(3),
+		groups(4),
+		search(5),	  // Returns everything with the tags specified in the "extra" field
+		commission(6),
+		user(7),	  
+		featured(8),  // Returns all featured
+		highlights(9),
+		groupwatch(10),
+		combinedwatch(11);
 		
 		public int value = 0;
 		
@@ -52,6 +63,7 @@ public class ApiFactory {
 	 * The Contenttype parameter Presets
 	 */
 	public enum ContentType {
+		all(-1),
 		art(1), // Does not filter the submission type
 		journals(3), // Returns all favorites
 		music(2),  // Returns all featured
@@ -130,6 +142,80 @@ public class ApiFactory {
 		req.setURL(API_URL + DEFAULT_API);
 		req.setParameter("f", "browse");
 		req.setParameter("viewSource", Integer.toString(source.value));
+		
+		switch (source) {
+		case favorites: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("viewUserID", extra);
+			} else {
+				throw new Exception("Favorites require viewUserID parameter");
+			}
+		}
+		case watchlist: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("viewUserID", extra);
+			} else {
+				throw new Exception("Watchlist require viewUserID parameter");
+			}
+		}
+		case folder: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("folderID", extra);
+			} else {
+				throw new Exception("Folder require folderID parameter");
+			}
+		}
+		case groups: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("gid", extra);
+			} else {
+				throw new Exception("Groups require groupID parameter");
+			}
+		}
+		case search: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("search", extra);
+			} else {
+				throw new Exception("Search require search parameter with comma separated tags");
+			}
+		}
+		case commission: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("cid", extra);
+			} else {
+				throw new Exception("Commission require commission ID parameter");
+			}
+		}
+		case user: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("viewUserID", extra);
+			} else {
+				throw new Exception("User require viewUserID parameter");
+			}
+		}
+		case highlights: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("viewUserID", extra);
+			} else {
+				throw new Exception("Highlights require viewUserID parameter");
+			}
+		}
+		case groupwatch: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("viewUserID", extra);
+			} else {
+				throw new Exception("Group watchlist require viewUserID parameter");
+			}
+		}
+		case combinedwatch: { 
+			if ( (extra != null) && (extra.length() > 0)) {
+			    req.setParameter("viewUserID", extra);
+			} else {
+				throw new Exception("Combined watchlist require viewUserID parameter");
+			}
+		}
+		}
+		/*
 		if (extra != null) {
 		  if ((source != ViewSource.search) && (source != ViewSource.user))
 			  throw new Exception("The extra parameter can only be used with the modes 'search' and 'user' otherwise it has to be null.");
@@ -138,10 +224,31 @@ public class ApiFactory {
 		  if (source == ViewSource.search)
 			req.setParameter("search", extra);
 		}
+		*/
 		req.setParameter("contentType", Integer.toString(contentType.value));
 		req.setParameter("entriesPerPage", Integer.toString(entriesPerPage));
 		req.setParameter("page", Integer.toString(page));
 		return req;
+	}
+	
+	/**
+	 * Parse browse responce and add Submissions
+	 * should return both number of items loaded and total amount. But returning only num items loaded
+	 * @param obj - responce to prase
+	 * @param addsub - add submission callback
+	 * @throws JSONException
+	 * return number of items readed from server
+	 */
+	public static int ParseBrowse(JSONObject obj, IAddSubmission addsub) throws JSONException {
+		JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
+		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
+		for (int i = 0; i < items.length(); i++) {
+			Submission s = new Submission();
+			s.populate(items.getJSONObject(i));
+			addsub.AddSubmission(s);
+		}
+//		return Integer.parseInt(obj.getString("totalpages"));
+		return items.length();
 	}
 	
 	/**
