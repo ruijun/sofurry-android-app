@@ -239,7 +239,18 @@ public class ApiFactory {
 	 * @throws JSONException
 	 * return number of items readed from server
 	 */
-	public static int ParseBrowse(JSONObject obj, IAddSubmission addsub) throws JSONException {
+	public static class ParseBrowseResult {
+		public int ItemsLoaded = 0;
+		public int NumPages = 0;
+		
+		public ParseBrowseResult(int itemsLoaded, int numPages) {
+			super();
+			ItemsLoaded = itemsLoaded;
+			NumPages = numPages;
+		}
+	}
+	
+	public static  ParseBrowseResult ParseBrowse(JSONObject obj, IAddSubmission addsub) throws JSONException {
 		JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
 		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
 		for (int i = 0; i < items.length(); i++) {
@@ -248,7 +259,8 @@ public class ApiFactory {
 			addsub.AddSubmission(s);
 		}
 //		return Integer.parseInt(obj.getString("totalpages"));
-		return items.length();
+//		return items.length();
+		return new ParseBrowseResult(items.length(), Integer.parseInt(obj.getString("totalpages")) ); 
 	}
 	
 	/**
