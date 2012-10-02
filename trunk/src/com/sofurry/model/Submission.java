@@ -281,6 +281,13 @@ public class Submission implements Serializable, IHasThumbnail {
 		setTags(datasource.getString("keywords"));
 //		setThumbnailUrl(datasource.getString("thumb")); // thumbnails for video have different URL
 		setSaveFilename(datasource.getString("thumb"));
+
+		switch (datasource.getInt("contentType")) {
+			case 0: { setType(ContentType.stories); }
+			case 1: { setType(ContentType.art); }
+			case 2: { setType(ContentType.music); }
+			case 3: { setType(ContentType.journals); }
+		}
 		
 		switch (type) {
 			case art: {
