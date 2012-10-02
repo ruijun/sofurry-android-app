@@ -10,6 +10,7 @@ import android.os.Parcelable.Creator;
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
+import com.sofurry.mobileapi.ApiFactory.ParseBrowseResult;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.model.SubmissionList;
@@ -54,8 +55,8 @@ public class SFSubmissionList extends SubmissionList {
 			Request req = ApiFactory.createBrowse(fSource, fExtra, fContentType, AppConstants.ENTRIESPERPAGE_GALLERY, currentPage);
 			JSONObject res = req.execute();
 			
-			totalPages = Integer.parseInt(res.getString("totalpages")); // should be in ApiFactory :\
-			int loaded = ApiFactory.ParseBrowse(res, this);
+			ParseBrowseResult loaded = ApiFactory.ParseBrowse(res, this);
+			totalPages = loaded.NumPages;
 			
 			if (StatusCallback != null) {
 				StatusCallback.onFinish(this);
