@@ -2,30 +2,39 @@ package com.sofurry.model;
 
 import java.util.ArrayList;
 
-import com.sofurry.base.interfaces.IAddSubmission;
+import com.sofurry.base.interfaces.IAddObjectCallback;
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.base.interfaces.IJobStatusCallback;
-import com.sofurry.storage.SubmissionListStorage;
+import com.sofurry.storage.NetworkListStorage;
 
 import android.os.Handler;
 
 
-// abstract list of submissions for any online gallery
-public abstract class SubmissionList implements IAddSubmission, ICanCancel {
+/**
+ * Abstract network loaded list of objects. 
+ * Provide simple get(index) access to objects loaded from network page splitted lists like list of submissions or list of comments
+ * Implements automatic next page load and forward next page load
+ *  
+ * @author Night_Gryphon
+ *
+ * @param <T>
+ */
+public abstract class NetworkList<T> implements IAddObjectCallback<T>, ICanCancel {
 		
 	
-		public SubmissionList() {
+		public NetworkList() {
 			super();
-			SubmissionListStorage.store(this);
+			NetworkListStorage.store(this);
 		}
 
 		@Override
 		protected void finalize() throws Throwable {
-			SubmissionListStorage.remove(getListId());
+			NetworkListStorage.remove(getListId());
+			// should we destroy all list objects here or GC will do this job for us?
 			super.finalize();
 		}
 
-		private ArrayList<Submission> fSubmissionsList = new ArrayList<Submission>();
+		private ArrayList<T> fList = new ArrayList<T>();
 		
 		// async loading next page
 		private AsyncPageLoader fAsyncLoader = null;
@@ -35,9 +44,9 @@ public abstract class SubmissionList implements IAddSubmission, ICanCancel {
 		// class AsyncPageLoader
 		private class AsyncPageLoader extends Thread implements IJobStatusCallback, ICanCancel {
 			public volatile Handler mHandler = null;
-			private SubmissionList fParent = null;
+			private NetworkList fParent = null;
 			
-			public AsyncPageLoader(SubmissionList aParent) {
+			public AsyncPageLoader(NetworkList aParent) {
 				super();
 				this.fParent = aParent;
 				this.mHandler = new Handler();
@@ -120,20 +129,20 @@ public abstract class SubmissionList implements IAddSubmission, ICanCancel {
 		 * add submission to list. 
 		 * if there is AsyncLoader working - assume we are called from worker thread so post runnable to main thread. 
 		 */
-		public void AddSubmission(final Submission sub) {
+		public void AddObject(final T sub) {
 			if ( (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
 				if (fAsyncLoader.mHandler != null) {
 					fAsyncLoader.mHandler.post(new Runnable() {
 		                public void run() {
-		              	  if (fSubmissionsList != null) {
-		              		  fSubmissionsList.add(sub);
+		              	  if (fList != null) {
+		              		  fList.add(sub);
 		              	  }
 		                }
 		            });
 				}
 			} else {
-            	  if (fSubmissionsList != null) {
-              		  fSubmissionsList.add(sub);
+            	  if (fList != null) {
+              		  fList.add(sub);
               	  }
 			}
 		}
@@ -144,15 +153,15 @@ public abstract class SubmissionList implements IAddSubmission, ICanCancel {
 		 * @return
 		 * @throws Exception
 		 */
-		public Submission getSubmission(int ASubmissionIndex) throws Exception  {
-			if (ASubmissionIndex < fSubmissionsList.size()) {
-				if (fSubmissionsList.size() - ASubmissionIndex - 1 < preloadCount) {
+		public T getSubmission(int aIndex) throws Exception  {
+			if (aIndex < fList.size()) {
+				if (fList.size() - aIndex - 1 < preloadCount) {
 					AsyncLoadNextPage();
 				}
-				return fSubmissionsList.get(ASubmissionIndex);
+				return fList.get(aIndex);
 			} else if ((fAsyncLoader == null) || ( !fAsyncLoader.isAlive() )) {
 				if ( 	IsFinalPage() || 
-						( (getSubmissionsCount() >=0 ) && (ASubmissionIndex >= getSubmissionsCount())) )  {
+						( (getSubmissionsCount() >=0 ) && (aIndex >= getSubmissionsCount())) )  {
 					throw new Exception("Submission index out of range");
 				}
 				AsyncLoadNextPage();

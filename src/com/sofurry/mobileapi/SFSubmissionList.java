@@ -13,7 +13,8 @@ import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ParseBrowseResult;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
-import com.sofurry.model.SubmissionList;
+import com.sofurry.model.NetworkList;
+import com.sofurry.model.Submission;
 
 /**
  * Implementation of SoFurry Submission List
@@ -22,7 +23,7 @@ import com.sofurry.model.SubmissionList;
  * @author Night_Gryphon
  *
  */
-public class SFSubmissionList extends SubmissionList {
+public class SFSubmissionList extends NetworkList<Submission> {
 
 	private int currentPage = -1;
 	private int totalPages = -1;
