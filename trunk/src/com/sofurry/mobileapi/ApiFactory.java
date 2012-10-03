@@ -4,10 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.sofurry.base.classes.ActivityManager;
-import com.sofurry.base.interfaces.IAddSubmission;
+import com.sofurry.base.interfaces.IAddObjectCallback;
 import com.sofurry.mobileapi.core.Request;
-import com.sofurry.mobileapi.core.Request.HttpMode;
 import com.sofurry.model.Submission;
 
 /**
@@ -250,13 +248,13 @@ public class ApiFactory {
 		}
 	}
 	
-	public static  ParseBrowseResult ParseBrowse(JSONObject obj, IAddSubmission addsub) throws JSONException {
+	public static  ParseBrowseResult ParseBrowse(JSONObject obj, IAddObjectCallback<Submission> addsub) throws JSONException {
 		JSONArray pagecontents = new JSONArray(obj.getString("pagecontents"));
 		JSONArray items = new JSONArray(pagecontents.getJSONObject(0).getString("items"));
 		for (int i = 0; i < items.length(); i++) {
 			Submission s = new Submission();
 			s.populate(items.getJSONObject(i));
-			addsub.AddSubmission(s);
+			addsub.AddObject(s);
 		}
 //		return Integer.parseInt(obj.getString("totalpages"));
 //		return items.length();
