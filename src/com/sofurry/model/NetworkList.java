@@ -1,6 +1,7 @@
 package com.sofurry.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import com.sofurry.base.interfaces.IAddObjectCallback;
 import com.sofurry.base.interfaces.ICanCancel;
@@ -19,9 +20,13 @@ import android.os.Handler;
  *
  * @param <T>
  */
-public abstract class NetworkList<T> implements IAddObjectCallback<T>, ICanCancel {
+public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel, IAddObjectCallback<T> {
 		
-	
+		/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 		public NetworkList() {
 			super();
 			NetworkListStorage.store(this);
@@ -29,34 +34,47 @@ public abstract class NetworkList<T> implements IAddObjectCallback<T>, ICanCance
 
 		@Override
 		protected void finalize() throws Throwable {
-			NetworkListStorage.remove(getListId());
+			if (! isWorkerThread) // do not remove id from storage when worker thread die
+				NetworkListStorage.remove(getListId());
 			// should we destroy all list objects here or GC will do this job for us?
+			
 			super.finalize();
 		}
 
-		private ArrayList<T> fList = new ArrayList<T>();
+//		private ArrayList<T> fList = new ArrayList<T>();
 		
 		// async loading next page
 		private AsyncPageLoader fAsyncLoader = null;
+		
+		/**
+		 * flag to determine if we are in worker thread or in main thread
+		 */
+		private Boolean isWorkerThread = false;
 
 		private int preloadCount = 0; // amount of items till the end of currently loaded list to start forward next page preload
 		
-		// class AsyncPageLoader
+		/**
+		 * Network List worker thread class 
+		 */
 		private class AsyncPageLoader extends Thread implements IJobStatusCallback, ICanCancel {
 			public volatile Handler mHandler = null;
-			private NetworkList fParent = null;
+			private NetworkList<T> fParent = null;
 			
-			public AsyncPageLoader(NetworkList aParent) {
+			public AsyncPageLoader(NetworkList<T> aParent) {
 				super();
-				this.fParent = aParent;
+				this.fParent = aParent; // do fParent become a working copy of parent thread object when worker thread starts?
 				this.mHandler = new Handler();
 			}
 
 			@Override
 			public void run() {
 				try {
-//					fParent.
-					doLoadNextPage(this); // should we pass fParent here to check cancelLoadFlag between different threads?
+					fParent.isWorkerThread = true;
+					// should we set fParent.fLoadingStatusListener = this ? and fix runnables to refer parent thread fLoadingStatusListener variable?
+					
+					onStart(this);
+					fParent.doLoadNextPage(this); // should we pass fParent here to check cancelLoadFlag between different threads?
+					onSuccess(this);
 				} catch (Exception e) {
 					onError(fParent, e.getMessage());
 				}
@@ -69,7 +87,7 @@ public abstract class NetworkList<T> implements IAddObjectCallback<T>, ICanCance
 			public void onStart(Object job) {
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
-		                public void run() {
+		                public void run() { // should we use fParent here or just refer to parent object variable?
 		              	  if (fParent.fLoadingStatusListener != null) {
 		              		  fParent.fLoadingStatusListener.onStart(fParent);
 		              	  }
@@ -79,13 +97,15 @@ public abstract class NetworkList<T> implements IAddObjectCallback<T>, ICanCance
 			}
 
 			@Override
-			public void onFinish(Object job) {
+			public void onSuccess(Object job) {
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
 		                public void run() {
 		              	  if (fParent.fLoadingStatusListener != null) {
-		              		  fParent.fLoadingStatusListener.onFinish(fParent);
+		              		  fParent.fLoadingStatusListener.onSuccess(fParent);
 		              	  }
+		              	  
+		              	  fFirstPage = false; // we are done loading a page so next page will not be not first
 		                }
 		            });
 				}
@@ -99,6 +119,8 @@ public abstract class NetworkList<T> implements IAddObjectCallback<T>, ICanCance
 		              	  if (fParent.fLoadingStatusListener != null) {
 		              		  fParent.fLoadingStatusListener.onError(fParent, msg);
 		              	  }
+		              	  
+		              	  fFirstPage = false; // we are done loading a page so next page will not be not first
 		                }
 		            });
 				}
@@ -125,75 +147,188 @@ public abstract class NetworkList<T> implements IAddObjectCallback<T>, ICanCance
 
 		} // end of class AsyncPageLoader
 		
+
 		/**
-		 * add submission to list. 
-		 * if there is AsyncLoader working - assume we are called from worker thread so post runnable to main thread. 
+		 * Hack to be able to call super.add from inside runnable object
+		 * @param index
+		 * @param object
 		 */
-		public void AddObject(final T sub) {
-			if ( (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+		private void doadd(int index, T object) {
+			super.add(index, object);
+		}
+		
+		@Override
+		public void add(final int index, final T object) {
+			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
 				if (fAsyncLoader.mHandler != null) {
 					fAsyncLoader.mHandler.post(new Runnable() {
 		                public void run() {
-		              	  if (fList != null) {
-		              		  fList.add(sub);
-		              	  }
+		          			doadd(index, object);
 		                }
 		            });
 				}
 			} else {
-            	  if (fList != null) {
-              		  fList.add(sub);
-              	  }
+          		doadd(index, object);
 			}
+		}
+
+
+		/**
+		 * Hack to be able to call super.add from inside runnable object
+		 * @param object
+		 * @return
+		 */
+		private boolean doadd(T object) {
+			return super.add(object);
+		}
+
+		@Override
+		public boolean add(final T object) {
+			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+				if (fAsyncLoader.mHandler != null) {
+					fAsyncLoader.mHandler.post(new Runnable() {
+		                public void run() {
+		          			doadd(object);
+		                }
+		            });
+				}
+				return true;
+			} else {
+          		return doadd(object);
+			}
+		}
+
+		/**
+		 * Hack to be able to call super.add from inside runnable object
+		 * @param collection
+		 * @return
+		 */
+		private boolean doaddAll(Collection<? extends T> collection) {
+			return super.addAll(collection);
+		}
+
+		@Override
+		public boolean addAll(final Collection<? extends T> collection) {
+			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+				if (fAsyncLoader.mHandler != null) {
+					fAsyncLoader.mHandler.post(new Runnable() {
+		                public void run() {
+		          			doaddAll(collection);
+		                }
+		            });
+				}
+				return true;
+			} else {
+          		return doaddAll(collection);
+			}
+		}
+
+		/**
+		 * Hack to be able to call super.add from inside runnable object
+		 * @param location
+		 * @param collection
+		 * @return
+		 */
+		private boolean doaddAll(int location, Collection<? extends T> collection) {
+			return super.addAll(location, collection);
+		}
+
+		@Override
+		public boolean addAll(final int location, final Collection<? extends T> collection) {
+			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+				if (fAsyncLoader.mHandler != null) {
+					fAsyncLoader.mHandler.post(new Runnable() {
+		                public void run() {
+		          			doaddAll(location, collection);
+		                }
+		            });
+				}
+				return true;
+			} else {
+          		return doaddAll(location, collection);
+			}
+		}
+
+	
+		@Override
+		public T get(int index) {
+			return get(index, true);
 		}
 
 		/**
 		 * Get submission from list. Start load pages as needed
 		 * @param ASubmissionIndex
 		 * @return
-		 * @throws Exception
 		 */
-		public T getSubmission(int aIndex) throws Exception  {
-			if (aIndex < fList.size()) {
-				if (fList.size() - aIndex - 1 < preloadCount) {
-					AsyncLoadNextPage();
+		public T get(int aIndex, boolean allowLoad)  {
+			if (aIndex < super.size()) {
+				if (super.size() - aIndex - 1 < preloadCount) {
+					if (allowLoad)
+						AsyncLoadNextPage();
 				}
-				return fList.get(aIndex);
+				return super.get(aIndex);
 			} else if ((fAsyncLoader == null) || ( !fAsyncLoader.isAlive() )) {
-				if ( 	IsFinalPage() || 
-						( (getSubmissionsCount() >=0 ) && (aIndex >= getSubmissionsCount())) )  {
-					throw new Exception("Submission index out of range");
-				}
-				AsyncLoadNextPage();
+				if (allowLoad)
+					AsyncLoadNextPage();
 			}
 			return null;
 		}
-		
-		// no sync request because we can't stop main thread
-		/*
-		private void SyncLoadNextPage() {
-			if (fAsyncLoader != null) {
-				// wait for semaphore
-			} else {
-				try {
-	              	  if (fLoadingStatusListener != null) {
-	              		  fLoadingStatusListener.onStart(this);
-	              	  }
 
-	              	  doLoadNextPage();
-	              	  
-	              	  if (fLoadingStatusListener != null) {
-	              		  fLoadingStatusListener.onFinish(this);
-	              	  }
-				} catch (Exception e) {
-	              	  if (fLoadingStatusListener != null) {
-	              		  fLoadingStatusListener.onError(this);
-	              	  }
-				}
-			}
+		@Override
+		public boolean isEmpty() {
+			return ( isFinalPage() && (!isLoading()) && super.isEmpty()); // can be incorrect if isFinalPage is not overrided
 		}
-		*/
+
+		/**
+		 * Override this if website API provide actual number of items to load
+		 * Return infinity if size can not be determined
+		 */
+		@Override
+		public int size() {
+			if (isFinalPage() && ( ! isLoading() ) )  // is all possible item pages done loading?
+				return super.size(); // no more items to load, return number of items we already have in list
+			else
+				return Integer.MAX_VALUE; // there may be infinite items left to load
+		}
+
+		/**
+		 * Return amount of items already loaded from server
+		 * @return
+		 */
+		public int sizeLoaded() {
+			return super.size();
+		}
 		
+		/**
+		 * Return if next page loading in progress
+		 * @return
+		 */
+		public Boolean isLoading() {
+			return (fAsyncLoader != null) && (fAsyncLoader.isAlive());
+		}
+		
+		/**
+		 * true if there is no more pages to download in current list
+		 * @return
+		 */
+		public Boolean isFinalPage() {
+			return false;
+		}
+		
+		private Boolean fFirstPage = true;
+		
+		/**
+		 * true if initial page loading. used to trigger different progress bars for first and other page loads
+		 * @return
+		 */
+		public Boolean isFirstPage() {
+			return fFirstPage;
+		}
+		
+
+		/**
+		 * Load items page in worker thread
+		 */
 		private void AsyncLoadNextPage() {
 			if  ( (fAsyncLoader == null) || ( ! fAsyncLoader.isAlive() ) ) {
 				fAsyncLoader = new AsyncPageLoader(this);
@@ -205,7 +340,7 @@ public abstract class NetworkList<T> implements IAddObjectCallback<T>, ICanCance
 		 * Cancel worker thread
 		 */
 		public void cancel() {
-			if ((fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+			if (isLoading()) {
 				fAsyncLoader.cancel();
 			}
 		}
@@ -213,23 +348,15 @@ public abstract class NetworkList<T> implements IAddObjectCallback<T>, ICanCance
 		/**
 		 * perform synchronous loading of next page from server.
 		 * Synchronous call. It's SubmissionsList who responsible to make this asynch
-		 * @param StatusCallback
+		 * @param StatusCallback - callback object to call correct methods to pass through threads boundary
 		 */
-		protected abstract void doLoadNextPage(IJobStatusCallback StatusCallback); 
+		protected abstract void doLoadNextPage(IJobStatusCallback StatusCallback) throws Exception; 
 		
 		/**
 		 * perform cancel load page request. Called inside worker thread.
 		 */
 		protected abstract void doCancel(); 
 
-		protected Boolean IsFinalPage() { // true if there is no more pages to download in current list
-			return true;
-		}
-		
-		protected int getSubmissionsCount() { // -1 = unknown number of submissions
-			return -1;
-		}
-		
 		// ID of this list for ListsStorage
 		private long fListId = System.currentTimeMillis();
 

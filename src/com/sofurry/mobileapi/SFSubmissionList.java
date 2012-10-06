@@ -5,8 +5,6 @@ package com.sofurry.mobileapi;
 
 import org.json.JSONObject;
 
-import android.os.Parcelable.Creator;
-
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
@@ -43,14 +41,9 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	}
 
 	@Override
-	protected void doLoadNextPage(IJobStatusCallback StatusCallback) {
-		try {
-			if (IsFinalPage()) return; // don't fetch after last page
+	protected void doLoadNextPage(IJobStatusCallback StatusCallback) throws Exception {
+			if (isFinalPage()) return; // don't fetch after last page
 			
-			if (StatusCallback != null) {
-				StatusCallback.onStart(this);
-			}
-
 			currentPage++;
 			
 			Request req = ApiFactory.createBrowse(fSource, fExtra, fContentType, AppConstants.ENTRIESPERPAGE_GALLERY, currentPage);
@@ -58,19 +51,10 @@ public class SFSubmissionList extends NetworkList<Submission> {
 			
 			ParseBrowseResult loaded = ApiFactory.ParseBrowse(res, this);
 			totalPages = loaded.NumPages;
-			
-			if (StatusCallback != null) {
-				StatusCallback.onFinish(this);
-			}
-		} catch (Exception e) {
-			if (StatusCallback != null) {
-				StatusCallback.onError(this, e.getMessage());
-			}
-		}
 	}
 
 	@Override
-	protected Boolean IsFinalPage() {
+	public Boolean isFinalPage() {
 		return (totalPages > 0) && (currentPage >= totalPages-1);
 	}
 

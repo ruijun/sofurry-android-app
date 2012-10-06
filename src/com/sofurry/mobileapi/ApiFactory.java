@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import com.sofurry.base.interfaces.IAddObjectCallback;
 import com.sofurry.mobileapi.core.Request;
+import com.sofurry.model.PrivateMessage;
 import com.sofurry.model.Submission;
 
 /**
@@ -231,11 +232,10 @@ public class ApiFactory {
 	
 	/**
 	 * Parse browse responce and add Submissions
-	 * should return both number of items loaded and total amount. But returning only num items loaded
+	 * Return both number of items loaded and total amount of pages.
 	 * @param obj - responce to prase
 	 * @param addsub - add submission callback
 	 * @throws JSONException
-	 * return number of items readed from server
 	 */
 	public static class ParseBrowseResult {
 		public int ItemsLoaded = 0;
@@ -254,7 +254,7 @@ public class ApiFactory {
 		for (int i = 0; i < items.length(); i++) {
 			Submission s = new Submission();
 			s.populate(items.getJSONObject(i));
-			addsub.AddObject(s);
+			addsub.add(s);
 		}
 //		return Integer.parseInt(obj.getString("totalpages"));
 //		return items.length();
@@ -419,6 +419,26 @@ public class ApiFactory {
 		req.setParameter("page", "" + page);
 		req.setParameter("entriesPerPage", "" + entriesPerPage);
 		return req;
+	}
+
+	/**
+	 * parse server responce to ListPMs request
+	 * @param obj - server responce
+	 * @param addproc - callback to add PM in to list
+	 * @return number of items readed
+	 * @throws JSONException
+	 */
+	public static  int ParsePMList(JSONObject obj, IAddObjectCallback<PrivateMessage> addproc) throws JSONException {
+        JSONArray items = new JSONArray(obj.getString("items"));
+
+        for (int i = 0; i < items.length(); i++) {
+            PrivateMessage m = new PrivateMessage();
+            m.populate(items.getJSONObject(i));
+			addproc.add(m);
+            // man.getPageIDs().add("" + m.getId());
+        }
+		
+		return items.length(); 
 	}
 	
 	/**

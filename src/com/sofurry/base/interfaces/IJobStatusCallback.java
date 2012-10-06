@@ -9,7 +9,7 @@ package com.sofurry.base.interfaces;
  */
 public interface IJobStatusCallback {
 	public abstract void onStart(Object job);
-	public abstract void onFinish(Object job);
+	public abstract void onSuccess(Object job);
 	public abstract void onError(Object job, String msg);
 	public abstract void onProgress(Object job, int progress, int total, String msg);
 }
