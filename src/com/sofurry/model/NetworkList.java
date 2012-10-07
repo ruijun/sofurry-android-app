@@ -9,6 +9,7 @@ import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.storage.NetworkListStorage;
 
 import android.os.Handler;
+import android.util.Log;
 
 
 /**
@@ -25,7 +26,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+//	private static final long serialVersionUID = 1L;
 
 		public NetworkList() {
 			super();
@@ -33,11 +34,11 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		}
 
 		@Override
-		protected void finalize() throws Throwable {
-			if (! isWorkerThread) // do not remove id from storage when worker thread die
+		public void finalize() throws Throwable {
+//			if (! isWorkerThread) // do not remove id from storage when worker thread die
 				NetworkListStorage.remove(getListId());
 			// should we destroy all list objects here or GC will do this job for us?
-			
+			fLoadingStatusListener = null;
 			super.finalize();
 		}
 
@@ -49,7 +50,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		/**
 		 * flag to determine if we are in worker thread or in main thread
 		 */
-		private Boolean isWorkerThread = false;
+//		private Boolean fLoading = false;
 
 		private int preloadCount = 0; // amount of items till the end of currently loaded list to start forward next page preload
 		
@@ -61,15 +62,19 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 			private NetworkList<T> fParent = null;
 			
 			public AsyncPageLoader(NetworkList<T> aParent) {
-				super();
+				super("NetList: Page Loader");
+				Log.d("[NetList]", "--------------------------=== Create loader");
 				this.fParent = aParent; // do fParent become a working copy of parent thread object when worker thread starts?
 				this.mHandler = new Handler();
 			}
 
 			@Override
 			public void run() {
+				Log.d("[NetList]", "=== Start thread");
+
 				try {
-					fParent.isWorkerThread = true;
+//					isWorkerThread = true;
+//					fLoading = true;
 					// should we set fParent.fLoadingStatusListener = this ? and fix runnables to refer parent thread fLoadingStatusListener variable?
 					
 					onStart(this);
@@ -79,7 +84,9 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 					onError(fParent, e.getMessage());
 				}
 				
+//				fLoading = false;
 				fParent.fAsyncLoader = null;
+				Log.d("[NetList]", "=== End thread");
 			}
 
 			// post callback to parent thread
@@ -159,7 +166,8 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		
 		@Override
 		public void add(final int index, final T object) {
-			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+//			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+			if ( isLoading() ) { // when load thread is alive we assume all add calls are inter-thread
 				if (fAsyncLoader.mHandler != null) {
 					fAsyncLoader.mHandler.post(new Runnable() {
 		                public void run() {
@@ -184,7 +192,8 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 
 		@Override
 		public boolean add(final T object) {
-			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+//			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+			if ( isLoading() ) { // when load thread is alive we assume all add calls are inter-thread
 				if (fAsyncLoader.mHandler != null) {
 					fAsyncLoader.mHandler.post(new Runnable() {
 		                public void run() {
@@ -209,7 +218,8 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 
 		@Override
 		public boolean addAll(final Collection<? extends T> collection) {
-			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+//			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+			if ( isLoading() ) { // when load thread is alive we assume all add calls are inter-thread
 				if (fAsyncLoader.mHandler != null) {
 					fAsyncLoader.mHandler.post(new Runnable() {
 		                public void run() {
@@ -235,7 +245,8 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 
 		@Override
 		public boolean addAll(final int location, final Collection<? extends T> collection) {
-			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+//			if ( (isWorkerThread) && (fAsyncLoader != null) && (fAsyncLoader.isAlive())) {
+			if ( isLoading() ) { // when load thread is alive we assume all add calls are inter-thread
 				if (fAsyncLoader.mHandler != null) {
 					fAsyncLoader.mHandler.post(new Runnable() {
 		                public void run() {
@@ -263,14 +274,18 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		public T get(int aIndex, boolean allowLoad)  {
 			if (aIndex < super.size()) {
 				if (super.size() - aIndex - 1 < preloadCount) {
-					if (allowLoad)
+					if ( (!isLoading()) && allowLoad ) {
+						// "    fLoading="+fLoading+
+						Log.d("[NetList]", ">>>>> NextPage request (preload): index="+aIndex+"   fAsyncLoader: "+(fAsyncLoader == null));
 						AsyncLoadNextPage();
+					}
 				}
 				return super.get(aIndex);
-			} else if ((fAsyncLoader == null) || ( !fAsyncLoader.isAlive() )) {
-				if (allowLoad)
-					AsyncLoadNextPage();
+			} else if ( (!isLoading()) && allowLoad ) {
+				Log.d("[NetList]", ">>>>> NextPage request (no item): index="+aIndex+"   fAsyncLoader: "+(fAsyncLoader == null));
+				AsyncLoadNextPage();
 			}
+			
 			return null;
 		}
 
@@ -304,7 +319,8 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * @return
 		 */
 		public Boolean isLoading() {
-			return (fAsyncLoader != null) && (fAsyncLoader.isAlive());
+//			return (fLoading) && (fAsyncLoader != null) && (fAsyncLoader.isAlive());
+			return (fAsyncLoader != null);
 		}
 		
 		/**
@@ -330,7 +346,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * Load items page in worker thread
 		 */
 		private void AsyncLoadNextPage() {
-			if  ( (fAsyncLoader == null) || ( ! fAsyncLoader.isAlive() ) ) {
+			if  ( ! isLoading() ) {
 				fAsyncLoader = new AsyncPageLoader(this);
 				fAsyncLoader.start();
 			}
@@ -360,10 +376,6 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		// ID of this list for ListsStorage
 		private long fListId = System.currentTimeMillis();
 
-/*		public void setListId(long AListId) { // can be useful when restoring list from storage on activity restoring. ???
-			fListId = AListId;
-		} */
-		
 		public long	getListId() {
 			return fListId;
 		}

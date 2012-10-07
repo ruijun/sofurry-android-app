@@ -283,10 +283,20 @@ public class Submission implements Serializable, IHasThumbnail {
 		setSaveFilename(datasource.getString("thumb"));
 
 		switch (datasource.getInt("contentType")) {
-			case 0: { setType(ContentType.stories); }
-			case 1: { setType(ContentType.art); }
-			case 2: { setType(ContentType.music); }
-			case 3: { setType(ContentType.journals); }
+			case 0: 
+				setType(ContentType.stories);
+				break;
+			case 1:
+				setType(ContentType.art);
+				break;
+			case 2:
+				setType(ContentType.music);
+				break;
+			case 3:
+				setType(ContentType.journals);
+				break;
+			default:
+				setType(ContentType.all);
 		}
 		
 		switch (type) {

@@ -28,4 +28,8 @@ public class NetworkListStorage {
 		storage.remove(id);
 	}
 	
+	public static void remove(NetworkList list) {
+		if (list != null)
+			storage.remove(list.getListId());
+	}
 }
