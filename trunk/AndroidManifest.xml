@@ -45,6 +45,13 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".base.classes.SFBrowseActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.GALLERY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity android:name=".activities.ListJournalsActivity"
                   android:label="@string/app_name_listjournals">
             <intent-filter>

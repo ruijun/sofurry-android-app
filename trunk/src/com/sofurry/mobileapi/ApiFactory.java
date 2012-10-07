@@ -187,7 +187,8 @@ public class ApiFactory {
 		}
 		case user: { 
 			if ( (extra != null) && (extra.length() > 0)) {
-			    req.setParameter("viewUserID", extra);
+//			    req.setParameter("viewUserID", extra);
+			    req.setParameter("authorid", extra); // WTF?! WIKI say here must be viewUserID but it doesn't work!!! 
 			} else {
 				throw new Exception("User require viewUserID parameter");
 			}

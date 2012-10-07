@@ -18,7 +18,9 @@ import android.widget.TextView;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
+import com.sofurry.base.classes.SFBrowseActivity;
 import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.core.AuthenticationHandler;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.mobileapi.downloaders.ContentDownloader;
@@ -106,6 +108,16 @@ public class MainMenuActivity
 
             case R.id.forums:
                 break;
+
+            case R.id.test:
+//              intent     = new Intent(this, GalleryArtActivity.class);
+              intent     = new Intent(this, SFBrowseActivity.class);
+              intent.putExtra("ContentType", ContentType.art);
+              
+              activityId = AppConstants.ACTIVITY_GALLERYART;
+
+              break;
+
         }
 
         // Check if we need to launch an activity

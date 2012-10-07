@@ -51,7 +51,12 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
     }
 
     public long getItemId(int position) {
-        return items.get(position).getId();
+    	Submission item = items.get(position);
+    	
+    	if (item != null)
+    		return item.getId();
+    	else
+    		return -1;
     }
 
     // viewholder to store links to intrface elements
@@ -112,23 +117,29 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
             }
         }
 
-        Bitmap thumb = items.get(position).getThumbnail();
+        Submission item = items.get(position);
+
+        Bitmap thumb = null;
+        
+        if (item != null)
+            thumb = item.getThumbnail();
+
         if (thumb != null)
-          holder.image.setImageBitmap(thumb);
-        else
-          holder.image.setImageDrawable(defaultImage);
+            holder.image.setImageBitmap(thumb);
+          else
+            holder.image.setImageDrawable(defaultImage);
 
         if (enableLayoutItems) {
         	try {
             	// set saved indicator
-        		if (FileStorage.fileExists(items.get(position).getSaveName(context))) {
+        		if ( (item != null) && (FileStorage.fileExists(item.getSaveName(context)))) {
         			holder.saved_indicator.setVisibility(View.VISIBLE);
         		} else {
         			holder.saved_indicator.setVisibility(View.INVISIBLE);
         		}
 
         		// set video indicator
-        		if (items.get(position).isVideo()) {
+        		if ( (item != null) && (item.isVideo())) {
         			holder.video_indicator.setVisibility(View.VISIBLE);
         		} else {
         			holder.video_indicator.setVisibility(View.INVISIBLE);
@@ -137,7 +148,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
         	}
         	
         	GradientDrawable bg = (GradientDrawable) holder.image.getBackground();
-        	if (items.get(position).getContentLevel().equals("0")) {
+        	if ( (item == null) || (item.getContentLevel().equals("0"))) {
         		bg.setStroke(1, 0xFF1C1C1C);
         	} else {
         		bg.setStroke(1, 0xFF2C0000);
