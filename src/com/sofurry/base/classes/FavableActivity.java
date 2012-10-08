@@ -12,6 +12,7 @@ import com.sofurry.activities.ListMusicActivity;
 import com.sofurry.activities.ListStoriesActivity;
 import com.sofurry.activities.RateActivity;
 import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.requests.AndroidRequestWrapper;
@@ -169,10 +170,39 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	 * Shows more work by the specific user
 	 */
 	public void morefromuser(Class<?> activity, int ActivityID) {
-		Intent intent = new Intent(this, activity);
+/*		Intent intent = new Intent(this, activity);
 		intent.putExtra("viewSource", ViewSource.user.name());
 		intent.putExtra("viewSearch", "" + authorId  );
+/**/
+		Intent intent = new Intent(this, SFBrowseActivity.class);
+		
+		switch (ActivityID) {
+		case AppConstants.ACTIVITY_GALLERYART:
+	        intent.putExtra("ContentType", ContentType.art);
+			break;
+
+		case AppConstants.ACTIVITY_MUSICLIST:
+	        intent.putExtra("ContentType", ContentType.music);
+			break;
+
+		case AppConstants.ACTIVITY_STORIESLIST:
+	        intent.putExtra("ContentType", ContentType.stories);
+			break;
+
+		case AppConstants.ACTIVITY_JOURNALSLIST:
+	        intent.putExtra("ContentType", ContentType.journals);
+			break;
+
+		default:
+			return;
+		}
+		
+		intent.putExtra("ContentFilter", ViewSource.user);
+		intent.putExtra("Extra", "" + authorId);
+
 		intent.putExtra("activityTitle", "" + authorName  );
+		intent.putExtra("NoMoreFromUserButton", true);
+
 		startActivityForResult(intent, ActivityID);
 	}
 	

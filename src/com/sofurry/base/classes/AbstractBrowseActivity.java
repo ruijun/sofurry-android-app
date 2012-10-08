@@ -11,6 +11,7 @@ import com.sofurry.storage.NetworkListStorage;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Adapter;
@@ -110,28 +111,39 @@ public abstract class AbstractBrowseActivity extends Activity {
 
 		
 		// required descendant specific params should be loaded before this point so now we can request DataView and Adapter
-		if (fList == null)
-			setList(createBrowseList());
-
 		if (fDataView == null) 
 			fDataView = getDataView();
 
+		if (fList == null)
+			setList(createBrowseList());
+
 		if (fDataView != null) {
+			// TODO set forward preload count to fList
+			
 			fDataView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				public void onItemClick(AdapterView parentView, View childView, int position, long id) {
-					onDataViewItemClick(position);
+					if ( (fList != null) && (fList.get(position) != null))
+						onDataViewItemClick(position);
 				}
 			});
 			fDataView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 				public boolean onItemLongClick(AdapterView parentView, View childView, int position, long id) {
-					return onDataViewItemLongClick(position);
+					if ( (fList != null) && (fList.get(position) != null))
+						return onDataViewItemLongClick(position);
+					else
+						return false;
 				}
 			});
 
-			// Plug in adapter
-			if (myAdapter == null) {
-				myAdapter = createAdapter(); 
-				fDataView.setAdapter(myAdapter);
+			pluginAdapter();
+			
+			if (savedInstanceState != null) {
+				fDataView.setSelection(savedInstanceState.getInt("", 0));
+			} else {
+			    Bundle extras = getIntent().getExtras();
+			    if (extras != null) {
+					fDataView.setSelection(extras.getInt("SelectedIndex", 0));
+			    }
 			}
 		}
 	}
@@ -141,12 +153,16 @@ public abstract class AbstractBrowseActivity extends Activity {
 		outState.putLong("ListID", fList.getListId());
 		outState.putCharSequence("ActTitle", getTitle());
 
+		if (fDataView != null)
+			outState.putInt("SelectedIndex", fDataView.getFirstVisiblePosition());
+		
 		super.onSaveInstanceState(outState);
 	}
 
 	@Override
 	protected void onDestroy() {
 		try {
+			StopLoadThumbnails();
 			fList.finalize();
 			fList = null;
 		} catch (Throwable e) {
@@ -175,14 +191,36 @@ public abstract class AbstractBrowseActivity extends Activity {
 	 * @param aList
 	 */
 	public void setList(NetworkList<Submission> aList) {
-		//detach current list
+		//detach current list and unplug adapter
 		if (fList != null) {
-			fList.setStatusListener(null); // clear status callbacks before detach list
+			try {
+				if (fDataView != null)
+					fDataView.setAdapter(null);
+				
+				myAdapter = null; // is this enough to destroy object?
+//				if (myAdapter != null)
+				
+				fList.setStatusListener(null); // clear status callbacks before detach list
+				fList.finalize();
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+			fList = null;
 		}
 		
 		// attach new list
 		fList = aList;
 		
+		if (fList != null) {
+			setListCallback();
+			pluginAdapter();
+		}
+	}
+
+	/**
+	 * Set callback procs to fList
+	 */
+	protected void setListCallback() {
 		if (fList != null) {
 			fList.setStatusListener(new IJobStatusCallback() {
 				
@@ -209,9 +247,36 @@ public abstract class AbstractBrowseActivity extends Activity {
 				}
 			});
 		}
-		refreshDataView();
 	}
 	
+	
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+//		if (fList != null)
+//			fList.setStatusListener(null); // clear callback so another activity can use list
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		setListCallback(); // restore callbacks to our activity
+	}
+
+	/**
+	 * Assign adapter to fDataView and reset list position
+	 */
+	public void pluginAdapter() {
+		// Plug in adapter
+		if ((fDataView != null) && (myAdapter == null)) {
+			myAdapter = createAdapter(); 
+			fDataView.setAdapter(myAdapter);
+			fDataView.setSelection(0);
+			
+			refreshDataView();
+		}
+	}
 	/**
 	 * current thumbnail loader
 	 */
@@ -237,7 +302,8 @@ public abstract class AbstractBrowseActivity extends Activity {
 	 */
 	protected void StopLoadThumbnails() {
 		if (thumbLoader != null)
-			thumbLoader.cancel(false);
+			if (thumbLoader.cancel(false))
+				thumbLoader = null;
 	}
 	
 	/**

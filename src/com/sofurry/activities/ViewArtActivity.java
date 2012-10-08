@@ -41,10 +41,13 @@ import com.sofurry.AppConstants;
 import com.sofurry.FixedViewFlipper;
 import com.sofurry.R;
 import com.sofurry.base.classes.FavableActivity;
+import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.mobileapi.downloaders.AsyncImageLoader;
+import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
 import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
+import com.sofurry.storage.NetworkListStorage;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -78,6 +81,7 @@ public class ViewArtActivity
 		private View	  myview = null;	
 		
 		private Submission submission = null;
+		private int page_submission_index = -1;
 		private AsyncImageLoader imageLoader = null;
 		
 		private Context context = null;
@@ -111,6 +115,11 @@ public class ViewArtActivity
 		}/**/
 
 		public void adjustInfo() {
+			if (submission == null) {
+				infoText.setText("Loading...");
+            	savedIndicator.setVisibility(View.INVISIBLE);
+				return;
+			}
 //			MemoryInfo mi = new MemoryInfo(); // DEBUG
 //			Debug.getMemoryInfo(mi);
 
@@ -156,10 +165,18 @@ public class ViewArtActivity
 			imageLoaded = false;
 		}
 
-		// load picture.
+		/**
+		 * Prepare/load picture.
+		 * set loading indicator and thumbnail preview
+		 * @param showImage - true = show image when loaded; false = only ensure that image is downloaded
+		 */
 		public void loadPic(boolean showImage) {
 			if (imageLoaded) return;
-			if (submission == null) return;
+			if (submission == null) { // current page of submission list is loading
+	           	loadingIndicator.setVisibility(View.VISIBLE);
+				playIndicator.setVisibility(View.INVISIBLE);
+				return;
+			}
 			
         	// load thumbnail (30ms!)
             imageBitmap = ImageStorage.loadSubmissionIcon(submission.getId());
@@ -191,11 +208,16 @@ public class ViewArtActivity
 
 		// assign current submission
 		// do not load image/thumbnail
-		public void setSubmission(Submission s) {
+//		public void setSubmission(Submission s, int aIndex) {
+		public void setSubmission(int aIndex) {
 			// do nothing if no change
-			if (s == submission) {
+			if ( (submission != null) && (aIndex == page_submission_index))
 				return;
-			}
+
+			Submission s = submissions_list.get(aIndex);
+			
+			if (s == submission)
+				return;
 			
 			// === clean loaded submission ===
         	// clean bitmap in case of reload
@@ -208,6 +230,7 @@ public class ViewArtActivity
         	
         	// === load new submission ===
         	submission = s;
+        	page_submission_index = aIndex;
         	
         	// set titles and indicators
         	adjustInfo(); // damn slowwwwwwwww (40-150ms)
@@ -232,6 +255,11 @@ public class ViewArtActivity
 			
            	loadingIndicator.setVisibility(View.VISIBLE);
 			playIndicator.setVisibility(View.INVISIBLE);
+			
+			if (submission == null)
+//				setSubmission(submissions_list.get(page_submission_index), page_submission_index);
+				setSubmission(page_submission_index);
+			
             imageLoader = AsyncImageLoader.doLoad(context, this, submission, true, false, useOriginalScale);
 		}
 		
@@ -323,13 +351,19 @@ public class ViewArtActivity
 	    }
 
 	    private String MakeTitle() {
-	    	return submission.getAuthorName()+": "+submission.getName();
+			if (submission == null)
+				return "";
+			else
+				return submission.getAuthorName()+": "+submission.getName();
 	    }
 
 	    /**
 	     * Saves the file to the images folder
 	     */
 	    public void save() {
+	    	if (submission == null)
+	    		return;
+	    	
 	        try {
 	            // source file in cache
 	            File f = new File(ImageStorage.getSubmissionImagePath(submission.getCacheName()));
@@ -573,16 +607,25 @@ public class ViewArtActivity
 
             if (extras != null) {
             	submissions_list = (ArrayList<Submission>) extras.get("list");
-            	submissions_index = (int) extras.getInt("listId");
+            	if (submissions_list == null)
+					submissions_list = NetworkListStorage.get(extras.getLong("listId"));
+
+            	submissions_index = (int) extras.getInt("listIndex");
 //            	man = (ActivityManager) extras.getSerializable("manager"); // can't pass man through intent
 
+            	if (extras.getBoolean("NoMoreFromUserButton", false))
+            		ArtistGalleryButton.setVisibility(View.INVISIBLE);
+            	
             	// only assign submissions. load will be performed by onResume
-        		pages.get(0).setSubmission(submissions_list.get(submissions_index));
+//        		pages.get(0).setSubmission(submissions_list.get(submissions_index), submissions_index);
+        		pages.get(0).setSubmission(submissions_index);
             	if (submissions_index < submissions_list.size()-1) {
-            		pages.get(1).setSubmission(submissions_list.get(submissions_index+1));
+//            		pages.get(1).setSubmission(submissions_list.get(submissions_index+1), submissions_index+1);
+            		pages.get(1).setSubmission(submissions_index+1);
             	}
             	if (submissions_index > 0) {
-            		pages.get(2).setSubmission(submissions_list.get(submissions_index-1));
+//            		pages.get(2).setSubmission(submissions_list.get(submissions_index-1), submissions_index-1);
+            		pages.get(2).setSubmission(submissions_index-1);
             	}
             }
 
@@ -590,7 +633,10 @@ public class ViewArtActivity
         } else {
         	// load saved object
             submissions_list = (ArrayList<Submission>)  retrieveObject("list");
-            submissions_index = (Integer) retrieveObject("listId");
+        	if (submissions_list == null)
+				submissions_list = NetworkListStorage.get((Long) retrieveObject("listId"));
+
+            submissions_index = (Integer) retrieveObject("listIndex");
             matrix = (Matrix) retrieveObject("matrix");
             
             pages.get(0).retreive("0");
@@ -600,6 +646,7 @@ public class ViewArtActivity
             curpageId = (Integer) retrieveObject("pageId");
             imageFlipper.setDisplayedChild(curpageId);
         }
+        
         
         // init dragging
         imageFlipper.setOnTouchListener((OnTouchListener) this);
@@ -613,6 +660,19 @@ public class ViewArtActivity
     	aRightOut = AnimationUtils.loadAnimation(this, R.anim.push_right_out);
     }
 
+    /**
+     * Load submission to page if it was not loaded
+     * @param PageID
+     */
+    public void RefreshPage(int PageID) {
+    	PageHolder p = pages.get(PageID);
+    	if (p.submission != null)
+    		return;
+    	
+    	p.setSubmission(p.page_submission_index);
+        p.loadPic(PageID == curpageId);
+    }
+    
     /*
      *  (non-Javadoc)
      * @see com.sofurry.IManagedActivity#finish()
@@ -620,7 +680,10 @@ public class ViewArtActivity
 
     @Override
     public void finish() {
-    	if (pages != null) {
+    	if (submissions_list instanceof NetworkList)
+        	((NetworkList) submissions_list).setStatusListener(null);
+    	
+        if (pages != null) {
     		pages.get(0).finish();
     		pages.get(1).finish();
     		pages.get(2).finish();
@@ -644,7 +707,32 @@ public class ViewArtActivity
 		pages.get(1).loadPic();
 		pages.get(2).loadPic(); /**/
 		
-		findViewById(R.id.viewFlipper1).getViewTreeObserver().addOnPreDrawListener(this);
+        if (submissions_list instanceof NetworkList)
+        	((NetworkList) submissions_list).setStatusListener(new IJobStatusCallback() {
+				
+				@Override
+				public void onSuccess(Object job) {
+					RefreshPage(0);
+					RefreshPage(1);
+					RefreshPage(2);
+				}
+				
+				@Override
+				public void onStart(Object job) {
+					Toast.makeText(getApplicationContext(), "Loading page...", Toast.LENGTH_SHORT).show();
+				}
+				
+				@Override
+				public void onProgress(Object job, int progress, int total, String msg) {
+				}
+				
+				@Override
+				public void onError(Object job, String msg) {
+					Toast.makeText(getApplicationContext(), "Error load page: "+msg, Toast.LENGTH_SHORT).show();
+				}
+			});
+
+        findViewById(R.id.viewFlipper1).getViewTreeObserver().addOnPreDrawListener(this);
 	}
 
 
@@ -733,8 +821,12 @@ public class ViewArtActivity
         pages.get(1).store("1");
         pages.get(2).store("2");
     	
-        storeObject("list", submissions_list);
-        storeObject("listId", submissions_index);
+        if (submissions_list instanceof NetworkList)
+        	storeObject("listId", (Long) ((NetworkList) submissions_list).getListId());
+        else
+        	storeObject("list", submissions_list);
+        
+        storeObject("listIndex", submissions_index);
         storeObject("pageId", curpageId);
         storeObject("matrix", matrix);
         
@@ -779,7 +871,8 @@ public class ViewArtActivity
 			}
 			
 			if (submissions_index < submissions_list.size()-1) {
-				pages.get(nextpage).setSubmission(submissions_list.get(submissions_index+1));
+//				pages.get(nextpage).setSubmission(submissions_list.get(submissions_index+1), submissions_index+1);
+				pages.get(nextpage).setSubmission(submissions_index+1);
 //			 tt3 = System.currentTimeMillis() - t; // DEBUG
 				pages.get(nextpage).loadPic(false); // preload file, do not load bitmap
 			} else {
@@ -832,7 +925,8 @@ public class ViewArtActivity
 			}
 			
 			if (submissions_index > 0) {
-				pages.get(prevpage).setSubmission(submissions_list.get(submissions_index-1));
+//				pages.get(prevpage).setSubmission(submissions_list.get(submissions_index-1), submissions_index-1);
+				pages.get(prevpage).setSubmission(submissions_index-1);
 				pages.get(prevpage).loadPic(false); // preload file, do not load bitmap
 			}
 			

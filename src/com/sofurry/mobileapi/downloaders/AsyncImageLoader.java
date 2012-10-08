@@ -30,9 +30,23 @@ public class AsyncImageLoader extends Thread {
 		public void onImageLoad(int id, Object obj); // null = file downloaded no bitmap, exception - error happens, bitmap - loaded picture
 	}
 	
+	/**
+	 * Load submission image in to bitmap.
+	 * @param con
+	 * @param req
+	 * @param sub - submission which data should be downloaded
+	 * @param forceDl - force download image even if it is in cache or stored
+	 * @param onlyDL - download image only. do not create bitmap object in memory
+	 * @param noScale - do not try to scale image to fit in memory. Just give up if it does not fit.
+	 * @return -  AsyncImageLoader
+	 */
 	public static AsyncImageLoader doLoad(Context con, AsyncImageLoader.IImageLoadResult req, Submission sub, Boolean forceDl, Boolean onlyDL, Boolean noScale) {
+		  if (sub == null)
+			  return null;
+		  
 		  AsyncImageLoader dl = new AsyncImageLoader(con, req, sub, forceDl, onlyDL, noScale);
-		  dl.start();
+		  if (dl != null)
+			  dl.start();
 		  return dl;
 	}
 		
@@ -73,6 +87,9 @@ public class AsyncImageLoader extends Thread {
 	}
     public void run() {
         try {
+        	if (my_submission == null)
+        		throw new Exception("AsyncImageLoader: no submission assigned to load request");
+
 //        	Bitmap b = null;
         	
         	// clean bmp in case of reuse (must newer happens but...)
@@ -155,7 +172,7 @@ public class AsyncImageLoader extends Thread {
         } /*finally {
         	// clear reference. onImageLoad MUST call mpp.recycle()
         	bmp = null;
-        }/**/
+        }/**/ 
     }
 
 }

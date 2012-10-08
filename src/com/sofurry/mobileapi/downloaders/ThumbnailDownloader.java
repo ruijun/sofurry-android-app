@@ -51,8 +51,15 @@ public abstract class ThumbnailDownloader extends
 					itemId++;
 					s = arg0[0].get(itemId, false);
 					
-					if (isCancelled())
+					if (isCancelled()) {
 						Log.d("[ThumbDl]", "--- Cancelled");
+						return (0);
+//						break;
+					}
+					
+					if (isCancelled())
+						return (0);
+//						break;
 				}
 				fastmode = false;
 				publishProgress(itemId);

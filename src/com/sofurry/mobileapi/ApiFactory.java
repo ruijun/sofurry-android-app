@@ -4,10 +4,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.graphics.Bitmap;
+
 import com.sofurry.base.interfaces.IAddObjectCallback;
 import com.sofurry.mobileapi.core.Request;
+import com.sofurry.mobileapi.downloaders.ContentDownloader;
 import com.sofurry.model.PrivateMessage;
 import com.sofurry.model.Submission;
+import com.sofurry.storage.ImageStorage;
 
 /**
  * @author Rangarig
@@ -31,8 +35,91 @@ import com.sofurry.model.Submission;
  * );
  *
  */
-public class ApiFactory {
 
+public final class ApiFactory {
+
+	public static final SFUserProfile myUserProfile = new SFUserProfile();
+	
+	public static class SFUserProfile {
+	    public int userID = -1;
+		public String username = "";
+		public String useralias = ""; // (This is the url-friendly username for username.sofurry.com profile addresses)
+	    public int profileViewCount = 0;
+	    public int submissionCount = 0;
+	    public int submissionViewCount = 0;
+	    public int commentCount = 0;
+	    public int commentPostedCount = 0;
+	    public String species = "";
+	    public int gender = 0; // (0=N/A, 1=Male, 2=Female, 3=Herm)
+	    public int orientation = 0; // (0=N/A, 1=Hetero, 2=Homosexual, 3=Bisexual, 4=Omnisexual)
+	    public int mateshipStatus = 0; // (0=N/A, 1=Single uninterested, 2=Single casual, 3=Single permanent, 4=Mated open, 5=Mated closed)
+	    public String country = "";
+	    public String city = "";
+	    public String registrationDate = "";
+	    public String description = "";
+	    public int unreadPMCount = 0;
+	    public int watchlistCount = 0;
+	    public int notification_voteCount = 0;
+	    public int notification_watchCount = 0;
+	    public int notification_favoriteCount = 0;
+	    public int notification_friendRequestCount = 0;
+	    public int notification_commentCount = 0;
+	    public int notification_adminCommentCount = 0;
+	    public int notification_shoutCount = 0;
+	    public int notification_forumPostCount = 0;
+	    public int notification_collaborationCount = 0;
+	    public int notification_subscribedFolderCount = 0;
+	    public int notificationTotalCount = 0;
+
+	    public SFUserProfile() {
+			super();
+			// TODO Auto-generated constructor stub
+		}
+	    
+	    public void LoadFromJSON(JSONObject obj) {
+	    		userID = obj.optInt("userID", -1); 
+	    		username = obj.optString("username", "");
+	    		useralias = obj.optString("useralias", ""); // (This is the url-friendly username for username.sofurry.com profile addresses)
+	    		profileViewCount = obj.optInt("profileViewCount", 0);
+	    		submissionCount = obj.optInt("submissionCount", 0);
+	    		submissionViewCount = obj.optInt("submissionViewCount", 0);
+	    		commentCount = obj.optInt("commentCount", 0);
+	    		commentPostedCount = obj.optInt("commentPostedCount", 0);
+	    		species = obj.optString("species", "");
+	    		gender = obj.optInt("gender", 0); // (0=N/A, 1=Male, 2=Female, 3=Herm)
+	    		orientation = obj.optInt("orientation", 0); // (0=N/A, 1=Hetero, 2=Homosexual, 3=Bisexual, 4=Omnisexual)
+	    		mateshipStatus = obj.optInt("mateshipStatus", 0); // (0=N/A, 1=Single uninterested, 2=Single casual, 3=Single permanent, 4=Mated open, 5=Mated closed)
+	    		country = obj.optString("country", "");
+	    		city = obj.optString("city", "");
+	    		registrationDate = obj.optString("registrationDate", "");
+	    		description = obj.optString("description", "");
+	    		unreadPMCount = obj.optInt("unreadPMCount", 0);
+	    		watchlistCount = obj.optInt("watchlistCount", 0);
+	    		notification_voteCount = obj.optInt("notification_voteCount", 0);
+	    		notification_watchCount = obj.optInt("notification_watchCount", 0);
+	    		notification_favoriteCount = obj.optInt("notification_favoriteCount", 0);
+	    		notification_friendRequestCount = obj.optInt("notification_friendRequestCount", 0);
+	    		notification_commentCount = obj.optInt("notification_commentCount", 0);
+	    		notification_adminCommentCount = obj.optInt("notification_adminCommentCount", 0);
+	    		notification_shoutCount = obj.optInt("notification_shoutCount", 0);
+	    		notification_forumPostCount = obj.optInt("notification_forumPostCount", 0);
+	    		notification_collaborationCount = obj.optInt("notification_collaborationCount", 0);
+	    		notification_subscribedFolderCount = obj.optInt("notification_subscribedFolderCount", 0);
+	    		notificationTotalCount = obj.optInt("notificationTotalCount", 0);
+	    }
+	    
+	    public Bitmap getAvatar() throws Exception {
+    		Bitmap bmp = ImageStorage.loadUserIcon(userID);
+    		
+    		if (bmp == null) {
+    			ContentDownloader.downloadFile(ApiFactory.getUserIconURL(userID), ImageStorage.getUserIconPath(userID), null);
+    			bmp = ImageStorage.loadUserIcon(userID);
+    		}
+
+    		return bmp;
+	    }
+	}
+	
 	/**
 	 * The Viewsource Parameter presets
 	 */
@@ -144,18 +231,16 @@ public class ApiFactory {
 		
 		switch (source) {
 		case favorites: { 
-			if ( (extra != null) && (extra.length() > 0)) {
+			if ( (extra != null) && (extra.length() > 0)) 
 			    req.setParameter("viewUserID", extra);
-			} else {
-				throw new Exception("Favorites require viewUserID parameter");
-			}
+//			else
+//				throw new Exception("Favorites require viewUserID parameter");
 		}
 		case watchlist: { 
-			if ( (extra != null) && (extra.length() > 0)) {
+			if ( (extra != null) && (extra.length() > 0))
 			    req.setParameter("viewUserID", extra);
-			} else {
-				throw new Exception("Watchlist require viewUserID parameter");
-			}
+//			else
+//				throw new Exception("Watchlist require viewUserID parameter");
 		}
 		case folder: { 
 			if ( (extra != null) && (extra.length() > 0)) {
