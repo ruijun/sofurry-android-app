@@ -1,17 +1,27 @@
 package com.sofurry.base.classes;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.Adapter;
 import android.widget.AdapterView;
+import android.widget.GridView;
+
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.activities.TagEditorActivity;
+import com.sofurry.activities.ViewArtActivity;
+import com.sofurry.activities.ViewJournalActivity;
+import com.sofurry.activities.ViewMusicActivity;
+import com.sofurry.activities.ViewStoryActivity;
 import com.sofurry.adapters.SubmissionGalleryAdapter;
 import com.sofurry.adapters.SubmissionListAdapter;
+import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.SFSubmissionList;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
@@ -33,6 +43,8 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		String fTitle = null;
+		
 		if (savedInstanceState != null) {
 			fContentType = (ContentType) savedInstanceState.getSerializable("ContentType");
 			fContentFilter = (ViewSource) savedInstanceState.getSerializable("ContentFilter");
@@ -43,6 +55,7 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 				fContentType = (ContentType) extras.getSerializable("ContentType");
 				fContentFilter = (ViewSource) extras.getSerializable("ContentFilter");
 				fExtra = extras.getString("Extra");
+				fTitle = extras.getString("activityTitle");
 		    }
 		}
 		
@@ -56,6 +69,9 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 		case art:
 			setContentView(R.layout.gallerylayout);
 			setTitle("Browse Art");
+	        SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(this);
+			((GridView) getDataView()).setColumnWidth(prefs.getInt(AppConstants.PREFERENCE_THUMB_SIZE, 130));
+
 			break;
 
 		case music:
@@ -76,6 +92,9 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 		default:
 			break;
 		} 
+		
+		if (fTitle != null)
+			setTitle(fTitle);
 	}
 
 	@Override
@@ -149,24 +168,32 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 			Intent intent = new Intent(this, TagEditorActivity.class);
 			startActivityForResult(intent, AppConstants.ACTIVITY_TAGS);
 			return true;
+
 		case AppConstants.MENU_FILTER_ALL:
 			setTitle("Recent");
 			fContentFilter = ViewSource.all;
+			fExtra = "";
 			setList(createBrowseList());
 			return true;
+
 		case AppConstants.MENU_FILTER_FEATURED:
 			setTitle("Featured");
 			fContentFilter = ViewSource.featured;
+			fExtra = ""+ApiFactory.myUserProfile.userID;
 			setList(createBrowseList());
 			return true;
+
 		case AppConstants.MENU_FILTER_FAVORITES:
 			setTitle("Favorites");
 			fContentFilter = ViewSource.favorites;
+			fExtra = ""+ApiFactory.myUserProfile.userID;
 			setList(createBrowseList());
 			return true;
+
 		case AppConstants.MENU_FILTER_WATCHLIST:
 			setTitle("Watchlist");
 			fContentFilter = ViewSource.watchlist;
+			fExtra = ""+ApiFactory.myUserProfile.userID;
 			setList(createBrowseList());
 			return true;
 		/*
@@ -178,8 +205,10 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 		case AppConstants.MENU_FILTER_WATCHLIST_COMBINED:
 			setTitle("Combined");
 			fContentFilter = ViewSource.combinedwatch;
+			fExtra = ""+ApiFactory.myUserProfile.userID;
 			setList(createBrowseList());
 			return true;
+
 		default:
 			return false;
 		}
@@ -198,4 +227,57 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
+	@Override
+	protected void onDataViewItemClick(int aItemIndex) {
+		if ( (fList != null) && (fList.get(aItemIndex) != null)) {
+			Submission s = fList.get(aItemIndex);
+			Intent i = null;
+			
+				
+			switch (s.getType()) {
+			case art:
+				Log.i(AppConstants.TAG_STRING, "SFGallery: Viewing art ID: " + s.getId());
+				i = new Intent(this, ViewArtActivity.class);
+				s.feedIntent(i);
+				// allow viewer to know submissions list
+//				fList.setStatusListener(null);
+				i.putExtra("listId", fList.getListId()); 
+				i.putExtra("listIndex", aItemIndex); 
+				if (fContentFilter == ViewSource.user)
+					i.putExtra("NoMoreFromUserButton", true);
+				startActivity(i);
+				break;
+				
+			case journals:
+				Log.i(AppConstants.TAG_STRING, "ListJournals: Viewing journal ID: " + s.getId());
+				i = new Intent(this, ViewJournalActivity.class);
+				s.feedIntent(i);
+				if (fContentFilter == ViewSource.user)
+					i.putExtra("NoMoreFromUserButton", true);
+				startActivity(i);
+				break;
+				
+			case music:
+				Log.i(AppConstants.TAG_STRING, "ListMusic: Viewing music ID: " + s.getId());
+				i = new Intent(this, ViewMusicActivity.class);
+				s.feedIntent(i);
+				if (fContentFilter == ViewSource.user)
+					i.putExtra("NoMoreFromUserButton", true);
+				startActivity(i);
+				break;
+				
+			case stories:
+				Log.i(AppConstants.TAG_STRING, "ListStories: Viewing story ID: " + s.getId());
+				i = new Intent(this, ViewStoryActivity.class);
+				s.feedIntent(i);
+				if (fContentFilter == ViewSource.user)
+					i.putExtra("NoMoreFromUserButton", true);
+				startActivity(i);
+				break;
+			}
+		}
+		super.onDataViewItemClick(aItemIndex);
+	}
+
+	
 }

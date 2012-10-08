@@ -82,7 +82,7 @@ public class GalleryArtActivity extends AbstractContentGallery<Submission> {
 		s.feedIntent(i);
 		// allow viewer to know submissions list
 		i.putExtra("list", man.getResultList()); 
-		i.putExtra("listId", selectedIndex); 
+		i.putExtra("listIndex", selectedIndex); 
 		startActivity(i);
 	}
 

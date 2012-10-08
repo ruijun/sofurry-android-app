@@ -59,6 +59,17 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	}
 
 	@Override
+	public int size() { // TODO return sizeLoaded if there was error in last page request
+		if (isFinalPage() && (! isLoading()))
+			return sizeLoaded();
+		
+		if (totalPages > 0) 
+			return totalPages * AppConstants.ENTRIESPERPAGE_GALLERY;
+		
+		return sizeLoaded() + AppConstants.ENTRIESPERPAGE_GALLERY;
+	}
+
+	@Override
 	protected void doCancel() {
 		// can't do anything here as Request is not cancellable
 	}

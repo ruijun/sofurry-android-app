@@ -62,11 +62,19 @@ public abstract class SubmissionViewActivity
 
     // changes currently viewed submission
     public void assignSubmission(Submission s) {
-    	pageID = s.getId();
-    	name = s.getName();
-    	authorId = s.getAuthorID();
-    	authorName = s.getAuthorName();
-    	thumbURL = s.getThumbURL();
+    	if (s != null) {
+        	pageID = s.getId();
+        	name = s.getName();
+        	authorId = s.getAuthorID();
+        	authorName = s.getAuthorName();
+        	thumbURL = s.getThumbURL();
+    	} else {
+        	pageID = -1;
+        	name = "";
+        	authorId = -1;
+        	authorName = "";
+        	thumbURL = "";
+    	}
     }
     
     /**
@@ -128,7 +136,8 @@ public abstract class SubmissionViewActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case AppConstants.MENU_SAVE:
-                save();
+            	if (pageID >= 0)
+            		save();
 
                 return true;
 
@@ -138,8 +147,8 @@ public abstract class SubmissionViewActivity
     }
 
     /**
-     * Method description
-     *
+     * Save current submission
+     * Should check for current submission == null
      */
     public abstract void save();
 }

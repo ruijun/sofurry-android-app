@@ -45,9 +45,6 @@ public class MainMenuActivity
     private int     messageCount_       = -1;
     private long    lastCheck_          = -1;
     
-    private int		user_id = -1;
-    private String	user_nickname = "";
-
 
     /**
      * Method description
@@ -175,9 +172,7 @@ public class MainMenuActivity
      */
     public void handleProfileRequest(JSONObject obj) {
     	try {
-    		user_id = obj.getInt("userID"); 
-    		user_nickname = obj.getString("username");
-
+    		ApiFactory.myUserProfile.LoadFromJSON(obj);
     		updateProfile();
     		
 		} catch (Exception e) {
@@ -186,7 +181,7 @@ public class MainMenuActivity
     }
 
     public void updateProfile() {
-    	if (user_id <=0) {
+    	if (ApiFactory.myUserProfile.userID <=0) {
     		return;
     	}
     	
@@ -194,16 +189,19 @@ public class MainMenuActivity
     		TextView nickname = (TextView) findViewById(R.id.user_profile_nickname);
     		if (nickname != null) {
     			nickname.setVisibility(View.VISIBLE);
-    			nickname.setText(user_nickname);
+    			nickname.setText(ApiFactory.myUserProfile.username);
     		}
 
-    		Bitmap bmp = ImageStorage.loadUserIcon(user_id);
+    		Bitmap bmp = ApiFactory.myUserProfile.getAvatar();
+    		
+/*    		Bitmap bmp = ImageStorage.loadUserIcon(user_id);
     		
     		if (bmp == null) {
     			ContentDownloader.downloadFile(ApiFactory.getUserIconURL(user_id), ImageStorage.getUserIconPath(user_id), null);
 
     			bmp = ImageStorage.loadUserIcon(user_id);
-    		}
+    		} */
+    		
     		if (bmp != null) {
     			ImageView image = (ImageView) findViewById(R.id.user_profile_avatar);
     			if (image != null) {
@@ -289,8 +287,8 @@ public class MainMenuActivity
         // Retrieve information from the instance state object, if need be
         if (savedInstanceState != null) {
             messageCount_ = (Integer) retrieveObject("messageCount");
-            user_id = (Integer) retrieveObject("user_id");
-            user_nickname = (String) retrieveObject("user_nickname");
+//            user_id = (Integer) retrieveObject("user_id");
+//            user_nickname = (String) retrieveObject("user_nickname");
 
             updateButtons();
             updateProfile();
@@ -334,6 +332,9 @@ public class MainMenuActivity
         	checkProfile();
         }
 
+        if (ApiFactory.myUserProfile.userID < 0) 
+        	checkProfile();
+        
         checkButtonDisabledState();
         checkPmCount();
     }
@@ -348,8 +349,8 @@ public class MainMenuActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         storeObject("messageCount", (Integer) messageCount_);
-        storeObject("user_id", (Integer) user_id);
-        storeObject("user_nickname", (String) user_nickname);
+//        storeObject("user_id", (Integer) user_id);
+//        storeObject("user_nickname", (String) user_nickname);
     }
 
     /**

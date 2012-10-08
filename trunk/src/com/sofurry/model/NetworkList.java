@@ -39,6 +39,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				NetworkListStorage.remove(getListId());
 			// should we destroy all list objects here or GC will do this job for us?
 			fLoadingStatusListener = null;
+			clear();
 			super.finalize();
 		}
 
@@ -300,6 +301,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 */
 		@Override
 		public int size() {
+			// TODO non actual value is bad to pass list through serializible as it looks serializible does not support 'null' list items
 			if (isFinalPage() && ( ! isLoading() ) )  // is all possible item pages done loading?
 				return super.size(); // no more items to load, return number of items we already have in list
 			else
