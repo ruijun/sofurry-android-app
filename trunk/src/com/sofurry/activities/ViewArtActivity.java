@@ -694,6 +694,10 @@ public class ViewArtActivity
     	submissions_list = null;
 		findViewById(R.id.viewFlipper1).getViewTreeObserver().removeOnPreDrawListener(this);
 
+		Intent intent = new Intent();
+		intent.putExtra("JumpTo", submissions_index);
+		setResult(RESULT_OK, intent);			
+		
         super.finish();
         System.gc();
     }

@@ -10,6 +10,7 @@ import com.sofurry.storage.NetworkListStorage;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -95,8 +96,6 @@ public abstract class AbstractBrowseActivity extends Activity {
 		} else {
 		    Bundle extras = getIntent().getExtras();
 		    if (extras != null) {
-//		    	viewSource = ViewSource.valueOf(extras.getString("viewSource"));
-//		    	viewSearch = extras.getString("viewSearch");
 		    	setTitle(extras.getString("activityTitle"));
 				setList(NetworkListStorage.get(extras.getInt("ListID")));
 		    }
@@ -119,7 +118,7 @@ public abstract class AbstractBrowseActivity extends Activity {
 
 		if (fDataView != null) {
 			// TODO set forward preload count to fList
-			
+
 			fDataView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				public void onItemClick(AdapterView parentView, View childView, int position, long id) {
 					if ( (fList != null) && (fList.get(position) != null))
@@ -162,13 +161,28 @@ public abstract class AbstractBrowseActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		try {
-			StopLoadThumbnails();
-			fList.finalize();
-			fList = null;
+			if (isFinishing()) {
+				StopLoadThumbnails();
+				fList.finalize();
+				fList = null;
+			} else {
+				// TODO should we clean callback for fList and ThumbDownloader here?
+			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		super.onDestroy();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		if (data != null) {
+			int jumptoitem = data.getIntExtra("JumpTo", -1);
+			if ((jumptoitem >= 0) && (fDataView != null))
+				fDataView.setSelection(jumptoitem);
+		}
 	}
 
 	/**
