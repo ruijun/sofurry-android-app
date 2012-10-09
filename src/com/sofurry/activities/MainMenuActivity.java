@@ -73,25 +73,29 @@ public class MainMenuActivity
                 break;
 
             case R.id.stories:
-                intent     = new Intent(this, ListStoriesActivity.class);
+                intent     = new Intent(this, SFBrowseActivity.class);
+                intent.putExtra("ContentType", ContentType.stories);
                 activityId = AppConstants.ACTIVITY_STORIESLIST;
 
                 break;
 
             case R.id.art:
-                intent     = new Intent(this, GalleryArtActivity.class);
+                intent     = new Intent(this, SFBrowseActivity.class);
+                intent.putExtra("ContentType", ContentType.art);
                 activityId = AppConstants.ACTIVITY_GALLERYART;
 
                 break;
 
             case R.id.music:
-                intent     = new Intent(this, ListMusicActivity.class);
+                intent     = new Intent(this, SFBrowseActivity.class);
+                intent.putExtra("ContentType", ContentType.music);
                 activityId = AppConstants.ACTIVITY_MUSICLIST;
 
                 break;
 
             case R.id.journals:
-                intent     = new Intent(this, ListJournalsActivity.class);
+                intent     = new Intent(this, SFBrowseActivity.class);
+                intent.putExtra("ContentType", ContentType.journals);
                 activityId = AppConstants.ACTIVITY_JOURNALSLIST;
 
                 break;
@@ -105,16 +109,6 @@ public class MainMenuActivity
 
             case R.id.forums:
                 break;
-
-            case R.id.test:
-//              intent     = new Intent(this, GalleryArtActivity.class);
-              intent     = new Intent(this, SFBrowseActivity.class);
-              intent.putExtra("ContentType", ContentType.art);
-              
-              activityId = AppConstants.ACTIVITY_GALLERYART;
-
-              break;
-
         }
 
         // Check if we need to launch an activity

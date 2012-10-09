@@ -98,6 +98,15 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 	}
 
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		
+		outState.putSerializable("ContentType", fContentType);
+		outState.putSerializable("ContentFilter", fContentFilter);
+		outState.putString("Extra", fExtra);
+	}
+
+	@Override
 	protected AdapterView getDataView() {
 		switch (fContentType) {
 		case art:
@@ -139,7 +148,9 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 
 	@Override
 	protected NetworkList<Submission> createBrowseList() {
-		return new SFSubmissionList(fContentFilter, fExtra, fContentType);
+		SFSubmissionList list = new SFSubmissionList(fContentFilter, fExtra, fContentType);
+		list.preloadCount = AppConstants.ENTRIESPERPAGE_GALLERY / 4;
+		return list;
 	}
 
 	// this is SF specific menus	
@@ -245,7 +256,7 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 				i.putExtra("listIndex", aItemIndex); 
 				if (fContentFilter == ViewSource.user)
 					i.putExtra("NoMoreFromUserButton", true);
-				startActivity(i);
+				startActivityForResult(i, 0);
 				break;
 				
 			case journals:
@@ -254,7 +265,7 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 				s.feedIntent(i);
 				if (fContentFilter == ViewSource.user)
 					i.putExtra("NoMoreFromUserButton", true);
-				startActivity(i);
+				startActivityForResult(i, 0);
 				break;
 				
 			case music:
@@ -263,7 +274,7 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 				s.feedIntent(i);
 				if (fContentFilter == ViewSource.user)
 					i.putExtra("NoMoreFromUserButton", true);
-				startActivity(i);
+				startActivityForResult(i, 0);
 				break;
 				
 			case stories:
@@ -272,7 +283,7 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 				s.feedIntent(i);
 				if (fContentFilter == ViewSource.user)
 					i.putExtra("NoMoreFromUserButton", true);
-				startActivity(i);
+				startActivityForResult(i, 0);
 				break;
 			}
 		}

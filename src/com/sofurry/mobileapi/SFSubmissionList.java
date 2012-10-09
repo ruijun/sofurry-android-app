@@ -44,12 +44,11 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	protected void doLoadNextPage(IJobStatusCallback StatusCallback) throws Exception {
 			if (isFinalPage()) return; // don't fetch after last page
 			
-			currentPage++;
-			
-			Request req = ApiFactory.createBrowse(fSource, fExtra, fContentType, AppConstants.ENTRIESPERPAGE_GALLERY, currentPage);
+			Request req = ApiFactory.createBrowse(fSource, fExtra, fContentType, AppConstants.ENTRIESPERPAGE_GALLERY, currentPage+1);
 			JSONObject res = req.execute();
 			
 			ParseBrowseResult loaded = ApiFactory.ParseBrowse(res, this);
+			currentPage++; // set current page as loaded only on success
 			totalPages = loaded.NumPages;
 	}
 

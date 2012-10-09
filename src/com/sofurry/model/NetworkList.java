@@ -53,7 +53,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 */
 //		private Boolean fLoading = false;
 
-		private int preloadCount = 0; // amount of items till the end of currently loaded list to start forward next page preload
+		public int preloadCount = 0; // amount of items till the end of currently loaded list to start forward next page preload
 		
 		/**
 		 * Network List worker thread class 
@@ -301,7 +301,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 */
 		@Override
 		public int size() {
-			// TODO non actual value is bad to pass list through serializible as it looks serializible does not support 'null' list items
+			// TODO non actual value is bad when pass list through serializible as it looks serializible does not support 'null' list items
 			if (isFinalPage() && ( ! isLoading() ) )  // is all possible item pages done loading?
 				return super.size(); // no more items to load, return number of items we already have in list
 			else
@@ -326,7 +326,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		}
 		
 		/**
-		 * true if there is no more pages to download in current list
+		 * true if current page is last page and there is no more pages to download in current list
 		 * @return
 		 */
 		public Boolean isFinalPage() {
@@ -348,7 +348,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * Load items page in worker thread
 		 */
 		private void AsyncLoadNextPage() {
-			if  ( ! isLoading() ) {
+			if  ( (! isLoading()) && (! isFinalPage()) ) {
 				fAsyncLoader = new AsyncPageLoader(this);
 				fAsyncLoader.start();
 			}
