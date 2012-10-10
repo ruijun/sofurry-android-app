@@ -175,6 +175,7 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		intent.putExtra("viewSearch", "" + authorId  );
 /**/
 		Intent intent = new Intent(this, SFBrowseActivity.class);
+		intent.putExtra("AuthorId", authorId  );
 		
 		switch (ActivityID) {
 		case AppConstants.ACTIVITY_GALLERYART:
