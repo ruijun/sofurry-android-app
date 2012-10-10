@@ -109,14 +109,7 @@ public final class ApiFactory {
 	    }
 	    
 	    public Bitmap getAvatar() throws Exception {
-    		Bitmap bmp = ImageStorage.loadUserIcon(userID);
-    		
-    		if (bmp == null) {
-    			ContentDownloader.downloadFile(ApiFactory.getUserIconURL(userID), ImageStorage.getUserIconPath(userID), null);
-    			bmp = ImageStorage.loadUserIcon(userID);
-    		}
-
-    		return bmp;
+    		return getUserIcon(userID);
 	    }
 	}
 	
@@ -205,6 +198,23 @@ public final class ApiFactory {
 		return RESOURCE_URL + "/avatar?user="+id;
 	}
 	
+	/**
+	 * Load user icon. Contains synchronous web download
+	 * @param userID
+	 * @return
+	 * @throws Exception
+	 */
+    public static Bitmap getUserIcon(int userID) throws Exception {
+		Bitmap bmp = ImageStorage.loadUserIcon(userID);
+		
+		if (bmp == null) {
+			ContentDownloader.downloadFile(ApiFactory.getUserIconURL(userID), ImageStorage.getUserIconPath(userID), null);
+			bmp = ImageStorage.loadUserIcon(userID);
+		}
+
+		return bmp;
+    }
+
 	
 	/**
 	 * Creates a Browse command. (the command will still have to be executed, either by execute or by executeasync.

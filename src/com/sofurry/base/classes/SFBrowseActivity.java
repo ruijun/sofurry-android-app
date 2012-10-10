@@ -5,12 +5,19 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
@@ -27,6 +34,7 @@ import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
+import com.sofurry.storage.ImageStorage;
 
 /**
  * Browse SoFurry submissions
@@ -38,17 +46,19 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 	protected ContentType fContentType = ContentType.all;
 	protected ViewSource fContentFilter = ViewSource.all;
 	protected String fExtra = "";
+	protected String fTitle = null;
+	protected int fAuthorId = -1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		String fTitle = null;
-		
 		if (savedInstanceState != null) {
 			fContentType = (ContentType) savedInstanceState.getSerializable("ContentType");
 			fContentFilter = (ViewSource) savedInstanceState.getSerializable("ContentFilter");
 			fExtra = savedInstanceState.getString("Extra");
+			fTitle = savedInstanceState.getString("activityTitle");
+			fAuthorId = savedInstanceState.getInt("AuthorId", -1);
 		} else {
 		    Bundle extras = getIntent().getExtras();
 		    if (extras != null) {
@@ -56,6 +66,7 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 				fContentFilter = (ViewSource) extras.getSerializable("ContentFilter");
 				fExtra = extras.getString("Extra");
 				fTitle = extras.getString("activityTitle");
+				fAuthorId = extras.getInt("AuthorId", -1);
 		    }
 		}
 		
@@ -64,6 +75,10 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 		
 		if (fContentFilter == null)
 			fContentFilter = ViewSource.all;
+
+		// check this with each of fContentType layouts. Now it is compatible with any used layout.
+		if (fContentFilter == ViewSource.user)
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		switch (fContentType) {
 		case art:
@@ -93,6 +108,29 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 			break;
 		} 
 		
+		if (fContentFilter == ViewSource.user) {
+			LinearLayout mainlayout = (LinearLayout) findViewById(R.id.main_layout);
+			if (mainlayout != null) {
+				LayoutInflater mInflater = LayoutInflater.from(this);
+		        View infoview = mInflater.inflate(R.layout.artist_info_bar, null);
+		        mainlayout.addView(infoview, 0);
+		        
+		        ((TextView) infoview.findViewById(R.id.AuthorName)).setText(fTitle);
+		        ((ImageView) infoview.findViewById(R.id.btnBack)).setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						finish();						}
+				});
+		        
+		        if (fAuthorId >= 0)
+					try {
+						((ImageView) infoview.findViewById(R.id.AuthorIcon)).setImageBitmap(ApiFactory.getUserIcon(fAuthorId));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+			}
+		}
+		
 		if (fTitle != null)
 			setTitle(fTitle);
 	}
@@ -104,6 +142,8 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 		outState.putSerializable("ContentType", fContentType);
 		outState.putSerializable("ContentFilter", fContentFilter);
 		outState.putString("Extra", fExtra);
+		outState.putString("activityTitle", fTitle);
+		outState.putInt("AuthorId", fAuthorId);
 	}
 
 	@Override
