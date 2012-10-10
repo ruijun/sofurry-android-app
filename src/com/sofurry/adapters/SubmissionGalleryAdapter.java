@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -21,6 +22,7 @@ import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.model.Submission;
 import com.sofurry.storage.FileStorage;
+import com.sofurry.util.Utils;
 
 
 
@@ -74,7 +76,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
             holder = new ViewHolder();
             
             if (enableLayoutItems) {
-            	convertView = mInflater.inflate(R.layout.art_gallery_item, null);
+            	convertView = mInflater.inflate(R.layout.art_gallery_item, parent, false); // null
 
             	holder.image = (ImageView) convertView.findViewById(R.id.art_gallery_item_image);
             	holder.saved_indicator = (ImageView) convertView.findViewById(R.id.art_gallery_item_save_indicator);
@@ -88,18 +90,21 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
             convertView.setTag(holder);
 
             SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(context);
-            int mThumbSize = prefs.getInt(AppConstants.PREFERENCE_THUMB_SIZE, 130);
-            float scale = context.getResources().getDisplayMetrics().density;
-            mThumbSize = (int) (mThumbSize * scale + 0.5f);
-            mThumbSize= mThumbSize + 5;
-            
+            int mThumbSize = Utils.dp_to_px(context, prefs.getInt(AppConstants.PREFERENCE_THUMB_SIZE, 130) );
+//            float scale = context.getResources().getDisplayMetrics().density;
+//            mThumbSize = (int) (mThumbSize * scale + 0.5f);
+//            mThumbSize= mThumbSize; // +5
+
+//            LayoutParams lp = convertView.getLayoutParams();
+//            lp.
             convertView.setLayoutParams(new GridView.LayoutParams(mThumbSize, mThumbSize));
             holder.image.setScaleType(ImageView.ScaleType.FIT_CENTER);
             holder.image.setAdjustViewBounds(true);
             
-            int mPaddingInPixels;
+            int mPaddingInPixels = Utils.dp_to_px(context, 5);
+/*            int mPaddingInPixels;
             mPaddingInPixels = (int) (2 * scale + 0.5f);
-            mPaddingInPixels = mPaddingInPixels + 5;
+            mPaddingInPixels = mPaddingInPixels + 5;*/
             holder.image.setPadding(mPaddingInPixels, mPaddingInPixels, mPaddingInPixels, mPaddingInPixels);
             
 /*            convertView.setDrawingCacheEnabled(true);

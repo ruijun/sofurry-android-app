@@ -35,6 +35,7 @@ import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
 import com.sofurry.storage.ImageStorage;
+import com.sofurry.util.Utils;
 
 /**
  * Browse SoFurry submissions
@@ -85,7 +86,7 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 			setContentView(R.layout.gallerylayout);
 			setTitle("Browse Art");
 	        SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(this);
-			((GridView) getDataView()).setColumnWidth(prefs.getInt(AppConstants.PREFERENCE_THUMB_SIZE, 130));
+			((GridView) getDataView()).setColumnWidth(Utils.dp_to_px(this, prefs.getInt(AppConstants.PREFERENCE_THUMB_SIZE, 130) ));
 
 			break;
 
