@@ -38,7 +38,28 @@ import com.sofurry.storage.ImageStorage;
 
 public final class ApiFactory {
 
-	public static final SFUserProfile myUserProfile = new SFUserProfile();
+	/**
+     * Path to the API request script
+     */
+    public static final String DEFAULT_API = "/ajaxfetch.php";
+
+    /**
+     * URL of the SoFurry API site
+     */
+    public static final String API_URL = "http://chat.sofurry.com";
+    public static final String API2_URL = "http://api2.sofurry.com";
+//    public static final String API2_URL = "http://ie1edcb55.dev.sofurry.net";
+
+    /**
+     * URL for all the resources like thumbnails, preview images, images
+     */
+    public static final String RESOURCE_URL = "http://www.sofurry.com/std";
+    
+
+    /**
+     * ============== USER PROFILE ======================
+     */
+    public static final SFUserProfile myUserProfile = new SFUserProfile();
 	
 	public static class SFUserProfile {
 	    public int userID = -1;
@@ -70,13 +91,17 @@ public final class ApiFactory {
 	    public int notification_collaborationCount = 0;
 	    public int notification_subscribedFolderCount = 0;
 	    public int notificationTotalCount = 0;
+	    public Boolean isWatched = false;
 
 	    public SFUserProfile() {
 			super();
 			// TODO Auto-generated constructor stub
 		}
 	    
-	    public void LoadFromJSON(JSONObject obj) {
+	    public void LoadFromJSON(JSONObject obj) throws Exception {
+	    		if (obj.optString("error", "undef").equals("true"))
+	    			throw new Exception("ERROR reading profile: "+obj.optString("errormessage", ""));
+	    	
 	    		userID = obj.optInt("userID", -1); 
 	    		username = obj.optString("username", "");
 	    		useralias = obj.optString("useralias", ""); // (This is the url-friendly username for username.sofurry.com profile addresses)
@@ -106,6 +131,11 @@ public final class ApiFactory {
 	    		notification_collaborationCount = obj.optInt("notification_collaborationCount", 0);
 	    		notification_subscribedFolderCount = obj.optInt("notification_subscribedFolderCount", 0);
 	    		notificationTotalCount = obj.optInt("notificationTotalCount", 0);
+
+		    	isWatched = obj.optString("iswatched", "undef").equals("true");
+	    		
+//				String s = obj.optString("iswatched", "undef");
+//		    	isWatched = ((s != null) && (s.equals("true")));
 	    }
 	    
 	    public Bitmap getAvatar() throws Exception {
@@ -156,22 +186,6 @@ public final class ApiFactory {
 		
 	}
 
-	/**
-     * Path to the API request script
-     */
-    public static final String DEFAULT_API = "/ajaxfetch.php";
-
-    /**
-     * URL of the SoFurry API site
-     */
-    public static final String API_URL = "http://chat.sofurry.com";
-    public static final String API2_URL = "http://api2.sofurry.com";
-
-    /**
-     * URL for all the resources like thumbnails, preview images, images
-     */
-    public static final String RESOURCE_URL = "http://www.sofurry.com/std";
-    
     /**
      * Returns the url to the preview sized submission image
      * @param id
@@ -643,8 +657,11 @@ public final class ApiFactory {
 	 */
 	public static Request createGetUserProfile() {
 		Request req = new Request();
+		// TODO
 		req.setURL(API2_URL + "/std/getUserProfile");
-//		req.setParameter("id", "" + userid);
+//		req.setParameter("id", "" + 67387);
+//		req.setParameter("id", "" + 999999);
+//		req.setParameter("username", "jUiNdAlo");
 		return req;
 	}
 
