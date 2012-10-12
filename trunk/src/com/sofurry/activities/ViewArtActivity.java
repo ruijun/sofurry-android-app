@@ -139,7 +139,7 @@ public class ViewArtActivity
 
 		/**
 		 * Prepare/load picture.
-		 * set loading indicator and thumbnail preview
+		 * Set loading indicator, load thumbnail preview and initiate load HQ image
 		 * @param showImage - true = show image when loaded; false = only ensure that image is downloaded
 		 */
 		public void loadPic(boolean showImage) {
@@ -158,14 +158,24 @@ public class ViewArtActivity
         	if (pages.get(curpageId) == this) {
         		centerImage(true, true, false, true, null);
         	}
-        	
+
+        	// use only cached HQ images (do not download) until click if preference set
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            startImageLoader(showImage, ! prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_CLICK_TO_LOAD, true) );
+		}
+
+		public void startImageLoader(boolean showImage, boolean allowDownload) {
+			if (imageLoaded) return; // already done
+			if (imageLoader != null) return; // already loading
+			if (submission == null) return; // nothing to load
+
             // start load thread
            	loadingIndicator.setVisibility(View.VISIBLE);
 			playIndicator.setVisibility(View.INVISIBLE);
 
-            imageLoader = AsyncImageLoader.doLoad(context, this, submission, false, ! showImage, useOriginalScale);
+            imageLoader = AsyncImageLoader.doLoad(context, this, submission, false, ! showImage, useOriginalScale, ! allowDownload);
 		}
-
+		
 		/**
 		 *  assign current submission
 		 *  do not load image/thumbnail
@@ -204,7 +214,7 @@ public class ViewArtActivity
 			if (submission == null)
 				setSubmission(page_submission_index);
 			
-            imageLoader = AsyncImageLoader.doLoad(context, this, submission, true, false, useOriginalScale);
+            imageLoader = AsyncImageLoader.doLoad(context, this, submission, true, false, useOriginalScale, false);
 		}
 		
 		public void updateScale(Matrix m, float s){
@@ -1117,7 +1127,7 @@ public class ViewArtActivity
                         Handler myHandler = new Handler() {
                              public void handleMessage(Message m) {
                                   if (!mHasDoubleClicked) {
-                                	  doHdView(pages.get(curpageId).submission);
+                                	  doImageClick();
                                   }
                              }
                         };
@@ -1192,5 +1202,14 @@ public class ViewArtActivity
 
         // if you return false, these actions will not be recorded
         return true;
+	}
+	
+	public void doImageClick() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if ( ( ! prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_CLICK_TO_LOAD, true)) || 
+			 ( pages.get(curpageId).imageLoaded ) )
+  		  doHdView(pages.get(curpageId).submission);
+		else
+			pages.get(curpageId).startImageLoader(true, true);
 	}
 }

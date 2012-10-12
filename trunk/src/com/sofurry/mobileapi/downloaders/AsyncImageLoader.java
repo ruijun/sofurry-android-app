@@ -25,6 +25,7 @@ public class AsyncImageLoader extends Thread {
 	private int id = -1;
 	private Handler mHandler = null;
 	private Bitmap bmp = null;
+	private Boolean onlyCache = false;
 
 	public interface IImageLoadResult {
 		public void onImageLoad(int id, Object obj); // null = file downloaded no bitmap, exception - error happens, bitmap - loaded picture
@@ -32,25 +33,30 @@ public class AsyncImageLoader extends Thread {
 	
 	/**
 	 * Load submission image in to bitmap.
+	 * onlyDL + onlyCached = null (nothing to do)
 	 * @param con
 	 * @param req
 	 * @param sub - submission which data should be downloaded
 	 * @param forceDl - force download image even if it is in cache or stored
-	 * @param onlyDL - download image only. do not create bitmap object in memory
+	 * @param onlyDL - do not create bitmap object in memory. check/download image only.
 	 * @param noScale - do not try to scale image to fit in memory. Just give up if it does not fit.
+	 * @param onlyCached - forbid download. Only load from local cache. Overrides forceDL
 	 * @return -  AsyncImageLoader
 	 */
-	public static AsyncImageLoader doLoad(Context con, AsyncImageLoader.IImageLoadResult req, Submission sub, Boolean forceDl, Boolean onlyDL, Boolean noScale) {
+	public static AsyncImageLoader doLoad(Context con, AsyncImageLoader.IImageLoadResult req, Submission sub, Boolean forceDl, Boolean onlyDL, Boolean noScale, Boolean onlyCached) {
 		  if (sub == null)
 			  return null;
 		  
-		  AsyncImageLoader dl = new AsyncImageLoader(con, req, sub, forceDl, onlyDL, noScale);
+		  if (onlyDL && onlyCached) // nothing to do (do not load in memory && do not download file)
+			  return null;
+		  
+		  AsyncImageLoader dl = new AsyncImageLoader(con, req, sub, forceDl, onlyDL, noScale, onlyCached);
 		  if (dl != null)
 			  dl.start();
 		  return dl;
 	}
 		
-	public AsyncImageLoader(Context con, AsyncImageLoader.IImageLoadResult req, Submission sub, Boolean forceDl, Boolean onlyDL, Boolean noSc) {
+	public AsyncImageLoader(Context con, AsyncImageLoader.IImageLoadResult req, Submission sub, Boolean forceDl, Boolean onlyDL, Boolean noSc, Boolean onlyCached) {
 			super();
 			
 			this.mHandler = new Handler();
@@ -62,6 +68,7 @@ public class AsyncImageLoader extends Thread {
 			this.noScale = noSc;
 			this.requesthandler = req;
 			this.id = my_submission.getId();
+			this.onlyCache = onlyCached;
 	}
 
 	public void doCancel() {
@@ -90,8 +97,6 @@ public class AsyncImageLoader extends Thread {
         	if (my_submission == null)
         		throw new Exception("AsyncImageLoader: no submission assigned to load request");
 
-//        	Bitmap b = null;
-        	
         	// clean bmp in case of reuse (must newer happens but...)
         	if (bmp != null) {
         		bmp.recycle();
@@ -108,12 +113,15 @@ public class AsyncImageLoader extends Thread {
             
         	// force DL - download file anyway
         	// only DL - download if not exists, do not load to memory
-            if (forceDownload) {
+            if ( (forceDownload) && (! onlyCache)) {
             	forceDownload = false;
             } else {
             	if (onlyDownload) {
-            		// if files already in cache/library then exit
-                	if ( ((prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_USE_LIB, false)) && (FileStorage.fileExists(my_submission.getSaveName(my_context)))) || (FileStorage.fileExists(ImageStorage.getSubmissionImagePath(my_submission.getCacheName())))) {
+            		// we are not expected to load any data to memory, prepare files only
+            		// if we are forbidden to download or files already in cache/library then exit
+                	if ( (onlyCache) ||
+                		 ((prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_USE_LIB, false)) && (FileStorage.fileExists(my_submission.getSaveName(my_context)))) || 
+                		 (FileStorage.fileExists(ImageStorage.getSubmissionImagePath(my_submission.getCacheName())))) {
                     	send_result(null); // close progress bar
                 		return;
                 	}
@@ -130,7 +138,8 @@ public class AsyncImageLoader extends Thread {
             	}
             }
 
-            if (bmp == null) {
+            // do download to cache and try to load downloaded file to mem
+            if ((bmp == null)&&(! onlyCache)) {
             	String url;
 
             	if (prefs.getString(AppConstants.PREFERENCE_USE_HD_IMAGES, "unk").equals("1")) {

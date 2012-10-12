@@ -180,9 +180,11 @@ public abstract class AbstractBrowseActivity extends Activity {
 		
 		if (data != null) {
 			int jumptoitem = data.getIntExtra("JumpTo", -1);
-			if ((jumptoitem >= 0) && (fDataView != null))
+			if ((jumptoitem >= 0) && (fDataView != null)) {
+//				fDataView.requestFocusFromTouch();
 //				if ( (jumptoitem < fDataView.getFirstVisiblePosition()) || (jumptoitem > fDataView.getLastVisiblePosition()))
 					fDataView.setSelection(jumptoitem);
+			}
 		}
 	}
 
