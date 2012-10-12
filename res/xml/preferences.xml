@@ -67,6 +67,6 @@
             sofurry:defaultValue="130" 
             sofurry:max="255" 
             android:title="Thumbnail size"/>
-		<CheckBoxPreference android:summaryOn="Click to load HD image" android:title="Do not load HD image until tap" android:summaryOff="Click for external viewer" android:key="load_hd_on_click" android:defaultValue="true"/>
+		<CheckBoxPreference android:summaryOn="Click to load HQ image" android:title="Click to load HQ image" android:summaryOff="Auto load HQ image" android:key="load_hd_on_click" android:defaultValue="true"/>
 	</PreferenceCategory>
 </PreferenceScreen>

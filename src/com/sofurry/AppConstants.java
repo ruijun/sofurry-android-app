@@ -51,7 +51,8 @@ public class AppConstants {
     public static final String PREFERENCE_SALT                      = "salt";
     public static final String PREFERENCE_USERNAME                  = "username";
     public static final String PREFERENCE_THUMB_SIZE                = "art_gallery_thumbnail_size";
-    public static final String PREFERENCE_THUMB_CLEAN_PERIOD          = "thumb_cleanup_period";
+    public static final String PREFERENCE_THUMB_CLEAN_PERIOD        = "thumb_cleanup_period";
+    public static final String PREFERENCE_IMAGE_CLICK_TO_LOAD       = "load_hd_on_click";
 
     /**
      * Name of the preference storage

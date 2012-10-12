@@ -148,7 +148,7 @@ public class MainMenuActivity
          * has been filled out
          */
         if ((buttonPMs_.isEnabled()) && (new Date().getTime() > lastCheck_ + 300000)) {
-            pbh.showProgressDialog("Fetching data...");
+//            pbh.showProgressDialog("Fetching data...");
             
     		Request req = ApiFactory.createUnreadPMCount();
     		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);

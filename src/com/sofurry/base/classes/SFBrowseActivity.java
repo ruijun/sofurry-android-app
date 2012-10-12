@@ -2,6 +2,8 @@ package com.sofurry.base.classes;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -49,6 +51,8 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 	protected String fExtra = "";
 	protected String fTitle = null;
 	protected int fAuthorId = -1;
+	
+	private AsyncTask<Integer, Integer, Bitmap> iconLoader = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +113,7 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 			break;
 		} 
 		
+		// set artist info bar for browse user
 		if (fContentFilter == ViewSource.user) {
 			LinearLayout mainlayout = (LinearLayout) findViewById(R.id.main_layout);
 			if (mainlayout != null) {
@@ -123,12 +128,30 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 						finish();						}
 				});
 		        
-		        if (fAuthorId >= 0)
-					try {
-						((ImageView) infoview.findViewById(R.id.AuthorIcon)).setImageBitmap(ApiFactory.getUserIcon(fAuthorId));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+		        if (fAuthorId >= 0) {
+		        	iconLoader = new AsyncTask<Integer, Integer, Bitmap>() {
+
+						@Override
+						protected Bitmap doInBackground(Integer... params) {
+							try {
+								return ApiFactory.getUserIcon(params[0]);
+							} catch (Exception e) {
+								e.printStackTrace();
+								return null;
+							}
+						}
+		        		
+						protected void onPostExecute(Bitmap result) {
+							if (! isCancelled()) {
+								ImageView iconview = (ImageView) findViewById(R.id.AuthorIcon);
+								if (iconview != null)
+									iconview.setImageBitmap(result);
+							}
+					    }
+					};
+		        
+					iconLoader.execute(new Integer(fAuthorId));
+		        }
 			}
 		}
 		
