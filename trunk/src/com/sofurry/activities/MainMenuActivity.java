@@ -7,11 +7,15 @@ import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,8 +30,10 @@ import com.sofurry.mobileapi.core.Request;
 import com.sofurry.mobileapi.downloaders.ContentDownloader;
 import com.sofurry.requests.AndroidRequestWrapper;
 import com.sofurry.requests.DataCall;
+import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
 import com.sofurry.util.BootVersionChecker;
+import com.sofurry.util.Utils;
 
 
 /**
@@ -45,6 +51,7 @@ public class MainMenuActivity
     private int     messageCount_       = -1;
     private long    lastCheck_          = -1;
     
+    private AsyncTask<Integer, Integer, Integer> cleaner = null;
 
     /**
      * Method description
@@ -283,6 +290,7 @@ public class MainMenuActivity
             messageCount_ = (Integer) retrieveObject("messageCount");
 //            user_id = (Integer) retrieveObject("user_id");
 //            user_nickname = (String) retrieveObject("user_nickname");
+            cleaner = (AsyncTask<Integer, Integer, Integer>) retrieveObject("cleaner");
 
             updateButtons();
             updateProfile();
@@ -290,6 +298,26 @@ public class MainMenuActivity
             // Fetch the information from the server instead
             checkPmCount();
             checkProfile();
+        }
+        
+        if (cleaner == null) {
+        	cleaner = new AsyncTask<Integer, Integer, Integer>() {
+
+				@Override
+				protected Integer doInBackground(Integer... params) {
+					try {
+				        SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(MainMenuActivity.this);
+				        int days = Integer.parseInt(prefs.getString(AppConstants.PREFERENCE_THUMB_CLEAN_PERIOD, "3"));
+				        if (days >= 0)
+				        	FileStorage.cleanold(FileStorage.getPath(ImageStorage.THUMB_PATH)+"/", days);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					cleaner = null;
+					return null;
+				}
+			};
+			cleaner.execute(null);
         }
     }
 
@@ -345,6 +373,7 @@ public class MainMenuActivity
         storeObject("messageCount", (Integer) messageCount_);
 //        storeObject("user_id", (Integer) user_id);
 //        storeObject("user_nickname", (String) user_nickname);
+        storeObject("cleaner", cleaner);
     }
 
     /**

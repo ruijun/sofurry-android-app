@@ -192,6 +192,17 @@ public class FileStorage {
 		}
 	}
 	
+	public static void cleanold(String abspath, int days) throws Exception {
+		File f = new File(abspath);
+		File[] tokill = f.listFiles();
+		if (tokill == null) throw new Exception("Directory to be cleared is not accessible.");
+		for (File kill : tokill) {
+			if (kill.isDirectory()) continue;
+			if ( (days <= 0) || (System.currentTimeMillis() - kill.lastModified() > ((long)days) * 24*60*60*1000))
+				kill.delete();
+		}
+	}
+	
 	public static void cleanMusic() throws Exception {
 		cleanup(FileStorage.getPath(MUSIC_PATH));
 	}

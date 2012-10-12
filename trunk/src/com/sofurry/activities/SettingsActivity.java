@@ -7,8 +7,10 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import android.os.Bundle;
 
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
@@ -35,6 +37,20 @@ public class SettingsActivity
         super.onCreate(savedInstanceState);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         addPreferencesFromResource(R.xml.preferences);
+        
+        getPreferenceScreen().findPreference("thumb_cleanup_period").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+			
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				try {
+					Integer.parseInt(newValue.toString());
+					return true;
+				}catch(NumberFormatException nfe) {
+					Toast.makeText(SettingsActivity.this, "ERROR: '"+newValue+"' is an invalid number", Toast.LENGTH_SHORT).show();
+					return false;
+				}
+			}
+		});
     }
 
     /**

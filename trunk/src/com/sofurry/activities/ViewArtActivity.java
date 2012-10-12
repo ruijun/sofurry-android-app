@@ -54,14 +54,14 @@ import java.util.ArrayList;
 
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.BounceInterpolator;
 
 import java.lang.Math;
 
 
 
 /**
- * Class description
- *
+ * Art submission viewer
  */
 public class ViewArtActivity
         extends FavableActivity 
@@ -69,7 +69,9 @@ public class ViewArtActivity
 	
 	static final Boolean useOriginalScale = true;
 	
-	// current page controls (change when page flips)
+	/**
+	 * Viewer flipper page contents
+	 */
 	private class PageHolder implements AsyncImageLoader.IImageLoadResult{
 		private Bitmap    imageBitmap = null;
 		private Boolean   imageLoaded = false;
@@ -88,31 +90,7 @@ public class ViewArtActivity
 		
 		public PageHolder(Context c) {
 			context = c;
-			/*			mutex1 = new Object();
-			myThumbLoader = new thumbLoader();
-			myThumbLoader.run();/**/
 		}
-
-/*		private thumbLoader myThumbLoader = null;
-		
-		private class thumbLoader extends Thread {
-			public boolean cancelled = false;
-			
-			@Override
-			public void run() {
-				try {
-					while (! cancelled) {
-//						mutex1.wait();
-						if (! cancelled) {
-							imageBitmap = ImageStorage.loadSubmissionIcon(submission.getId());
-							image.setImageBitmap(imageBitmap);
-						}
-					}
-				} catch (Exception e) {
-					Log.i(AppConstants.TAG_STRING, e.getMessage());
-				}
-			}
-		}/**/
 
 		public void adjustInfo() {
 			if (submission == null) {
@@ -120,17 +98,9 @@ public class ViewArtActivity
             	savedIndicator.setVisibility(View.INVISIBLE);
 				return;
 			}
-//			MemoryInfo mi = new MemoryInfo(); // DEBUG
-//			Debug.getMemoryInfo(mi);
-
-/*			MemoryInfo mi = new MemoryInfo();
-			android.app.ActivityManager activityManager = (android.app.ActivityManager) getSystemService(ACTIVITY_SERVICE);
-			activityManager.getMemoryInfo(mi);
-			long availableMegs = mi.availMem / 1048576L; /**/
 			
             // set description
             infoText.setText(MakeTitle());
-//          InfoText.setText(MakeTitle()+" Dalvik: "+mi.dalvikPss+" Native: "+mi.nativePss+" Other: "+mi.otherPss);
 
             // check if image already saved
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -147,7 +117,9 @@ public class ViewArtActivity
             }
 		}
 		
-		// unload picture
+		/**
+		 *  unload picture
+		 */
 		public void unloadPic() {
         	// stop loading image
         	if (imageLoader != null) {
@@ -184,20 +156,8 @@ public class ViewArtActivity
 	
         	// scale/center thumbnail if it is on currently visible page
         	if (pages.get(curpageId) == this) {
-        		centerImage(true, true, false);
+        		centerImage(true, true, false, true, null);
         	}
-        	
-//			(new thumbLoader()).run();
-//			myThumbLoader.notify();
-
-/*			// can possible cause interference with image loading while setting/using imageBitmap
-			Thread t = new Thread() {
-				public void run() {
-					imageBitmap = ImageStorage.loadSubmissionIcon(submission.getId());
-					image.setImageBitmap(imageBitmap);
-				}
-			};
-			t.start();/**/
         	
             // start load thread
            	loadingIndicator.setVisibility(View.VISIBLE);
@@ -206,9 +166,11 @@ public class ViewArtActivity
             imageLoader = AsyncImageLoader.doLoad(context, this, submission, false, ! showImage, useOriginalScale);
 		}
 
-		// assign current submission
-		// do not load image/thumbnail
-//		public void setSubmission(Submission s, int aIndex) {
+		/**
+		 *  assign current submission
+		 *  do not load image/thumbnail
+		 * @param aIndex
+		 */
 		public void setSubmission(int aIndex) {
 			// do nothing if no change
 			if ( (submission != null) && (aIndex == page_submission_index))
@@ -219,13 +181,6 @@ public class ViewArtActivity
 			if (s == submission)
 				return;
 			
-			// === clean loaded submission ===
-        	// clean bitmap in case of reload
-/*        	if (imageBitmap != null) {
-        		imageBitmap.recycle();
-        		imageBitmap = null;
-        	}/**/
-			
 			unloadPic();
         	
         	// === load new submission ===
@@ -235,17 +190,7 @@ public class ViewArtActivity
         	// set titles and indicators
         	adjustInfo(); // damn slowwwwwwwww (40-150ms)
         	
-        	/*        	// can cause unproper info loading in case of fast submission changes
-        	Thread t = new Thread() {
-				public void run() {
-		        	adjustInfo();
-				}
-        	};
-        	t.start();/**/
-
         	imageLoaded = false;
-//        	loadPic(); // load only when needed
-
 		}
 
 		private void doRefresh() {
@@ -257,10 +202,20 @@ public class ViewArtActivity
 			playIndicator.setVisibility(View.INVISIBLE);
 			
 			if (submission == null)
-//				setSubmission(submissions_list.get(page_submission_index), page_submission_index);
 				setSubmission(page_submission_index);
 			
             imageLoader = AsyncImageLoader.doLoad(context, this, submission, true, false, useOriginalScale);
+		}
+		
+		public void updateScale(Matrix m, float s){
+			float trans[] = {0, 0};
+			m.mapPoints( trans );
+//			float scale = (float)1.0;
+			float scale = m.mapRadius((float)1.0);
+			
+			m.reset();
+			m.postScale(scale * s, scale * s);
+			m.postTranslate(trans[0], trans[1]);
 		}
 		
 		public void onImageLoad(int id, Object obj) {
@@ -286,7 +241,21 @@ public class ViewArtActivity
 				return;
 			}
 
-			// clean bitmap if other image already loaded
+			// preserve image size and position
+    		RectF r = null;
+    		float ratio = 1;
+    		float scale = 0;
+    		// if thumbnail is loaded
+    		if (imageBitmap != null) {
+    			r = new RectF();
+        		r.set(0,0, imageBitmap.getWidth(), imageBitmap.getHeight());
+        		matrix.mapRect(r);
+        		
+        		ratio = (float) imageBitmap.getWidth() / imageBitmap.getHeight();
+        		scale = imageBitmap.getHeight();
+    		} 
+
+    		// clean bitmap if other image already loaded (thumbnail)
 			unloadPic();
 
         	imageBitmap = (Bitmap) obj;
@@ -294,9 +263,19 @@ public class ViewArtActivity
         	
         	imageLoaded = true;
         	
-        	// scale/center image if it is on currently visible page
+        	// if image is on currently visible page
         	if (pages.get(curpageId) == this) {
-        		centerImage(true, true, false);
+        		// if ratio changes or thumb was not loaded
+        		if (( Math.abs( ratio * imageBitmap.getHeight() - imageBitmap.getWidth() ) > 5 ) || (scale <= 0)) 
+        			centerImage(true, true, false, false, null); // scale/center
+        		else {
+        			// preserve size and position
+        			scale = (float) scale / imageBitmap.getHeight();
+        			updateScale(savedMatrix, scale);
+        			updateScale(matrix, scale);
+        			pages.get(curpageId).image.setImageMatrix(matrix);
+        		}
+        			
         	}
 		}
 
@@ -305,10 +284,6 @@ public class ViewArtActivity
 	    		imageLoader.doCancel();
 	    		imageLoader = null;
 	    	}
-	    	
-	    	/*	    	myThumbLoader.cancelled = true;
-	    	myThumbLoader.notify();
-	    	myThumbLoader = null;/**/
 	    	
 	    	unloadPic();
 
@@ -374,10 +349,6 @@ public class ViewArtActivity
 	            // target file in user images library
 	            String targetPath = submission.getSaveName(context);
 	            
-	            // create directories. alredy done by ensureDirectory
-//	            File td = new File(targetPath.substring(0, targetPath.lastIndexOf('/')));
-//	            td.mkdirs();
-	            
 	            File tf = new File(targetPath);
 	            FileStorage.ensureDirectory(tf.getParent());
 	            
@@ -403,11 +374,8 @@ public class ViewArtActivity
     
     private ArrayList<Submission> submissions_list = null;
     private int submissions_index = 0;
-//    protected ActivityManager man = null; 
     		
 	// screen dragging support
-/*	private float downXValue; 
-	private float downYValue;/**/
     private PointF downPoint = new PointF();
 	private long downTimer;
 	private long prevClickTime = 0;
@@ -439,13 +407,6 @@ public class ViewArtActivity
 	private Animation aLeftOut = null;
 	private Animation aRightIn = null;
 	private Animation aRightOut = null;
-
-/*	// definitions to use with old API	
-	static final int ACTION_MASK = 0x000000ff;
-	static final int ACTION_POINTER_UP = 0x00000006;
-	static final int ACTION_POINTER_DOWN = 0x00000005;/**/
-	
-    //~--- methods ------------------------------------------------------------
 
     /**
      * Method description
@@ -506,7 +467,6 @@ public class ViewArtActivity
 
         pages = new ArrayList<ViewArtActivity.PageHolder>();
         
-//      Authentication.loadAuthenticationInformation(this);
         setContentView(R.layout.artdetails);
         FixedViewFlipper imageFlipper = (FixedViewFlipper) findViewById(R.id.viewFlipper1);
 
@@ -611,20 +571,16 @@ public class ViewArtActivity
 					submissions_list = NetworkListStorage.get(extras.getLong("listId"));
 
             	submissions_index = (int) extras.getInt("listIndex");
-//            	man = (ActivityManager) extras.getSerializable("manager"); // can't pass man through intent
 
             	if (extras.getBoolean("NoMoreFromUserButton", false))
             		ArtistGalleryButton.setVisibility(View.INVISIBLE);
             	
             	// only assign submissions. load will be performed by onResume
-//        		pages.get(0).setSubmission(submissions_list.get(submissions_index), submissions_index);
         		pages.get(0).setSubmission(submissions_index);
             	if (submissions_index < submissions_list.size()-1) {
-//            		pages.get(1).setSubmission(submissions_list.get(submissions_index+1), submissions_index+1);
             		pages.get(1).setSubmission(submissions_index+1);
             	}
             	if (submissions_index > 0) {
-//            		pages.get(2).setSubmission(submissions_list.get(submissions_index-1), submissions_index-1);
             		pages.get(2).setSubmission(submissions_index-1);
             	}
             }
@@ -706,11 +662,6 @@ public class ViewArtActivity
 	protected void onResume() {
 		super.onResume();
 
-//		getWindow().getDecorView().requestLayout();
-/*		pages.get(0).loadPic();
-		pages.get(1).loadPic();
-		pages.get(2).loadPic(); /**/
-		
         if (submissions_list instanceof NetworkList)
         	((NetworkList) submissions_list).setStatusListener(new IJobStatusCallback() {
 				
@@ -845,8 +796,7 @@ public class ViewArtActivity
 
 	public boolean showNext() {
 		if (submissions_index < submissions_list.size()-1) {
-//			long t = System.currentTimeMillis(); // DEBUG
-			
+
 			submissions_index ++;
 			assignSubmission(submissions_list.get(submissions_index));
 
@@ -856,7 +806,6 @@ public class ViewArtActivity
 			if (curpageId > 2) {
 				curpageId = 0;
 			}
-//			long tt1 = System.currentTimeMillis() - t; // DEBUG
 
 			// reset image transformations
 			matrix.reset();
@@ -865,9 +814,6 @@ public class ViewArtActivity
 			// start load image
 			pages.get(curpageId).loadPic(true);
 			
-//			long tt2 = System.currentTimeMillis() - t; // DEBUG
-//			long tt3 = 0;// DEBUG
-
 			 // preload next image
 			int nextpage = curpageId + 1;
 			if (nextpage > 2) {
@@ -875,18 +821,11 @@ public class ViewArtActivity
 			}
 			
 			if (submissions_index < submissions_list.size()-1) {
-//				pages.get(nextpage).setSubmission(submissions_list.get(submissions_index+1), submissions_index+1);
 				pages.get(nextpage).setSubmission(submissions_index+1);
-//			 tt3 = System.currentTimeMillis() - t; // DEBUG
 				pages.get(nextpage).loadPic(false); // preload file, do not load bitmap
-			} else {
-				// fetch next page 
-				// TODO Add code to load next page (pass man from GalleryArt?)
-//				man.forceLoadNext(); // can't pass man through intent :(
 			}
 			
-//			 long tt4 = System.currentTimeMillis() - t; // DEBUG
-	        // Get a reference to the ViewFlipper
+			// Get a reference to the ViewFlipper
 	        ViewFlipper vf = (ViewFlipper) findViewById(R.id.viewFlipper1);
 	         // Set the animation
 	         vf.setInAnimation(aRightIn);
@@ -896,8 +835,6 @@ public class ViewArtActivity
 	         
 			 pages.get(oldpageId).unloadPic();
 			
-//			 long tt5 = System.currentTimeMillis() - t; // DEBUG
-//			 t = tt1 + tt2 + tt3 + tt4 + tt5; // DEBUG
 			 return true;
 		}
 		return false;
@@ -929,7 +866,6 @@ public class ViewArtActivity
 			}
 			
 			if (submissions_index > 0) {
-//				pages.get(prevpage).setSubmission(submissions_list.get(submissions_index-1), submissions_index-1);
 				pages.get(prevpage).setSubmission(submissions_index-1);
 				pages.get(prevpage).loadPic(false); // preload file, do not load bitmap
 			}
@@ -952,7 +888,6 @@ public class ViewArtActivity
 	public void setViewPosition(int dX, int dY) {
     	View centerview = pages.get(curpageId).myview; 
     	centerview.setVisibility(View.INVISIBLE);
-//    	centerview.layout(dX, centerview.getTop(), getApplicationContext().getResources().getDisplayMetrics().widthPixels + dX, centerview.getBottom());
     	centerview.layout(dX, dY, centerview.getWidth() + dX, centerview.getHeight() + dY);
     	centerview.setVisibility(View.VISIBLE);
 	}
@@ -975,8 +910,16 @@ public class ViewArtActivity
 		   return FloatMath.sqrt(x * x + y * y);
 	}
 
-	public float centerImage(Boolean forceCenter, Boolean doFit, Boolean rescale) {
-//    	View pageView = pages.get(curpageId).myview;
+	/**
+	 * Update image transform matrix
+	 * @param forceCenter - move to view center
+	 * @param doFit - fit in to view
+	 * @param rescale - fit if image scaled smaller than view
+	 * @param allowEnlarge
+	 * aBounds - fit to this bounds. if null - fit to page
+	 * @return
+	 */
+	public float centerImage(Boolean forceCenter, Boolean doFit, Boolean rescale, Boolean allowEnlarge, RectF aBounds) {
     	View pageView = findViewById(R.id.viewFlipper1);
     	ImageView img = pages.get(curpageId).image;
     	Bitmap bmp = pages.get(curpageId).imageBitmap;
@@ -991,8 +934,13 @@ public class ViewArtActivity
 
     	if (doFit) {
     		matrix.reset();
-    		float scale = Math.min( (float) pageView.getWidth() / bmp.getWidth(), (float) pageView.getHeight() / bmp.getHeight() );
-    		if ((scale > 0 )&&(scale < 1)) // do not enlarge
+    		float scale = 1;
+    		if (aBounds != null)
+    			scale = Math.min( (float) aBounds.width() / bmp.getWidth(), (float) aBounds.height() / bmp.getHeight() );
+    		else
+    			scale = Math.min( (float) pageView.getWidth() / bmp.getWidth(), (float) pageView.getHeight() / bmp.getHeight() );
+    		
+    		if ((scale > 0 )&&((scale < 1) || (allowEnlarge))) // do not enlarge
     			matrix.postScale(scale, scale);
 	    	r.set(0,0,bmp.getWidth(),bmp.getHeight());
 	    	matrix.mapRect(r);
@@ -1003,6 +951,9 @@ public class ViewArtActivity
     	if (forceCenter) {
         	dx = pageView.getWidth()/2 - r.centerX();
         	dy = pageView.getHeight()/2 - r.centerY();
+    	} else if (aBounds != null) {
+    		dx = aBounds.left;
+    		dy = aBounds.top;
     	} else {
     		if (r.width() <= pageView.getWidth()) {
             	dx = pageView.getWidth()/2 - r.centerX();
@@ -1037,7 +988,9 @@ public class ViewArtActivity
 	
 	// calculate distance to move page in flipper
 	public void calculatePageDisplacement(PointF delta) {
-//    	View pageView = pages.get(curpageId).myview;
+		if ((matrix == null) || (delta == null))
+			return;
+		
     	View pageView = findViewById(R.id.viewFlipper1);
     	Bitmap bmp = pages.get(curpageId).imageBitmap;
     	if (bmp == null)
@@ -1051,7 +1004,6 @@ public class ViewArtActivity
     	delta.x = 0;
     	delta.y = 0;
 
-//    	if ( (r.left > 0)&&(r.right < pageView.getWidth()) ) {
        	if ( (r.width() <= pageView.getWidth()) ) {
     		delta.x = (r.left + r.right - pageView.getWidth())/2;
     	} else if (r.left > 0) {
@@ -1059,7 +1011,6 @@ public class ViewArtActivity
     	} else if (r.right < pageView.getWidth())
     		delta.x = r.right - pageView.getWidth();
 
-//    	if ( (r.top > 0)&&(r.bottom < pageView.getHeight()) ) {
        	if ( (r.height() <= pageView.getHeight()) ) {
     		delta.y = (r.top + r.bottom - pageView.getHeight())/2;
     	} else if (r.top > 0) {
@@ -1107,7 +1058,6 @@ public class ViewArtActivity
             	    mode = ZOOM;
             		savedMatrix.set(matrix);
             	    midPoint(midPoint, arg1);
-//            		midPoint.set(arg1.getX(0), arg1.getY(0));
             	}
             	break;
             }
@@ -1136,9 +1086,7 @@ public class ViewArtActivity
                 getViewPosition(d);
                 
                 // flip feel constants
-//                int longflipLength = getApplicationContext().getResources().getDisplayMetrics().widthPixels / 3;
                 int longflipLength = pages.get(curpageId).myview.getWidth() / 3;
-//                int shortflipLength = 15;
                 int MinFlipVelocity = 40; 
 
                 // read drag speed
@@ -1148,11 +1096,9 @@ public class ViewArtActivity
                 VTracker.recycle();
 
                 // CLICK
-//                if ( (clickDuration < clickTime) && (Math.abs(dX) < shortflipLength) ) {
                 if ( (clickDuration < maxClickTime) && (Math.abs(dX) < maxClickLength) && (Math.abs(vx) < maxClickVelocity) ) {
                 	// click
                 	
-//                    doHdView(pages.get(curpageId).submission);
                 	if (clickTime - prevClickTime <= doubleClickDuration) {
                 		// double click
                 		mHasDoubleClicked = true;
@@ -1183,8 +1129,6 @@ public class ViewArtActivity
                     return true;
                 } else
                 // DRAG
-                // very long drag || fast long drag
-//                if ( (Math.abs(dX) > longflipLength) || ( (clickDuration < clickTime) && (Math.abs(dX) >= shortflipLength) )) {
 
                 if ( (Math.abs(vx) >= MinFlipVelocity) ) {
                 	// velocity flip
@@ -1205,7 +1149,7 @@ public class ViewArtActivity
                 
             	// NONE of finally for DRAG (if page was not flipped)
                 // return to center animation
-            	centerImage(false, false, true);
+            	centerImage(false, false, true, false, null);
                 setViewPosition(0, 0);
                 
                 break;
@@ -1216,9 +1160,6 @@ public class ViewArtActivity
                 
             	switch (mode) {
             		case DRAG: {
-//                    	int dX = (int) (arg1.getX() - downPoint.x);
-//                    	setViewPosition(dX, 0);
-
             			// move image inside view
                     	matrix.set(savedMatrix);
                         matrix.postTranslate(arg1.getX() - downPoint.x, arg1.getY() - downPoint.y);

@@ -241,14 +241,14 @@ public abstract class AbstractBrowseActivity extends Activity {
 				
 				@Override
 				public void onSuccess(Object job) {
-					hideProgressDialog();
 					refreshDataView();
 					LoadThumbnails();
+					onLoadFinish();
 				}
 				
 				@Override
 				public void onStart(Object job) {
-					showProgressDialog("Loading page...", ! fList.isFirstPage());
+					onLoadStart();
 				}
 				
 				@Override
@@ -258,13 +258,24 @@ public abstract class AbstractBrowseActivity extends Activity {
 				
 				@Override
 				public void onError(Object job, String msg) {
-					hideProgressDialog();
+					onLoadError(msg);
+//					hideProgressDialog();
 				}
 			});
 		}
 	}
 	
+	public void onLoadStart() {
+		showProgressDialog("Loading page...", ! fList.isFirstPage());
+	}
 	
+	public void onLoadFinish() {
+		hideProgressDialog();
+	}
+	
+	public void onLoadError(String msg) {
+		hideProgressDialog();
+	}
 	
 	@Override
 	protected void onPause() {
@@ -277,6 +288,7 @@ public abstract class AbstractBrowseActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		setListCallback(); // restore callbacks to our activity
+		refreshDataView();
 	}
 
 	/**
