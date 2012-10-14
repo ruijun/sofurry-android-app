@@ -153,6 +153,11 @@ public abstract class AbstractBrowseActivity extends Activity {
 			    }
 			}
 		}
+		
+/*		if (savedInstanceState != null) {
+			if (savedInstanceState.getBoolean("startThumbLoader", false))
+				LoadThumbnails();
+		}/**/
 	}
 
 	@Override
@@ -163,6 +168,11 @@ public abstract class AbstractBrowseActivity extends Activity {
 		if (fDataView != null)
 			outState.putInt("SelectedIndex", fDataView.getFirstVisiblePosition());
 		
+/*		if (thumbLoader != null) {
+//			StopLoadThumbnails();
+			outState.putBoolean("startThumbLoader", true);
+		}/**/
+		
 		super.onSaveInstanceState(outState);
 	}
 
@@ -170,7 +180,7 @@ public abstract class AbstractBrowseActivity extends Activity {
 	protected void onDestroy() {
 		try {
 			if (isFinishing()) {
-				StopLoadThumbnails();
+//				StopLoadThumbnails();
 				fList.finalize();
 				fList = null;
 			} else {
@@ -252,7 +262,7 @@ public abstract class AbstractBrowseActivity extends Activity {
 				@Override
 				public void onSuccess(Object job) {
 					refreshDataView();
-					LoadThumbnails();
+//					LoadThumbnails(); // done by underlying NetworkList
 					onLoadFinish();
 				}
 				
@@ -261,9 +271,10 @@ public abstract class AbstractBrowseActivity extends Activity {
 					onLoadStart();
 				}
 				
+				// Called by SFSubmissionList on thumb loading progress
 				@Override
 				public void onProgress(Object job, int progress, int total, String msg) {
-//					doRefreshList();
+					refreshDataView();
 				}
 				
 				@Override
@@ -313,34 +324,6 @@ public abstract class AbstractBrowseActivity extends Activity {
 			
 			refreshDataView();
 		}
-	}
-	/**
-	 * current thumbnail loader
-	 */
-	private ThumbnailDownloader thumbLoader = null;
-	
-	/**
-	 * Start or restart thumbnails loading 
-	 */
-	protected void LoadThumbnails() {
-		StopLoadThumbnails();
-		
-		thumbLoader = new ThumbnailDownloader() {
-			@Override
-			protected void onProgressUpdate(Integer... values) {
-				refreshDataView();
-			}
-		};
-		thumbLoader.execute(fList);
-	}
-	
-	/**
-	 * Stop loading thumbnails
-	 */
-	protected void StopLoadThumbnails() {
-		if (thumbLoader != null)
-			if (thumbLoader.cancel(false))
-				thumbLoader = null;
 	}
 	
 	/**
