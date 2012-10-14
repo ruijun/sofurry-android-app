@@ -23,6 +23,7 @@ public abstract class SubmissionViewActivity
         implements ICanCancel {
     protected String authorName;
     protected String name;
+    protected String tags;
     protected String thumbURL;
     protected int    authorId;
     protected int    pageID;
@@ -59,6 +60,7 @@ public abstract class SubmissionViewActivity
             authorId   = extras.getInt("authorId");
             authorName = extras.getString("authorName");
             thumbURL   = extras.getString("thumbnail");
+            tags   	   = extras.getString("tags");
         }
     }
 
@@ -70,12 +72,14 @@ public abstract class SubmissionViewActivity
         	authorId = s.getAuthorID();
         	authorName = s.getAuthorName();
         	thumbURL = s.getThumbURL();
+        	tags = s.getTags();
     	} else {
         	pageID = -1;
         	name = "";
         	authorId = -1;
         	authorName = "";
         	thumbURL = "";
+        	tags = "";
     	}
     }
     
