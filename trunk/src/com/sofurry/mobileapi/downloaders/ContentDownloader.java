@@ -47,8 +47,12 @@ public class ContentDownloader {
 			connection.setReadTimeout(10);
 			
 			//connection.setReadTimeout(1000*10); // Set timeout for 10 seconds
+			if (connection.getResponseCode() / 100 != 2)
+				throw new Exception("HTTP error "+connection.getResponseCode()+" : "+connection.getResponseMessage());
+
 			if (! connection.getContentType().toLowerCase().startsWith("text")) 
 				throw new Exception("Content type should be text/* but get "+connection.getContentType().toLowerCase());
+
 			len = connection.getContentLength(); // Maybe one needs to do this nowerdays. How am I supposed to know?
 			is = connection.getInputStream();
 			Log.d(AppConstants.TAG_STRING, "ContentDownloader: Downloading text...");
