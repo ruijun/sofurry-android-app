@@ -47,7 +47,7 @@ public class MainMenuActivity
     private Button  buttonForums_;
     private Button  buttonLogbook_;
     private Button  buttonPMs_;
-    private boolean mustReloadAuthInfo_ = true;
+//    private boolean mustReloadAuthInfo_ = true;
     private int     messageCount_       = -1;
     private long    lastCheck_          = -1;
     
@@ -110,7 +110,7 @@ public class MainMenuActivity
             case R.id.settings:
                 intent              = new Intent(this, SettingsActivity.class);
                 activityId          = AppConstants.ACTIVITY_SETTINGS;
-                mustReloadAuthInfo_ = true;
+//                mustReloadAuthInfo_ = true; // now done by settings activity
 
                 break;
 
@@ -132,14 +132,21 @@ public class MainMenuActivity
     }
 
     private void checkButtonDisabledState() {
-        if ((AuthenticationHandler.getUsername() == null) || (AuthenticationHandler.getUsername().trim().length() <= 0)
-                || (AuthenticationHandler.getPassword() == null) || (AuthenticationHandler.getPassword().trim().length() <= 0)) {
-            buttonPMs_.setEnabled(false);
-            buttonChat_.setEnabled(false);
-        } else {
-            buttonPMs_.setEnabled(true);
-            buttonChat_.setEnabled(true);
-        }
+//        if ((AuthenticationHandler.getUsername() == null) || (AuthenticationHandler.getUsername().trim().length() <= 0)
+//                || (AuthenticationHandler.getPassword() == null) || (AuthenticationHandler.getPassword().trim().length() <= 0)) {
+    	try {
+			if (! AuthenticationHandler.useAuthentication(this)) {
+				buttonPMs_.setEnabled(false);
+			    buttonChat_.setEnabled(false);
+			} else {
+			    buttonPMs_.setEnabled(true);
+			    buttonChat_.setEnabled(true);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			buttonPMs_.setEnabled(false);
+		    buttonChat_.setEnabled(false);
+		}
     }
 
     private void checkPmCount() {
@@ -161,9 +168,10 @@ public class MainMenuActivity
 
     // user profile support
     private void checkProfile() {
-    		Request req = ApiFactory.createGetUserProfile();
+    		Request req = ApiFactory.SFUserProfile.createRequest();
     		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
     		arw.exec(new DataCall() { public void call() { handleProfileRequest((JSONObject)arg1);	} });
+            lastCheck_ = new Date().getTime();
     }
 
     /**
@@ -175,6 +183,10 @@ public class MainMenuActivity
     	try {
     		ApiFactory.myUserProfile.LoadFromJSON(obj);
     		updateProfile();
+
+    		// handle PM count
+    		messageCount_ = ApiFactory.myUserProfile.unreadPMCount;
+            updateButtons();
     		
 		} catch (Exception e) {
 			onError(e);
@@ -182,12 +194,16 @@ public class MainMenuActivity
     }
 
     public void updateProfile() {
-    	if (ApiFactory.myUserProfile.userID <=0) {
+		TextView nickname = (TextView) findViewById(R.id.user_profile_nickname);
+		ImageView image = (ImageView) findViewById(R.id.user_profile_avatar);
+
+		if (ApiFactory.myUserProfile.userID <=0) {
+			nickname.setVisibility(View.INVISIBLE);
+			image.setVisibility(View.INVISIBLE);
     		return;
     	}
     	
     	try {
-    		TextView nickname = (TextView) findViewById(R.id.user_profile_nickname);
     		if (nickname != null) {
     			nickname.setVisibility(View.VISIBLE);
     			nickname.setText(ApiFactory.myUserProfile.username);
@@ -195,16 +211,7 @@ public class MainMenuActivity
 
     		Bitmap bmp = ApiFactory.myUserProfile.getAvatar();
     		
-/*    		Bitmap bmp = ImageStorage.loadUserIcon(user_id);
-    		
-    		if (bmp == null) {
-    			ContentDownloader.downloadFile(ApiFactory.getUserIconURL(user_id), ImageStorage.getUserIconPath(user_id), null);
-
-    			bmp = ImageStorage.loadUserIcon(user_id);
-    		} */
-    		
     		if (bmp != null) {
-    			ImageView image = (ImageView) findViewById(R.id.user_profile_avatar);
     			if (image != null) {
     				image.setVisibility(View.VISIBLE);
     				image.setImageBitmap(bmp);
@@ -235,7 +242,6 @@ public class MainMenuActivity
             if (extras != null) {
                 // General error handling
                 String errorMessage = extras.getString("errorMessage");
-
                 if (errorMessage != null) {
                     new AlertDialog.Builder(MainMenuActivity.this).setMessage(errorMessage).show();
                 }
@@ -260,10 +266,16 @@ public class MainMenuActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Utils.initUtils(this);
+        
         // Retrieve authentication info
-        AuthenticationHandler.loadAuthenticationInformation(this);
+        try {
+			AuthenticationHandler.loadAuthenticationInformation(this);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 
-        mustReloadAuthInfo_ = false;
+//        mustReloadAuthInfo_ = false;
 
         // If the notification alarm service hasn't been scheduled, do so
         setupAlarmIfNeeded();
@@ -296,10 +308,11 @@ public class MainMenuActivity
             updateProfile();
         } else {
             // Fetch the information from the server instead
-            checkPmCount();
+//            checkPmCount(); // Profile contains unread pm count
             checkProfile();
         }
         
+        // clean old thumbnails
         if (cleaner == null) {
         	cleaner = new AsyncTask<Integer, Integer, Integer>() {
 
@@ -349,16 +362,21 @@ public class MainMenuActivity
     protected void onResume() {
         super.onResume();
 
-        if (mustReloadAuthInfo_) {
+/*        if (mustReloadAuthInfo_) {
             AuthenticationHandler.loadAuthenticationInformation(this);
         	checkProfile();
-        }
+        } else /**/
+        try {
+			if (AuthenticationHandler.useAuthentication(this))
+			    if (ApiFactory.myUserProfile.userID < 0) 
+			    	checkProfile();
+			    else
+			        checkPmCount();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        if (ApiFactory.myUserProfile.userID < 0) 
-        	checkProfile();
-        
         checkButtonDisabledState();
-        checkPmCount();
     }
 
     /**

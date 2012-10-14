@@ -11,6 +11,7 @@ import com.sofurry.activities.GalleryArtActivity;
 import com.sofurry.activities.ListMusicActivity;
 import com.sofurry.activities.ListStoriesActivity;
 import com.sofurry.activities.RateActivity;
+import com.sofurry.activities.SettingsActivity;
 import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
@@ -33,12 +34,12 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	
 	@Override
 	public void createExtraMenuOptions(Menu menu) {
-		SubMenu favsmenu = menu.addSubMenu("Favs & More").setIcon(android.R.drawable.ic_menu_add);
+		SubMenu favsmenu = menu.addSubMenu(0, 0, 15, "Favs & More").setIcon(android.R.drawable.ic_menu_add);
 		favsmenu.add(0,AppConstants.MENU_ADDFAV ,0,"Add Fav").setIcon(android.R.drawable.ic_menu_add);
 		favsmenu.add(0,AppConstants.MENU_REMFAV ,0,"Remove Fav").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		favsmenu.add(0,AppConstants.MENU_RATE   ,0,"Rate").setIcon(android.R.drawable.btn_star_big_off);
 		favsmenu.add(0, AppConstants.MENU_CUM   ,0,"Cum!").setIcon(android.R.drawable.ic_menu_compass);
-		SubMenu usermenu = menu.addSubMenu("Author").setIcon(android.R.drawable.ic_menu_more);
+		SubMenu usermenu = menu.addSubMenu(0, 0, 20, "Author").setIcon(android.R.drawable.ic_menu_more);
 		usermenu.add(0, AppConstants.MENU_WATCH   ,0,"Watch").setIcon(android.R.drawable.ic_menu_search);
 		usermenu.add(0, AppConstants.MENU_UNWATCH   ,0,"Unwatch").setIcon(android.R.drawable.ic_menu_delete);
 		usermenu.add(0,AppConstants.MENU_USERSSTORIES,0,"Author's Stories").setIcon(android.R.drawable.ic_menu_slideshow);

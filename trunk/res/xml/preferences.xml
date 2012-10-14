@@ -53,6 +53,7 @@
 			android:summary="Use only 'clean' and 'adult' for level"
 			android:defaultValue="false" />
 		<EditTextPreference android:key="thumb_cleanup_period" android:title="Delete thumbnails older than ... days (0=all, -1 = disabled)" android:defaultValue="3"/>
+		<CheckBoxPreference android:defaultValue="true" android:key="delete_incomplete_files" android:title="Delete incomplete downloaded files"/>
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Submission Viewer"><ListPreference android:key="useHDImg" android:entries="@array/useHD_titles" android:entryValues="@array/useHD_values" android:title="Use HD images" android:dialogTitle="Choose when to use HD images" android:summary="Controls when to download HD images" android:defaultValue="0"></ListPreference>
 		<CheckBoxPreference android:defaultValue="true" android:key="imgCheckSaved" android:title="Show if image already saved in library" android:summaryOn="Will show saved status" android:summaryOff="Will NOT show saved status"></CheckBoxPreference>
@@ -67,6 +68,7 @@
             sofurry:defaultValue="130" 
             sofurry:max="255" 
             android:title="Thumbnail size"/>
-		<CheckBoxPreference android:summaryOn="Click to load HQ image" android:title="Click to load HQ image" android:summaryOff="Auto load HQ image" android:key="load_hd_on_click" android:defaultValue="true"/>
+		<CheckBoxPreference android:summaryOn="Manual load HQ image" android:title="Click to load HQ image" android:summaryOff="Auto load HQ image" android:key="load_hd_on_click" android:defaultValue="true"/>
+		<CheckBoxPreference android:summaryOff="Use original thumbnails" android:defaultValue="true" android:key="use_custom_thumbs" android:title="Use custom thumbnails" android:summaryOn="Use custom thumbnails"/>
 	</PreferenceCategory>
 </PreferenceScreen>

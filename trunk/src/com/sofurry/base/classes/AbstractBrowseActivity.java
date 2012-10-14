@@ -1,5 +1,7 @@
 package com.sofurry.base.classes;
 
+import com.sofurry.AppConstants;
+import com.sofurry.activities.SettingsActivity;
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.helpers.ProgressBarHelper;
@@ -13,10 +15,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Adapter;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -47,7 +52,10 @@ public abstract class AbstractBrowseActivity extends Activity {
 	/**
 	 * Refresh display to show changes in list
 	 */
-	protected void refreshDataView() {
+	protected synchronized void refreshDataView() {
+		if ((myAdapter != null) && (myAdapter instanceof BaseAdapter))
+			((BaseAdapter) myAdapter).notifyDataSetChanged();
+
 		if (fDataView != null) {
 			if (fDataView instanceof AbsListView)
 				((AbsListView) fDataView).invalidateViews();
@@ -352,4 +360,26 @@ public abstract class AbstractBrowseActivity extends Activity {
 	public void hideProgressDialog() {
 		pbh.hideProgressDialog();
 	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, AppConstants.MENU_SETTINGS, 10, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
+
+        return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+			case AppConstants.MENU_SETTINGS:
+				Intent intent = new Intent(this, SettingsActivity.class);
+				startActivity(intent);
+				return true;
+				
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+	}
+	
+	
 }

@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -26,6 +27,7 @@ import com.sofurry.requests.AndroidDownloadWrapper;
 import com.sofurry.requests.AndroidRequestWrapper;
 import com.sofurry.requests.DataCall;
 import com.sofurry.storage.FileStorage;
+import com.sofurry.util.Utils;
 
 /**
  * @author Rangarig
@@ -205,8 +207,13 @@ public class ViewMusicActivity extends FavableActivity  {
 			pbh.hideProgressDialog();
 			pbh.showProgressDialog("Downloading Song...");
 			
+			boolean deleteIncomplete = true;
+			try {
+				deleteIncomplete = Utils.getPreferences(this).getBoolean(AppConstants.PREFERENCE_DELETE_INCOMPLETE, true);
+			} catch (Exception e) {
+			}
 			// Prepare async download
-			down = new AndroidDownloadWrapper(requesthandler, url, playPath);
+			down = new AndroidDownloadWrapper(requesthandler, url, playPath, deleteIncomplete);
 			initializeADWFeedback();
 			down.start(); // Starts the download
 		} catch (Exception e) {

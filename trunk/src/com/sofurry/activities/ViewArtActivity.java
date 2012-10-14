@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -48,6 +49,7 @@ import com.sofurry.model.Submission;
 import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
 import com.sofurry.storage.NetworkListStorage;
+import com.sofurry.util.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -68,6 +70,8 @@ public class ViewArtActivity
         implements OnTouchListener, OnPreDrawListener {
 	
 	static final Boolean useOriginalScale = true;
+	private Toast mytoast = null;
+	
 	
 	/**
 	 * Viewer flipper page contents
@@ -79,12 +83,14 @@ public class ViewArtActivity
 		private ImageView savedIndicator = null;
 		private ImageView playIndicator = null;
 		private TextView  infoText = null;
+		private TextView  HQIndicator = null;
 		private View 	  loadingIndicator = null;
 		private View	  myview = null;	
 		
 		private Submission submission = null;
 		private int page_submission_index = -1;
 		private AsyncImageLoader imageLoader = null;
+		private boolean mustLoadImage = false;
 		
 		private Context context = null;
 		
@@ -92,7 +98,19 @@ public class ViewArtActivity
 			context = c;
 		}
 
+		public void attachView(View view) {
+	        myview = view;
+	        image    		= (ImageView) 	myview.findViewById(R.id.imagepreview);
+	        infoText 		= (TextView) 	myview.findViewById(R.id.InfoText);
+	        savedIndicator 	= (ImageView) 	myview.findViewById(R.id.savedIndicator);
+	        loadingIndicator = (View) 		myview.findViewById(R.id.loadingIndicator);
+	        playIndicator 	= (ImageView) 	myview.findViewById(R.id.playIndicator);
+	        HQIndicator		= (TextView) 	myview.findViewById(R.id.hq_indicator);
+		}
+		
 		public void adjustInfo() {
+        	HQIndicator.setVisibility(View.INVISIBLE);
+        	
 			if (submission == null) {
 				infoText.setText("Loading...");
             	savedIndicator.setVisibility(View.INVISIBLE);
@@ -147,6 +165,7 @@ public class ViewArtActivity
 			if (submission == null) { // current page of submission list is loading
 	           	loadingIndicator.setVisibility(View.VISIBLE);
 				playIndicator.setVisibility(View.INVISIBLE);
+				HQIndicator.setVisibility(View.INVISIBLE);
 				return;
 			}
 			
@@ -159,20 +178,48 @@ public class ViewArtActivity
         		centerImage(true, true, false, true, null);
         	}
 
+        	HQIndicator.setText("LQ");
+        	HQIndicator.setTextColor(Color.parseColor("#2C2C2C"));
+			HQIndicator.setVisibility(View.VISIBLE);
+        	
+        	
         	// use only cached HQ images (do not download) until click if preference set
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            startImageLoader(showImage, ! prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_CLICK_TO_LOAD, true) );
+//            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean allowDL = ! Utils.getPreferences(context).getBoolean(AppConstants.PREFERENCE_IMAGE_CLICK_TO_LOAD, true); 
+            startImageLoader(showImage, allowDL );
+            
+			if ((showImage) && (! submission.isSubmissionFileExists()) && (! allowDL))
+	            showToast("Tap to download");
+            
 		}
 
+		
+		
+		//TODO all this loading stuff should be in special download manager or at least in submission
+		//TODO to avoid multiple download instances for single out file. must rework later.
 		public void startImageLoader(boolean showImage, boolean allowDownload) {
 			if (imageLoaded) return; // already done
-			if (imageLoader != null) return; // already loading
 			if (submission == null) return; // nothing to load
 
             // start load thread
            	loadingIndicator.setVisibility(View.VISIBLE);
 			playIndicator.setVisibility(View.INVISIBLE);
 
+			// can happen when click on image many times or flip to preloading page
+			if (imageLoader != null) // already loading something
+				if (imageLoader.getSubmissionId() == submission.getId()) { // already loading THIS submission
+					// mark load file to memory when ready if it was not already requested
+					mustLoadImage = showImage && imageLoader.getOnlyDl();  // onlyDL - was requested not to load in mem. On callback from loader we can try to load to mem.
+					return;
+				} else {
+					// loading something wrong. cancel it.
+					imageLoader.doCancel();
+					imageLoader = null;
+				}
+				
+			mustLoadImage = false; // we will request load to mem in new AsyncImageLoader
+			// start new load / download
+			// do not download if file already exist (forceDL = false) as it can be used by another download thread
             imageLoader = AsyncImageLoader.doLoad(context, this, submission, false, ! showImage, useOriginalScale, ! allowDownload);
 		}
 		
@@ -243,11 +290,19 @@ public class ViewArtActivity
 			
 			// show play indicator
 			if (submission.isVideo()) {
-				playIndicator.setVisibility(View.VISIBLE);
+				if (submission.isSubmissionFileExists())
+					playIndicator.setVisibility(View.VISIBLE);
+				HQIndicator.setVisibility(View.INVISIBLE);
 			}
 
-			// if no bitmap loaded or error
+			// AsyncLoad finished but with error or no bitmap loading was requested
 			if ((obj == null)||(! (obj instanceof Bitmap))) {
+				if (obj instanceof Exception)
+					showToast("Error: "+((Exception) obj).getMessage());
+				else
+				if (mustLoadImage) // bitmap load was requested while AsyncLoad was already started
+					startImageLoader(true, false); // download should be allowed on first stage. retry bmp load. do not retry download.
+					
 				return;
 			}
 
@@ -272,6 +327,10 @@ public class ViewArtActivity
         	image.setImageBitmap(imageBitmap);
         	
         	imageLoaded = true;
+
+        	HQIndicator.setText("HQ");
+        	HQIndicator.setTextColor(Color.parseColor("#006C00"));
+			HQIndicator.setVisibility(View.VISIBLE);
         	
         	// if image is on currently visible page
         	if (pages.get(curpageId) == this) {
@@ -364,7 +423,7 @@ public class ViewArtActivity
 	            
 	            // save file to user image library
 	            FileStorage.copyFile(f, tf);
-	            Toast.makeText(getApplicationContext(), "File saved to:\n" + targetPath, Toast.LENGTH_LONG).show();
+	            showToast("File saved to:\n" + targetPath);
 	            
 	            // display saved indicator
 	            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(AppConstants.PREFERENCE_IMAGE_CHECK_SAVED, true)) {
@@ -432,25 +491,12 @@ public class ViewArtActivity
     }
 
     /**
-     * Views the button using the activity that is associated with images
+     * If submission file downloaded then open it in associated viewer
      */
     public void doHdView(Submission s) {
-    	File f = null;
-    	
-    	try {
-    		SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(this);
-    		if (prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_USE_LIB, false)) {
-    			f = new File(s.getSaveName(this));
-    		}
-    	} catch (Exception e) {
-		} 
-    	
-    	if ( (f == null) || (!f.exists())) {
-    		f = new File(ImageStorage.getSubmissionImagePath(s.getCacheName()));
-    		if (!f.exists()) {
-    			return;    // Until that file exists, there is nothing we can do really.
-    		}
-    	}
+    	File f = s.getSubmissionFile(); // return null if file does not exist
+    	if (f == null)
+    		return;
     		
     	// Starts the associated image viewer, so the user can zoom and tilt
     	Intent intent = new Intent();
@@ -484,32 +530,17 @@ public class ViewArtActivity
         mInflater = LayoutInflater.from(this);
         
         curpage = new PageHolder(this);
-        curpage.myview = mInflater.inflate(R.layout.artdetails_page_tmpl, null);
-        curpage.image    		= (ImageView) 	curpage.myview.findViewById(R.id.imagepreview);
-        curpage.infoText 		= (TextView) 	curpage.myview.findViewById(R.id.InfoText);
-        curpage.savedIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.savedIndicator);
-        curpage.loadingIndicator = (View) 		curpage.myview.findViewById(R.id.loadingIndicator);
-        curpage.playIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.playIndicator);
+        curpage.attachView(mInflater.inflate(R.layout.artdetails_page_tmpl, null));
         imageFlipper.addView(curpage.myview);
         pages.add(curpage);
 
         curpage = new PageHolder(this);
-        curpage.myview = mInflater.inflate(R.layout.artdetails_page_tmpl, null);
-        curpage.image    		= (ImageView) 	curpage.myview.findViewById(R.id.imagepreview);
-        curpage.infoText 		= (TextView) 	curpage.myview.findViewById(R.id.InfoText);
-        curpage.savedIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.savedIndicator);
-        curpage.loadingIndicator = (View) 		curpage.myview.findViewById(R.id.loadingIndicator);
-        curpage.playIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.playIndicator);
+        curpage.attachView(mInflater.inflate(R.layout.artdetails_page_tmpl, null));
         imageFlipper.addView(curpage.myview);
         pages.add(curpage);
 
         curpage = new PageHolder(this);
-        curpage.myview = mInflater.inflate(R.layout.artdetails_page_tmpl, null);
-        curpage.image    		= (ImageView) 	curpage.myview.findViewById(R.id.imagepreview);
-        curpage.infoText 		= (TextView) 	curpage.myview.findViewById(R.id.InfoText);
-        curpage.savedIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.savedIndicator);
-        curpage.loadingIndicator = (View) 		curpage.myview.findViewById(R.id.loadingIndicator);
-        curpage.playIndicator 	= (ImageView) 	curpage.myview.findViewById(R.id.playIndicator);
+        curpage.attachView(mInflater.inflate(R.layout.artdetails_page_tmpl, null));
         imageFlipper.addView(curpage.myview);
         pages.add(curpage);
 
@@ -599,9 +630,15 @@ public class ViewArtActivity
         } else {
         	// load saved object
             submissions_list = (ArrayList<Submission>)  retrieveObject("list");
+            
+            Long listid = null;
         	if (submissions_list == null)
-				submissions_list = NetworkListStorage.get((Long) retrieveObject("listId"));
+        		if ( (listid = (Long) retrieveObject("listId")) != null )
+        			submissions_list = NetworkListStorage.get(listid);
 
+ //       	if (submissions_list == null)
+ //       		throw new Exception("submission list was not restored");
+        	
             submissions_index = (Integer) retrieveObject("listIndex");
             matrix = (Matrix) retrieveObject("matrix");
             
@@ -684,7 +721,7 @@ public class ViewArtActivity
 				
 				@Override
 				public void onStart(Object job) {
-					Toast.makeText(getApplicationContext(), "Loading page...", Toast.LENGTH_SHORT).show();
+					showToast("Loading page...");
 				}
 				
 				@Override
@@ -693,7 +730,7 @@ public class ViewArtActivity
 				
 				@Override
 				public void onError(Object job, String msg) {
-					Toast.makeText(getApplicationContext(), "Error load page: "+msg, Toast.LENGTH_SHORT).show();
+					showToast("Error load page: "+msg);
 				}
 			});
 
@@ -787,7 +824,7 @@ public class ViewArtActivity
         pages.get(2).store("2");
     	
         if (submissions_list instanceof NetworkList)
-        	storeObject("listId", (Long) ((NetworkList) submissions_list).getListId());
+        	storeObject("listId", (Long) ((NetworkList<Submission>) submissions_list).getListId());
         else
         	storeObject("list", submissions_list);
         
@@ -1205,11 +1242,25 @@ public class ViewArtActivity
 	}
 	
 	public void doImageClick() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		//TODO what to do if already loading something?
+		SharedPreferences prefs = Utils.getPreferences(this);
 		if ( ( ! prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_CLICK_TO_LOAD, true)) || 
-			 ( pages.get(curpageId).imageLoaded ) )
-  		  doHdView(pages.get(curpageId).submission);
-		else
+			 ( pages.get(curpageId).imageLoaded ) || // short check
+			 ( pages.get(curpageId).submission.isSubmissionFileExists() ) // hard check 
+			) {
+			if (pages.get(curpageId).imageLoader != null)
+	            showToast("Warning: download in progress");
+	  		doHdView(pages.get(curpageId).submission);
+		} else
 			pages.get(curpageId).startImageLoader(true, true);
+	}
+	
+	private void showToast(String msg) {
+		if (mytoast != null)
+			mytoast.setText(msg);
+		else
+			mytoast = Toast.makeText(getApplicationContext(), "Tap to download", Toast.LENGTH_SHORT);
+
+		mytoast.show();
 	}
 }

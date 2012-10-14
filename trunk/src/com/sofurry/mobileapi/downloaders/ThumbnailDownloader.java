@@ -16,7 +16,7 @@ public abstract class ThumbnailDownloader extends
 			Log.d("[ThumbDl]", "--- Starting");
 
 			boolean tryAgain = true;
-			boolean fastmode = true;
+//			boolean fastmode = true;
 			int itemId = 0;
 			Submission s = null;
 //			long threadId = System.currentTimeMillis();
@@ -33,7 +33,8 @@ public abstract class ThumbnailDownloader extends
 					// The IHasThumbnail object will know what to do
 					if (!s.checkThumbnail())
 					  try {
-						  s.populateThumbnail(fastmode);
+//						  s.populateThumbnail(fastmode);
+						  s.populateThumbnail(false); // fast mode = true => do nothing
 					  } catch (Exception e) {
 						  Log.d(AppConstants.TAG_STRING, "Thumbloading failed " + e.getMessage());
 					  }
@@ -61,7 +62,7 @@ public abstract class ThumbnailDownloader extends
 						return (0);
 //						break;
 				}
-				fastmode = false;
+//				fastmode = false;
 				publishProgress(itemId);
 			}
 		} catch (Exception e) {

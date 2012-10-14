@@ -1,5 +1,6 @@
 package com.sofurry.base.classes;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.view.KeyEvent;
@@ -7,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.sofurry.AppConstants;
+import com.sofurry.activities.SettingsActivity;
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.model.Submission;
 
@@ -88,6 +90,7 @@ public abstract class SubmissionViewActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean result = super.onCreateOptionsMenu(menu);
 
+        menu.add(0, AppConstants.MENU_SETTINGS, 10, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
         menu.add(0, AppConstants.MENU_SAVE, 0, "Save").setIcon(android.R.drawable.ic_menu_save);
         createExtraMenuOptions(menu);
 
@@ -135,6 +138,11 @@ public abstract class SubmissionViewActivity
      */
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+			case AppConstants.MENU_SETTINGS:
+				Intent intent = new Intent(this, SettingsActivity.class);
+				startActivity(intent);
+				return true;
+				
             case AppConstants.MENU_SAVE:
             	if (pageID >= 0)
             		save();

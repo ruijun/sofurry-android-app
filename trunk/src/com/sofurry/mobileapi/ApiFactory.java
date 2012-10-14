@@ -59,7 +59,7 @@ public final class ApiFactory {
     /**
      * ============== USER PROFILE ======================
      */
-    public static final SFUserProfile myUserProfile = new SFUserProfile();
+    public static SFUserProfile myUserProfile = new SFUserProfile();
 	
 	public static class SFUserProfile {
 	    public int userID = -1;
@@ -98,6 +98,35 @@ public final class ApiFactory {
 			// TODO Auto-generated constructor stub
 		}
 	    
+		/**
+		 * Returns the profile information of a user
+		 * @param userid
+		 * The user's userid. If the userid is your own, extra parameters are passed.
+		 * @return
+		 */
+		public static Request createRequest(int userid) {
+			Request req = new Request();
+			req.setURL(API2_URL + "/std/getUserProfile");
+			req.setParameter("id", "" + userid);
+			return req;
+		}
+
+		/**
+		 * Returns the profile information of a current user
+		 * @param userid
+		 * The user's userid. If the userid is your own, extra parameters are passed.
+		 * @return
+		 */
+		public static Request createRequest() {
+			Request req = new Request();
+			// TODO
+			req.setURL(API2_URL + "/std/getUserProfile");
+//			req.setParameter("id", "" + 67387);
+//			req.setParameter("id", "" + 999999);
+//			req.setParameter("username", "jUiNdAlo");
+			return req;
+		}
+
 	    public void LoadFromJSON(JSONObject obj) throws Exception {
 	    		if (obj.optString("error", "undef").equals("true"))
 	    			throw new Exception("ERROR reading profile: "+obj.optString("errormessage", ""));
@@ -205,6 +234,10 @@ public final class ApiFactory {
 	}
 	
 	public static String getThumbURL(int id) {
+		return RESOURCE_URL + "/thumb?page="+id+"&original=1";
+	}
+	
+	public static String getCustomThumbURL(int id) {
 		return RESOURCE_URL + "/thumb?page="+id;
 	}
 	
@@ -222,7 +255,7 @@ public final class ApiFactory {
 		Bitmap bmp = ImageStorage.loadUserIcon(userID);
 		
 		if (bmp == null) {
-			ContentDownloader.downloadFile(ApiFactory.getUserIconURL(userID), ImageStorage.getUserIconPath(userID), null);
+			ContentDownloader.downloadFile(ApiFactory.getUserIconURL(userID), ImageStorage.getUserIconPath(userID), null, true);
 			bmp = ImageStorage.loadUserIcon(userID);
 		}
 
@@ -636,34 +669,5 @@ public final class ApiFactory {
 		return req;
 	}
 	
-	/**
-	 * Returns the profile information of a user
-	 * @param userid
-	 * The user's userid. If the userid is your own, extra parameters are passed.
-	 * @return
-	 */
-	public static Request createGetUserProfile(int userid) {
-		Request req = new Request();
-		req.setURL(API2_URL + "/std/getUserProfile");
-		req.setParameter("id", "" + userid);
-		return req;
-	}
-
-	/**
-	 * Returns the profile information of a current user
-	 * @param userid
-	 * The user's userid. If the userid is your own, extra parameters are passed.
-	 * @return
-	 */
-	public static Request createGetUserProfile() {
-		Request req = new Request();
-		// TODO
-		req.setURL(API2_URL + "/std/getUserProfile");
-//		req.setParameter("id", "" + 67387);
-//		req.setParameter("id", "" + 999999);
-//		req.setParameter("username", "jUiNdAlo");
-		return req;
-	}
-
 
 }
