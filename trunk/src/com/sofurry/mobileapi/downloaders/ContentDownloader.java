@@ -21,6 +21,64 @@ import com.sofurry.storage.FileStorage;
 public class ContentDownloader {
 
 	/**
+	 * Downloads a text string from the server
+	 * @param url
+	 * The url to the bitmap
+	 * @return
+	 * Returns downloaded text in String object
+	 * @throws Exception
+	 */
+	public static String downloadText(String url) throws Exception {
+		Log.d(SFConstants.TAG_STRING, "ContentDownloader: Fetching text...");
+		
+		URL myImageURL = new URL(HttpRequestHandler.encodeURL(url));
+		HttpURLConnection connection = null;
+		InputStream is = null;
+		Bitmap bitmap = null;
+		ByteArrayOutputStream bos = null;
+		int t = 0; // Total bytes transfered
+		int len = -1;
+		
+		try {
+			connection = (HttpURLConnection) myImageURL.openConnection();
+			connection.setDoInput(true);
+			connection.setDoOutput(false);
+			connection.connect();
+			connection.setReadTimeout(10);
+			
+			//connection.setReadTimeout(1000*10); // Set timeout for 10 seconds
+			if (! connection.getContentType().toLowerCase().startsWith("text")) 
+				throw new Exception("Content type should be text/* but get "+connection.getContentType().toLowerCase());
+			len = connection.getContentLength(); // Maybe one needs to do this nowerdays. How am I supposed to know?
+			is = connection.getInputStream();
+			Log.d(AppConstants.TAG_STRING, "ContentDownloader: Downloading text...");
+			bos = new ByteArrayOutputStream();
+		    int readBytes;
+		    byte[] buffer = new byte[1024];
+		    while ((readBytes = is.read(buffer)) > 0) {
+		        bos.write(buffer, 0, readBytes);
+		        t += readBytes;
+
+//		        if (canceler.isCanceled()) break;
+		    }
+		    bos.flush();
+		    bos.close();
+		} catch (SocketException se) {
+			if ((t < 1024) || (t < len) || (!se.getMessage().toLowerCase().contains("reset")))
+			throw se;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+		  if (is != null)
+		    is.close();
+		  if (bos != null)
+			bos.close();
+		  connection.disconnect();
+		}
+		return bos.toString();
+	}
+	
+	/**
 	 * Downloads a bitmap from the server
 	 * @param url
 	 * The url to the bitmap
@@ -36,6 +94,9 @@ public class ContentDownloader {
 		InputStream is = null;
 		Bitmap bitmap = null;
 		ByteArrayOutputStream bos = null;
+		int t = 0; // Total bytes transfered
+		int len = -1;
+		
 		try {
 			connection = (HttpURLConnection) myImageURL.openConnection();
 			connection.setDoInput(true);
@@ -45,6 +106,7 @@ public class ContentDownloader {
 			
 			//connection.setReadTimeout(1000*10); // Set timeout for 10 seconds
 			if (connection.getContentType().toLowerCase().startsWith("text")) throw new Exception("Unable to download image. (text answer where binary expected)");
+			len = connection.getContentLength(); // Maybe one needs to do this nowerdays. How am I supposed to know?
 			is = connection.getInputStream();
 			Log.d(AppConstants.TAG_STRING, "ContentDownloader: Downloading...");
 			bos = new ByteArrayOutputStream();
@@ -52,12 +114,18 @@ public class ContentDownloader {
 		    byte[] buffer = new byte[1024];
 		    while ((readBytes = is.read(buffer)) > 0) {
 		        bos.write(buffer, 0, readBytes);
+		        t += readBytes;
+
+//		        if (canceler.isCanceled()) break;
 		    }
 		    bos.flush();
 		    bos.close();
 			//Log.d("SF ContentDownloader", is.available() + " bytes available to be read from server");
 			Log.d(AppConstants.TAG_STRING, "ContentDownloader: creating drawable... ("+bos.size()+" bytes)");
 			bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(),0,bos.size());
+		} catch (SocketException se) {
+			if ((t < 1024) || (t < len) || (!se.getMessage().toLowerCase().contains("reset")))
+			throw se;
 		} catch (Exception e) {
 			throw e;
 		} finally {
