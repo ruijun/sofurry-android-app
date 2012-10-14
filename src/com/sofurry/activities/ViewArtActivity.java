@@ -1199,6 +1199,7 @@ public class ViewArtActivity
                 		// double click
                 		mHasDoubleClicked = true;
                 		
+                		// zoom to actual pixels, keep tapped point
                 		float[] p = {arg1.getX(), arg1.getY()};
                 		Matrix m = new Matrix();
                 		matrix.invert(m);
@@ -1245,7 +1246,8 @@ public class ViewArtActivity
                 
             	// NONE of finally for DRAG (if page was not flipped)
                 // return to center animation
-            	centerImage(false, false, true, false, null);
+                if (pages.get(curpageId).imageLoaded)
+                	centerImage(false, false, true, false, null);
                 setViewPosition(0, 0);
                 
                 break;
@@ -1291,9 +1293,8 @@ public class ViewArtActivity
 	}
 	
 	public void doImageClick() {
-		//TODO what to do if already loading something?
 		SharedPreferences prefs = Utils.getPreferences(this);
-		if ( ( ! prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_CLICK_TO_LOAD, true)) || 
+/*		if ( ( ! prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_CLICK_TO_LOAD, true)) || 
 			 ( pages.get(curpageId).imageLoaded ) || // short check
 			 ( pages.get(curpageId).submission.isSubmissionFileExists() ) // hard check 
 			) {
@@ -1301,14 +1302,25 @@ public class ViewArtActivity
 	            showToast("Warning: download in progress");
 	  		doHdView(pages.get(curpageId).submission);
 		} else
-			pages.get(curpageId).startImageLoader(true, true);
+			pages.get(curpageId).startImageLoader(true, true);/**/
+
+		boolean fieloaded = ( pages.get(curpageId).imageLoaded ) || // short check
+				 			( pages.get(curpageId).submission.isSubmissionFileExists() ); // hard check
+		
+		if (fieloaded) {
+				if (pages.get(curpageId).imageLoader != null)
+		            showToast("Warning: download in progress");
+		  		doHdView(pages.get(curpageId).submission);
+		} else
+			pages.get(curpageId).startImageLoader(true, true); // will handle running downloads correctly
+		/**/
 	}
 	
 	private void showToast(String msg) {
 		if (mytoast != null)
 			mytoast.setText(msg);
 		else
-			mytoast = Toast.makeText(getApplicationContext(), "Tap to download", Toast.LENGTH_SHORT);
+			mytoast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
 
 		mytoast.show();
 	}
