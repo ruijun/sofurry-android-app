@@ -496,21 +496,7 @@ public final class ApiFactory {
 		req.setParameter("votevalue", "" + numberOfStars);
 		return req;
 	}
-	
-	/**
-	 * Sets a 'cum' flag for the indicated submission
-	 * @param pid
-	 * The page ID of the submission
-	 * @return
-	 */
-	public static Request createCum(int pid) {
-		Request req = new Request();
-		req.setURL(API_URL + DEFAULT_API);
-		req.setParameter("f", "cum");
-		req.setParameter("pid", "" + pid);
-		return req;
-	}
-	
+
 	/**
 	 * Adds the author indicated by the authorid to the currentusers watchlist 
 	 * @param authorid

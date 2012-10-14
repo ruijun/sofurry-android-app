@@ -38,7 +38,6 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		favsmenu.add(0,AppConstants.MENU_ADDFAV ,0,"Add Fav").setIcon(android.R.drawable.ic_menu_add);
 		favsmenu.add(0,AppConstants.MENU_REMFAV ,0,"Remove Fav").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		favsmenu.add(0,AppConstants.MENU_RATE   ,0,"Rate").setIcon(android.R.drawable.btn_star_big_off);
-		favsmenu.add(0, AppConstants.MENU_CUM   ,0,"Cum!").setIcon(android.R.drawable.ic_menu_compass);
 		SubMenu usermenu = menu.addSubMenu(0, 0, 20, "Author").setIcon(android.R.drawable.ic_menu_more);
 		usermenu.add(0, AppConstants.MENU_WATCH   ,0,"Watch").setIcon(android.R.drawable.ic_menu_search);
 		usermenu.add(0, AppConstants.MENU_UNWATCH   ,0,"Unwatch").setIcon(android.R.drawable.ic_menu_delete);
@@ -58,9 +57,6 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		case AppConstants.MENU_RATE:
 			Intent intent = new Intent(this, RateActivity.class);
 			startActivityForResult(intent, AppConstants.ACTIVITY_RATE);
-			return true;
-		case AppConstants.MENU_CUM:
-			cum();
 			return true;
 		case AppConstants.MENU_WATCH:
 			watch();
@@ -131,17 +127,6 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		pbh.showProgressDialog("Rating "+stars+" stars");
 		
 		Request req = ApiFactory.createSetStars(pageID, stars);
-		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
-		arw.exec(new DataCall() { public void call() { justHideProgress();	} });
-	}
-
-	/**
-	 * Flags the cum-counter for currently visible image
-	 */
-	public void cum() {
-		pbh.showProgressDialog("Cumming ...");
-
-		Request req = ApiFactory.createCum(pageID);
 		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
 		arw.exec(new DataCall() { public void call() { justHideProgress();	} });
 	}
