@@ -676,7 +676,7 @@ public class ViewArtActivity
         	if (	(btn instanceof Button) &&
         			(btn.getTag() instanceof String) ) {
     			if (! prefs.getBoolean((String)btn.getTag(), true)    )
-    				btn.setVisibility(View.INVISIBLE);
+    				btn.setVisibility(View.GONE);
     			else
         		if (prefs.getBoolean((String)btn.getTag(), false)    )
         			btn.setVisibility(View.VISIBLE);
@@ -686,7 +686,7 @@ public class ViewArtActivity
     	
     	if (disableMoreArt) {
     		Button ArtistGalleryButton = (Button) findViewById(R.id.ArtistGalleryButton);
-    		ArtistGalleryButton.setVisibility(View.INVISIBLE);
+    		ArtistGalleryButton.setVisibility(View.GONE);
     	}
     }
     
@@ -704,6 +704,14 @@ public class ViewArtActivity
 
         	case R.id.BackBtn:
                 finish();
+        		break;
+        		
+        	case R.id.WatchBtn:
+        		watch();
+        		break;
+        		
+        	case R.id.FavBtn:
+        		setFavorite();
         		break;
         }
     	

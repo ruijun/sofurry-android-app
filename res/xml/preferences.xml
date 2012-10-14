@@ -66,9 +66,13 @@
 		
 		<PreferenceScreen android:title="Side menu settings">
 		    <ListPreference android:title="Side menu position" android:key="imgMenuPosition" android:entries="@array/imgMenuPosition_titles" android:summary="position of always visible fast buttons bar" android:dialogTitle="Choose menu bar position" android:defaultValue="1" android:entryValues="@array/imgMenuPosition_values"></ListPreference>
-		    <CheckBoxPreference android:key="art_menu_back" android:title="Back button" android:defaultValue="true"/>
-			<CheckBoxPreference android:key="art_menu_save" android:title="Save button" android:defaultValue="true"/>
-			<CheckBoxPreference android:key="art_menu_more" android:title="More art from author" android:defaultValue="true"/>
+		    <PreferenceCategory android:title="Buttons"><CheckBoxPreference android:key="art_menu_back" android:title="Back button" android:defaultValue="true" /><CheckBoxPreference android:key="art_menu_save" android:title="Save button" android:defaultValue="true" /><CheckBoxPreference android:key="art_menu_watch" android:title="Watch button" android:defaultValue="true"/><CheckBoxPreference android:defaultValue="true" android:key="art_menu_fav" android:title="Fav button" /><CheckBoxPreference android:key="art_menu_more" android:title="More art button" android:defaultValue="true" />
+		    
+</PreferenceCategory>
+			
+			
+			
+			
 		</PreferenceScreen>
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Thumbnails">
