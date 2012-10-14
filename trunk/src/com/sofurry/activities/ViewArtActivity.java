@@ -443,6 +443,8 @@ public class ViewArtActivity
     
     private ArrayList<Submission> submissions_list = null;
     private int submissions_index = 0;
+    
+    private boolean disableMoreArt = false;
     		
 	// screen dragging support
     private PointF downPoint = new PointF();
@@ -546,61 +548,6 @@ public class ViewArtActivity
 
         curpage = pages.get(0);
 
-        // init side menu
-        Button ArtistGalleryButton = (Button) findViewById(R.id.ArtistGalleryButton);
-        Button SaveButton = (Button) findViewById(R.id.SaveBtn);
-        Button BackButton = (Button) findViewById(R.id.BackBtn);
-
-        ArtistGalleryButton.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View arg0) {
-                morefromuser(GalleryArtActivity.class,AppConstants.ACTIVITY_GALLERYART);
-            }
-        });
-        
-        SaveButton.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View arg0) {
-                save();
-            }
-        });
-        
-        BackButton.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View arg0) {
-                finish();
-            }
-        });
-
-        
-        SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(this);
-
-        // setting menu position
-        String MenuPosition = prefs.getString(AppConstants.PREFERENCE_IMAGE_MENU_POSITION, "0");
-    	LinearLayout menuLayout = (LinearLayout) findViewById(R.id.menuLayout);
-    	RelativeLayout.LayoutParams params = null;
-        if ( MenuPosition.equals("1") ) {
-        	menuLayout.setOrientation(LinearLayout.HORIZONTAL);
-        	params = new RelativeLayout.LayoutParams(  LayoutParams.FILL_PARENT, 
-        			    								LayoutParams.WRAP_CONTENT);
-        	params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        	menuLayout.setLayoutParams(params);
-
-        } else if (MenuPosition.equals("2")) {
-        	menuLayout.setOrientation(LinearLayout.VERTICAL);
-        	params = new RelativeLayout.LayoutParams(  LayoutParams.WRAP_CONTENT, 
-        											LayoutParams.FILL_PARENT);
-        	params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        	menuLayout.setLayoutParams(params);
-
-        } else if (MenuPosition.equals("3")) {
-        	menuLayout.setOrientation(LinearLayout.VERTICAL);
-        	params = new RelativeLayout.LayoutParams(  LayoutParams.WRAP_CONTENT, 
-        											LayoutParams.FILL_PARENT);
-        	params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        	menuLayout.setLayoutParams(params);
-
-        } else {
-        	menuLayout.setVisibility(View.INVISIBLE);
-		}	
-
         // load data
         if (savedInstanceState == null) {
         	// init new object
@@ -613,8 +560,7 @@ public class ViewArtActivity
 
             	submissions_index = (int) extras.getInt("listIndex");
 
-            	if (extras.getBoolean("NoMoreFromUserButton", false))
-            		ArtistGalleryButton.setVisibility(View.INVISIBLE);
+            	disableMoreArt = extras.getBoolean("NoMoreFromUserButton", false); 
             	
             	// only assign submissions. load will be performed by onResume
         		pages.get(0).setSubmission(submissions_index);
@@ -648,8 +594,11 @@ public class ViewArtActivity
             
             curpageId = (Integer) retrieveObject("pageId");
             imageFlipper.setDisplayedChild(curpageId);
+            
+            disableMoreArt = (Boolean) retrieveObject("disableMoreArt");
         }
         
+        updateSideMenu();
         
         // init dragging
         imageFlipper.setOnTouchListener((OnTouchListener) this);
@@ -663,6 +612,102 @@ public class ViewArtActivity
     	aRightOut = AnimationUtils.loadAnimation(this, R.anim.push_right_out);
     }
 
+    public void updateSideMenu() {
+        SharedPreferences prefs        = Utils.getPreferences(this);
+
+        // init side menu
+/*        Button ArtistGalleryButton = (Button) findViewById(R.id.ArtistGalleryButton);
+        Button SaveButton = (Button) findViewById(R.id.SaveBtn);
+        Button BackButton = (Button) findViewById(R.id.BackBtn);
+
+        ArtistGalleryButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View arg0) {
+                morefromuser(GalleryArtActivity.class,AppConstants.ACTIVITY_GALLERYART);
+            }
+        });
+        
+        SaveButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View arg0) {
+                save();
+            }
+        });
+        
+        BackButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View arg0) {
+                finish();
+            }
+        });/**/
+
+        
+        // setting menu position
+        String MenuPosition = prefs.getString(AppConstants.PREFERENCE_IMAGE_MENU_POSITION, "0");
+    	LinearLayout menuLayout = (LinearLayout) findViewById(R.id.menuLayout);
+    	RelativeLayout.LayoutParams params = null;
+        if ( MenuPosition.equals("1") ) {
+        	menuLayout.setOrientation(LinearLayout.HORIZONTAL);
+        	params = new RelativeLayout.LayoutParams(  LayoutParams.FILL_PARENT, 
+        			    								LayoutParams.WRAP_CONTENT);
+        	params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        	menuLayout.setLayoutParams(params);
+
+        } else if (MenuPosition.equals("2")) {
+        	menuLayout.setOrientation(LinearLayout.VERTICAL);
+        	params = new RelativeLayout.LayoutParams(  LayoutParams.WRAP_CONTENT, 
+        											LayoutParams.FILL_PARENT);
+        	params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        	menuLayout.setLayoutParams(params);
+
+        } else if (MenuPosition.equals("3")) {
+        	menuLayout.setOrientation(LinearLayout.VERTICAL);
+        	params = new RelativeLayout.LayoutParams(  LayoutParams.WRAP_CONTENT, 
+        											LayoutParams.FILL_PARENT);
+        	params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        	menuLayout.setLayoutParams(params);
+
+        } else {
+        	menuLayout.setVisibility(View.INVISIBLE);
+		}	
+
+        // reading button visibility from settings
+        int i = 0;
+        while (i < menuLayout.getChildCount()) {
+        	View btn = menuLayout.getChildAt(i);
+        	if (	(btn instanceof Button) &&
+        			(btn.getTag() instanceof String) ) {
+    			if (! prefs.getBoolean((String)btn.getTag(), true)    )
+    				btn.setVisibility(View.INVISIBLE);
+    			else
+        		if (prefs.getBoolean((String)btn.getTag(), false)    )
+        			btn.setVisibility(View.VISIBLE);
+        	}
+        	i++;
+        }
+    	
+    	if (disableMoreArt) {
+    		Button ArtistGalleryButton = (Button) findViewById(R.id.ArtistGalleryButton);
+    		ArtistGalleryButton.setVisibility(View.INVISIBLE);
+    	}
+    }
+    
+    public void menuButtonClick(View v) {
+        int id = v.getId();
+
+        switch (id) {
+        	case R.id.ArtistGalleryButton:
+                morefromuser(GalleryArtActivity.class,AppConstants.ACTIVITY_GALLERYART);
+        		break;
+
+        	case R.id.SaveBtn:
+                save();
+        		break;
+
+        	case R.id.BackBtn:
+                finish();
+        		break;
+        }
+    	
+    }
+    
     /**
      * Load submission to page if it was not loaded
      * @param PageID
@@ -735,6 +780,8 @@ public class ViewArtActivity
 			});
 
         findViewById(R.id.viewFlipper1).getViewTreeObserver().addOnPreDrawListener(this);
+        
+        updateSideMenu();
 	}
 
 
@@ -831,6 +878,8 @@ public class ViewArtActivity
         storeObject("listIndex", submissions_index);
         storeObject("pageId", curpageId);
         storeObject("matrix", matrix);
+        
+        storeObject("disableMoreArt", disableMoreArt);
         
         super.onSaveInstanceState(outState);
     }
