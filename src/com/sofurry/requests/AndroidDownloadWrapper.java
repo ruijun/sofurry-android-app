@@ -30,11 +30,13 @@ public class AndroidDownloadWrapper {
 	public AsyncFileDownloader downloader = null;
 	public DataCall callPercent = null;
 	public DataCall callFinish = null;
+	private boolean deleteIncomplete = true;
 	
-	public AndroidDownloadWrapper(RequestHandler reqHandler, String url, String targetFile) {
+	public AndroidDownloadWrapper(RequestHandler reqHandler, String url, String targetFile, boolean deleteIncomplete) {
 		this.url = url;
 		this.targetFile = targetFile;
 		this.req = reqHandler;
+		this.deleteIncomplete = deleteIncomplete;
 	}
 	
 	/**
@@ -80,6 +82,7 @@ public class AndroidDownloadWrapper {
 					relayFeedback(prog, goal);
 				}
 			}
+			, deleteIncomplete
 			);
 			downloader.start();
 		} catch (Exception e) {

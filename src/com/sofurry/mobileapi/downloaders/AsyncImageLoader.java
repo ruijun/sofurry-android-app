@@ -26,7 +26,8 @@ public class AsyncImageLoader extends Thread {
 	private Handler mHandler = null;
 	private Bitmap bmp = null;
 	private Boolean onlyCache = false;
-
+	private DownloadCancler dlcancel = new DownloadCancler();
+	
 	public interface IImageLoadResult {
 		public void onImageLoad(int id, Object obj); // null = file downloaded no bitmap, exception - error happens, bitmap - loaded picture
 	}
@@ -34,8 +35,8 @@ public class AsyncImageLoader extends Thread {
 	/**
 	 * Load submission image in to bitmap.
 	 * onlyDL + onlyCached = null (nothing to do)
-	 * @param con
-	 * @param req
+	 * @param con - context to get preferences
+	 * @param req - callback IImageLoadResult
 	 * @param sub - submission which data should be downloaded
 	 * @param forceDl - force download image even if it is in cache or stored
 	 * @param onlyDL - do not create bitmap object in memory. check/download image only.
@@ -71,10 +72,19 @@ public class AsyncImageLoader extends Thread {
 			this.onlyCache = onlyCached;
 	}
 
+	public int getSubmissionId() {
+		return id;
+	}
+	
+	public boolean getOnlyDl() {
+		return onlyDownload;
+	}
+	
 	public void doCancel() {
 		cancelFlag = true;
 		mHandler = null;
 		requesthandler = null;
+		dlcancel.doCancel();
 	}
 	
 	public void setOnlyDL(Boolean aOnlyDL) {
@@ -113,15 +123,18 @@ public class AsyncImageLoader extends Thread {
             
         	// force DL - download file anyway
         	// only DL - download if not exists, do not load to memory
-            if ( (forceDownload) && (! onlyCache)) {
+/*            if ( (forceDownload) && (! onlyCache)) {
             	forceDownload = false;
-            } else {
+            } else {/**/
+        	if ((! forceDownload) || (onlyCache)) { // do not try to load first if forceDL. 
             	if (onlyDownload) {
             		// we are not expected to load any data to memory, prepare files only
             		// if we are forbidden to download or files already in cache/library then exit
-                	if ( (onlyCache) ||
-                		 ((prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_USE_LIB, false)) && (FileStorage.fileExists(my_submission.getSaveName(my_context)))) || 
-                		 (FileStorage.fileExists(ImageStorage.getSubmissionImagePath(my_submission.getCacheName())))) {
+                	if ( (onlyCache) || // do not download
+                		 (my_submission.isSubmissionFileExists()) // already downloaded	
+//                		 ((prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_USE_LIB, false)) && (FileStorage.fileExists(my_submission.getSaveName(my_context)))) || 
+//                		 (FileStorage.fileExists(ImageStorage.getSubmissionImagePath(my_submission.getCacheName())))
+                		) {
                     	send_result(null); // close progress bar
                 		return;
                 	}
@@ -136,9 +149,16 @@ public class AsyncImageLoader extends Thread {
                 		bmp = ImageStorage.loadSubmissionImage(my_submission.getCacheName(), maxsize);
                 	}
             	}
+            	
+            	// if file exists but can not be loaded on previous step then exit 
+            	// as it can be concurrent download from other thread or non image submission file.
+            	if ((bmp == null) && (my_submission.isSubmissionFileExists())) {
+                	send_result(null); // close progress bar
+            		return;
+            	}
             }
 
-            // do download to cache and try to load downloaded file to mem
+            // do download to cache and then try to load downloaded file to mem. Only cache prohibit download.
             if ((bmp == null)&&(! onlyCache)) {
             	String url;
 
@@ -150,13 +170,14 @@ public class AsyncImageLoader extends Thread {
 
                 Log.i(AppConstants.TAG_STRING, "ImageDownloader: Downloading image for id " + my_submission.getId() + " from " + url);
 
-                ContentDownloader.downloadFile(url, ImageStorage.getSubmissionImagePath(my_submission.getCacheName()), null);
+                ContentDownloader.downloadFile(url, ImageStorage.getSubmissionImagePath(my_submission.getCacheName()), null, dlcancel, prefs.getBoolean(AppConstants.PREFERENCE_DELETE_INCOMPLETE, true));
 
+                if (my_submission.isImage()) // do not try to load bmp for non-image files
                 if ((!cancelFlag)&&(!onlyDownload)) { // if image load was cancelled or onlyDL then do not load bitmap in memory, just put file to cache for future use 
                 	// read file
                 	bmp = ImageStorage.loadSubmissionImage(my_submission.getCacheName(), maxsize);
                 	if (bmp == null) {
-                		throw new Exception("Downloaded Image failed to load.");
+                		throw new Exception("Download ok. Can't view. Try external viewer");
                 	}
                 }
             }

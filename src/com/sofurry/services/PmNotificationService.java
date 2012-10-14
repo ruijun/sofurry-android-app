@@ -46,18 +46,21 @@ public class PmNotificationService extends WakefulIntentService {
     @Override
     protected void doWakefulWork(Intent intent) {
         // Load auth information from server
-    	if (!hasAuthInformation()) // Then the authentification handler is already initialized, we do not need to do that again.
-          AuthenticationHandler.loadAuthenticationInformation(this); 
+//    	if (!hasAuthInformation()) // Then the authentification handler is already initialized, we do not need to do that again.
+        try {
+			if (! AuthenticationHandler.useAuthentication(this)) // Then the authentification handler is already initialized, we do not need to do that again.
+			  AuthenticationHandler.loadAuthenticationInformation(this);
 
-        if (hasAuthInformation()) {
-            Log.i(AppConstants.TAG_STRING, "Requesting PM count (Authorized)...");
-            
-            try {
-                handleUnreadPMData(createRequest().execute());
-			} catch (Exception e) {
-		        Log.e(AppConstants.TAG_STRING, "Error occurred: " + e.getLocalizedMessage());
-			}
-        }
+//	        if (hasAuthInformation()) {
+	        if (AuthenticationHandler.useAuthentication(this)) {
+	            Log.i(AppConstants.TAG_STRING, "Requesting PM count (Authorized)...");
+	            
+	            handleUnreadPMData(createRequest().execute());
+	        }
+		} catch (Exception e) {
+			e.printStackTrace();
+	        Log.e(AppConstants.TAG_STRING, "Error occurred: " + e.getLocalizedMessage());
+		} 
     }
 
     /**
@@ -138,13 +141,13 @@ public class PmNotificationService extends WakefulIntentService {
      *
      * @return
      */
-    protected boolean hasAuthInformation() {
+/*    protected boolean hasAuthInformation() {
         if ((AuthenticationHandler.getUsername() == null) || (AuthenticationHandler.getUsername().trim().length() <= 0)
                 || (AuthenticationHandler.getPassword() == null) || (AuthenticationHandler.getPassword().trim().length() <= 0)) {
             return false;
         }
 
         return true;
-    }
+    }/**/
 
 }

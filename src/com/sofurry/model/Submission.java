@@ -1,5 +1,6 @@
 package com.sofurry.model;
 
+import java.io.File;
 import java.io.Serializable;
 
 import org.json.JSONException;
@@ -18,6 +19,7 @@ import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.downloaders.ContentDownloader;
 import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
+import com.sofurry.util.Utils;
 
 public class Submission implements Serializable, IHasThumbnail {
 
@@ -164,11 +166,11 @@ public class Submission implements Serializable, IHasThumbnail {
 
 		if (type == ContentType.art) {
 			if (!ImageStorage.checkSubmissionIcon(getId()) ) {
-				ContentDownloader.downloadFile(getThumbURL(), ImageStorage.getSubmissionIconPath(getId()), null);
+				ContentDownloader.downloadFile(getThumbURL(), ImageStorage.getSubmissionIconPath(getId()), null, true);
 			}
 		} else {
 			if (! ImageStorage.checkUserIcon(getAuthorID()) ) {
-				ContentDownloader.downloadFile(getThumbURL(), ImageStorage.getUserIconPath(getAuthorID()), null);
+				ContentDownloader.downloadFile(getThumbURL(), ImageStorage.getUserIconPath(getAuthorID()), null, true);
 			}
 		}
 			
@@ -193,7 +195,7 @@ public class Submission implements Serializable, IHasThumbnail {
     		return SavedNameCache;
     	}
     	
-        SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences prefs        = Utils.getPreferences(context);
         String            fileNameTmpl = prefs.getString(AppConstants.PREFERENCE_IMAGE_FILE_NAME_TMPL,
                                                          "%AUTHOR% - %NAME%");
         boolean           useOnlyAdult = prefs.getBoolean(AppConstants.PREFERENCE_IMAGE_TMPL_USE_ONLY_ADULT, false);
@@ -239,6 +241,29 @@ public class Submission implements Serializable, IHasThumbnail {
     	return filename;
     }
 
+    public File getSubmissionFile() {
+    	File f = null;
+    	
+    	try {
+    		if (Utils.getPreferences().getBoolean(AppConstants.PREFERENCE_IMAGE_USE_LIB, false)) {
+    			f = new File(getSaveName(null));
+    		}
+    	} catch (Exception e) {
+		} 
+    	
+    	if ( (f == null) || (!f.exists())) {
+    		f = new File(ImageStorage.getSubmissionImagePath(getCacheName()));
+    		if (!f.exists()) {
+    			return null;    // Until that file exists, there is nothing we can do really.
+    		}
+    	} 
+    	
+    	return f;
+    }
+    
+    public boolean isSubmissionFileExists() {
+    	return (getSubmissionFile() != null);
+    }
     
     /**
      * Returns the preview URL
@@ -262,7 +287,12 @@ public class Submission implements Serializable, IHasThumbnail {
 	 * @return
 	 */
 	public String getThumbURL() {
-		return ApiFactory.getThumbURL(getId());
+		try {
+			if (! Utils.getPreferences().getBoolean(AppConstants.PREFERENCE_USE_CUSTOM_THUMBS, true))
+				return ApiFactory.getThumbURL(getId());
+		} catch (Exception e) {
+		}
+		return ApiFactory.getCustomThumbURL(getId());
 	}
 	
 	/**

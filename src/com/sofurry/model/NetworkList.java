@@ -72,6 +72,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 			@Override
 			public void run() {
 				Log.d("[NetList]", "=== Start thread");
+				fAsyncLoader = fParent.fAsyncLoader;
 
 				try {
 //					isWorkerThread = true;
@@ -87,6 +88,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				
 //				fLoading = false;
 				fParent.fAsyncLoader = null;
+				fAsyncLoader = null;
 				Log.d("[NetList]", "=== End thread");
 			}
 

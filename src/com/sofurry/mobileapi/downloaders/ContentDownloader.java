@@ -79,8 +79,8 @@ public class ContentDownloader {
 	 * @param req
 	 * The request handler to signal arrival to
 	 */
-	public static AsyncFileDownloader asyncDownload(String url, String absfilename, CallBack cb, PercentageFeedback feed, DownloadCancler downcancel) throws Exception {
-		AsyncFileDownloader afd = new AsyncFileDownloader(url, absfilename, cb, feed);
+	public static AsyncFileDownloader asyncDownload(String url, String absfilename, CallBack cb, PercentageFeedback feed, DownloadCancler downcancel, boolean deleteIncomplete) throws Exception {
+		AsyncFileDownloader afd = new AsyncFileDownloader(url, absfilename, cb, feed, deleteIncomplete);
 		afd.start();
 		return afd;
 	}
@@ -97,8 +97,8 @@ public class ContentDownloader {
 	 * And object that is passed by the caller, allowing the caller to cancel the download
 	 * @throws Exception
 	 */
-	public static void downloadFile(String url, String absfilename, PercentageFeedback feed) throws Exception {
-		downloadFile(url,absfilename,feed,new DownloadCancler());
+	public static void downloadFile(String url, String absfilename, PercentageFeedback feed, boolean deleteIncomplete) throws Exception {
+		downloadFile(url,absfilename,feed,new DownloadCancler(), deleteIncomplete);
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public class ContentDownloader {
 	 * And object that is passed by the caller, allowing the caller to cancel the download
 	 * @throws Exception
 	 */
-	public static void downloadFile(String url, String absfilename, PercentageFeedback feed,DownloadCancler canceler) throws Exception {
+	public static void downloadFile(String url, String absfilename, PercentageFeedback feed,DownloadCancler canceler, boolean deleteIncomplete) throws Exception {
 		Log.d(SFConstants.TAG_STRING, "ContentDownloader: Fetching file...");
 		Log.d(SFConstants.TAG_STRING, "ContentDownloader: " + url);
 		URL myImageURL = new URL(HttpRequestHandler.encodeURL(url));
@@ -122,7 +122,7 @@ public class ContentDownloader {
 		connection.connect();
 		connection.setReadTimeout(10); // Set timeout for 10 seconds
 		if (connection.getContentType().toLowerCase().startsWith("text")) throw new Exception("Unable to download file. (text answer where binary expected)");
-		//int len = connection.getContentLength(); // Maybe one needs to do this nowerdays. How am I supposed to know?
+		int len = connection.getContentLength(); // Maybe one needs to do this nowerdays. How am I supposed to know?
 		//Log.d("contDown", "contentType" + connection.getContentType() + " / " + connection.getContentLength());
 		InputStream is = connection.getInputStream();
 		FileOutputStream os = FileStorage.getFileOutputStream(absfilename);
@@ -149,7 +149,7 @@ public class ContentDownloader {
 		    }
 	        // I positively HATE this workaround. But as of now, after a day of fiddeling, I cannot do any better :(
 		} catch (SocketException se) {
-			if ((t < 1024) || (!se.getMessage().toLowerCase().contains("reset")))
+			if ((t < 1024) || (t < len) || (!se.getMessage().toLowerCase().contains("reset")))
 			throw se;
 		} catch (Exception e) {
 		    Log.d(AppConstants.TAG_STRING, "Dwn: " + t + " " + l);
@@ -160,6 +160,10 @@ public class ContentDownloader {
 			if (os != null) {
 			  os.flush();
 	          os.close();
+			}
+			if ((deleteIncomplete) && (t < len)) {
+				File f = new File(absfilename);
+				f.delete();
 			}
 		}
 		// If the download was canceled, remove the file that we have written

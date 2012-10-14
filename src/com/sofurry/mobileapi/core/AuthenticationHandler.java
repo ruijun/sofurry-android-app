@@ -10,6 +10,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.sofurry.AppConstants;
+import com.sofurry.mobileapi.ApiFactory;
+import com.sofurry.mobileapi.ApiFactory.SFUserProfile;
+import com.sofurry.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +42,7 @@ public class AuthenticationHandler {
     private static String username                      = null;
     private static long   currentAuthenticationSequence = 0;
     private static Object authSyncDummy = new Object();
+    private static Boolean mustReloadAuth = true;
 
 
     /**
@@ -49,9 +53,13 @@ public class AuthenticationHandler {
      * If this is set to true, a fake username will be transmitted, which is required by some parts of the new API
      */
     public static void addAuthParametersToQuery(Map<String, String> queryParams) {
-        if (!useAuthentication()) {
-            return;
-        }
+        try {
+			if (!useAuthentication()) // this reload auth info if required
+			    return;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return; // the only reason for this is
+		}
 
         synchronized (authSyncDummy) {
             queryParams.put("otpuser", username);
@@ -62,11 +70,8 @@ public class AuthenticationHandler {
 		}
     }
 
-    // Create a hash using the current authentication sequence counter, thus "salting" the hash.
-
     /**
-     * Method description
-     *
+     * Create a hash using the current authentication sequence counter, thus "salting" the hash.
      *
      * @return
      */
@@ -82,18 +87,48 @@ public class AuthenticationHandler {
     }
 
     /**
-     * Method description
-     *
-     *
-     * @param context
+     * Set flag to reload auth info next time 
+     * @param context - context to load SharedPrefs from
+     * @throws Exception
      */
-    public static void loadAuthenticationInformation(final Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public static void triggerReloadAuth(Context context) throws Exception {
+    	if (Utils.getPreferences() == null)
+    		if (context != null)
+    			Utils.initUtils(context);
+    		else
+    			throw new Exception("Must provide context or init Utils to reload auth info");
+    	
+        mustReloadAuth = true;
+        ApiFactory.myUserProfile = new SFUserProfile(); // clean user profile
+    }
+    
+    /**
+     * Load auth info from preferences
+     *
+     * @param context - context to load SharedPrefs from. Can be null if previous request was provide info to cache PrefManager
+     * @throws Exception 
+     */
+    public static void loadAuthenticationInformation(final Context context) throws Exception {
+    	if (Utils.getPreferences() == null)
+    		if (context != null)
+    			Utils.initUtils(context);
+    		else
+    			throw new Exception("Must provide context or init Utils to load auth info");
+    	
+    	SharedPreferences prefs = Utils.getPreferences();
 
         synchronized (authSyncDummy) {
-        	username = prefs.getString(AppConstants.PREFERENCE_USERNAME, "");
-        	password = prefs.getString(AppConstants.PREFERENCE_PASSWORD, "");
+        	String newusername = prefs.getString(AppConstants.PREFERENCE_USERNAME, "");
+        	String newpassword = prefs.getString(AppConstants.PREFERENCE_PASSWORD, "");
+        	
+        	// clean profile if credentials changed
+        	if ((! newusername.equals(username)) || (! newpassword.equals(password)))
+        		ApiFactory.myUserProfile = new SFUserProfile();
+        	
+        	username = newusername;
+        	password = newpassword;
             salt     = prefs.getString(AppConstants.PREFERENCE_SALT, "");
+            mustReloadAuth = false;
 		}
     }
 
@@ -148,17 +183,33 @@ public class AuthenticationHandler {
      *
      *
      * @param context
+     * @throws Exception 
      */
-    public static void savePreferences(final Context context) {
-        SharedPreferences        prefs  = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
+    public static void savePreferences(final Context context) throws Exception {
+    	if (mustReloadAuth) {
+    		// we did not load latest auth preferences so should not save non actual info
+			try {
+				loadAuthenticationInformation(context);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	} else {
+        	if (Utils.getPreferences() == null)
+        		if (context != null)
+        			Utils.initUtils(context);
+        		else
+        			throw new Exception("Must provide context or init Utils to load auth info");
+        	
+        	SharedPreferences prefs = Utils.getPreferences();
+            SharedPreferences.Editor editor = prefs.edit();
 
-        synchronized (authSyncDummy) {
-            editor.putString(AppConstants.PREFERENCE_USERNAME, username);
-            editor.putString(AppConstants.PREFERENCE_PASSWORD, password);
-            editor.putString(AppConstants.PREFERENCE_SALT, salt);
+            synchronized (authSyncDummy) {
+                editor.putString(AppConstants.PREFERENCE_USERNAME, username);
+                editor.putString(AppConstants.PREFERENCE_PASSWORD, password);
+                editor.putString(AppConstants.PREFERENCE_SALT, salt);
+    		}
+            editor.commit();
 		}
-        editor.commit();
     }
 
 //    /**
@@ -179,11 +230,19 @@ public class AuthenticationHandler {
     /**
      * Returns true, if Authentification Parameters are available
      * @return
+     * @throws Exception 
      */
-    public static boolean useAuthentication() {
-        return ((getUsername() != null) && (getUsername().trim().length() > 0));
+    public static boolean useAuthentication(Context context) throws Exception {
+    	if (mustReloadAuth)
+    		loadAuthenticationInformation(context);
+    	
+        return ((username != null) && (username.trim().length() > 0));
     }
 
+    public static boolean useAuthentication() throws Exception {
+    	return useAuthentication(null);
+    }
+    
     // Get the MD5 sum of a given input string
     private static String getMd5Hash(final String input) {
         try {
@@ -210,7 +269,7 @@ public class AuthenticationHandler {
      *
      * @return
      */
-    public static String getPassword() {
+/*    public static String getPassword() {
         return password;
     }
 
