@@ -98,9 +98,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
 		                public void run() { // should we use fParent here or just refer to parent object variable?
-		              	  if (fParent.fLoadingStatusListener != null) {
-		              		  fParent.fLoadingStatusListener.onStart(fParent);
-		              	  }
+		                	fParent.doStartNotify(fParent);
 		                }
 		            });
 				}
@@ -111,11 +109,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
 		                public void run() {
-		              	  if (fParent.fLoadingStatusListener != null) {
-		              		  fParent.fLoadingStatusListener.onSuccess(fParent);
-		              	  }
-		              	  
-		              	  fFirstPage = false; // we are done loading a page so next page will not be not first
+		                	fParent.doSuccessNotify(fParent);
 		                }
 		            });
 				}
@@ -126,11 +120,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
 		                public void run() {
-		              	  if (fParent.fLoadingStatusListener != null) {
-		              		  fParent.fLoadingStatusListener.onError(fParent, msg);
-		              	  }
-		              	  
-		              	  fFirstPage = false; // we are done loading a page so next page will not be not first
+		                	fParent.doErrorNotify(fParent, msg);
 		                }
 		            });
 				}
@@ -141,9 +131,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
 		                public void run() {
-		              	  if (fParent.fLoadingStatusListener != null) {
-		              		  fParent.fLoadingStatusListener.onProgress(fParent, progress, total, msg);
-		              	  }
+		                	fParent.doProgressNotify(fParent, progress, total, msg);
 		                }
 		            });
 				}
@@ -156,7 +144,52 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 			}
 
 		} // end of class AsyncPageLoader
-		
+
+		/**
+		 * allow descendants to override load status actions
+		 * @param job
+		 */
+		protected void doStartNotify(Object job) {
+        	  if (fLoadingStatusListener != null) {
+          		  fLoadingStatusListener.onStart(job);
+          	  }
+		}
+
+		/**
+		 * allow descendants to override load status actions
+		 * @param job
+		 */
+		protected void doSuccessNotify(Object job) {
+      	  	fFirstPage = false; // we are done loading a page so next page will not be not first
+        	if (fLoadingStatusListener != null) {
+        		  fLoadingStatusListener.onSuccess(job);
+        	}
+		}
+
+		/**
+		 * allow descendants to override load status actions
+		 * @param job
+		 * @param msg
+		 */
+		protected void doErrorNotify(Object job, final String msg) {
+	      	  fFirstPage = false; // we are done loading a page so next page will not be not first
+	      	  if (fLoadingStatusListener != null) {
+	      		  fLoadingStatusListener.onError(job, msg);
+	      	  }
+        }
+
+		/**
+		 * allow descendants to override load status actions
+		 * @param job
+		 * @param progress
+		 * @param total
+		 * @param msg
+		 */
+		protected void doProgressNotify(Object job, final int progress, final int total, final String msg) {
+	      	  if (fLoadingStatusListener != null) {
+	      		  fLoadingStatusListener.onProgress(job, progress, total, msg);
+	      	  }
+        }
 
 		/**
 		 * Hack to be able to call super.add from inside runnable object

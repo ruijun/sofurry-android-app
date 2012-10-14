@@ -189,7 +189,12 @@ public class ContentDownloader {
 		connection.setDoInput(true);
 		connection.connect();
 		connection.setReadTimeout(10); // Set timeout for 10 seconds
-		if (connection.getContentType().toLowerCase().startsWith("text")) throw new Exception("Unable to download file. (text answer where binary expected)");
+		if (connection.getResponseCode() / 100 != 2)
+			throw new Exception("HTTP error "+connection.getResponseCode()+" : "+connection.getResponseMessage());
+
+		if (connection.getContentType().toLowerCase().startsWith("text")) 
+			throw new Exception("Unable to download file. (text answer where binary expected)");
+
 		int len = connection.getContentLength(); // Maybe one needs to do this nowerdays. How am I supposed to know?
 		//Log.d("contDown", "contentType" + connection.getContentType() + " / " + connection.getContentLength());
 		InputStream is = connection.getInputStream();

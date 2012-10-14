@@ -44,6 +44,7 @@ import com.sofurry.R;
 import com.sofurry.base.classes.FavableActivity;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.mobileapi.downloaders.AsyncImageLoader;
+import com.sofurry.mobileapi.downloaders.ThumbnailDownloader;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
 import com.sofurry.storage.FileStorage;
@@ -443,7 +444,7 @@ public class ViewArtActivity
     
     private ArrayList<Submission> submissions_list = null;
     private int submissions_index = 0;
-    
+
     private boolean disableMoreArt = false;
     		
 	// screen dragging support
@@ -762,6 +763,7 @@ public class ViewArtActivity
 					RefreshPage(0);
 					RefreshPage(1);
 					RefreshPage(2);
+//					LoadThumbnails(); // moved to SFSubmissionList
 				}
 				
 				@Override
@@ -1324,4 +1326,5 @@ public class ViewArtActivity
 
 		mytoast.show();
 	}
+	
 }

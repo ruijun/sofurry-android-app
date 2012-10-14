@@ -11,6 +11,7 @@ import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ParseBrowseResult;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
+import com.sofurry.mobileapi.downloaders.ThumbnailDownloader;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
 
@@ -29,7 +30,9 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	private ViewSource fSource = ViewSource.all;
 	private String fExtra = null;
 	private ContentType fContentType = ContentType.all;
-	
+
+	private ThumbnailDownloader thumbLoader = null;
+
 	/**
 	 * 
 	 */
@@ -73,5 +76,48 @@ public class SFSubmissionList extends NetworkList<Submission> {
 		// can't do anything here as Request is not cancellable
 	}
 
+	
+	
+	@Override
+	protected void doSuccessNotify(Object job) {
+		super.doSuccessNotify(job);
+		LoadThumbnails();
+	}
 
+	/**
+	 * Start or restart thumbnails loading 
+	 */
+	protected void LoadThumbnails() {
+		StopLoadThumbnails();
+		
+		thumbLoader = new ThumbnailDownloader() {
+			@Override
+			protected void onProgressUpdate(Integer... values) {
+				doProgressNotify(SFSubmissionList.this, values[0], AppConstants.ENTRIESPERPAGE_GALLERY, "");
+			}
+
+			@Override
+			protected void onPostExecute(Integer result) {
+				thumbLoader = null;
+			}
+			
+		};
+		thumbLoader.execute(this);
+	}
+	
+	/**
+	 * Stop loading thumbnails
+	 */
+	protected void StopLoadThumbnails() {
+		if (thumbLoader != null)
+			if (thumbLoader.cancel(false))
+				thumbLoader = null;
+	}
+
+	@Override
+	public void finalize() throws Throwable {
+		StopLoadThumbnails();
+		super.finalize();
+	}
+	
 }
