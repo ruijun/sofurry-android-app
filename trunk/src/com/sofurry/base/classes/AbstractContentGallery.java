@@ -124,7 +124,6 @@ public abstract class AbstractContentGallery<T> extends Activity implements IMan
 		});
 		galleryView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
-			@Override
 			public boolean onItemLongClick(AdapterView parentView, View childView, int position, long id) {
 				return showPreview(position);
 			}

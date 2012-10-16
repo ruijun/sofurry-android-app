@@ -81,7 +81,6 @@ public abstract class AbstractBrowseActivity extends Activity {
 	 * progress messages and dialogs
 	 */
 	private ProgressBarHelper pbh = new ProgressBarHelper(this, new ICanCancel() {
-		@Override
 		public void cancel() {
 			if (fList != null)
 				fList.cancel();
@@ -259,25 +258,21 @@ public abstract class AbstractBrowseActivity extends Activity {
 		if (fList != null) {
 			fList.setStatusListener(new IJobStatusCallback() {
 				
-				@Override
 				public void onSuccess(Object job) {
 					refreshDataView();
 //					LoadThumbnails(); // done by underlying NetworkList
 					onLoadFinish();
 				}
 				
-				@Override
 				public void onStart(Object job) {
 					onLoadStart();
 				}
 				
 				// Called by SFSubmissionList on thumb loading progress
-				@Override
 				public void onProgress(Object job, int progress, int total, String msg) {
 					refreshDataView();
 				}
 				
-				@Override
 				public void onError(Object job, String msg) {
 					onLoadError(msg);
 //					hideProgressDialog();

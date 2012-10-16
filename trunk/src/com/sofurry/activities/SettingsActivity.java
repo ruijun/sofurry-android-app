@@ -47,7 +47,6 @@ public class SettingsActivity
 
         // validate thumb cleanup period value
         getPreferenceScreen().findPreference(AppConstants.PREFERENCE_THUMB_CLEAN_PERIOD).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				try {
 					Integer.parseInt(newValue.toString());
@@ -134,7 +133,6 @@ public class SettingsActivity
         	Utils.showYesNoDialog(this, "Clear thumb cache", 
         						"To reload already cached thumbnails you should clear thumbnails cache. Clear cache?", 
         						new DialogInterface.OnClickListener() { // yes
-									@Override
 									public void onClick(DialogInterface dialog, int which) {
 										// start cleanup in async thread
 										(new AsyncTask<Integer, Integer, Integer>() {
