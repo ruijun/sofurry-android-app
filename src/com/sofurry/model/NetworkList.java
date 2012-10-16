@@ -93,7 +93,6 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 			}
 
 			// post callback to parent thread
-			@Override
 			public void onStart(Object job) {
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
@@ -104,7 +103,6 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				}
 			}
 
-			@Override
 			public void onSuccess(Object job) {
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
@@ -115,7 +113,6 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				}
 			}
 
-			@Override
 			public void onError(Object job, final String msg) {
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
@@ -126,7 +123,6 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				}
 			}
 
-			@Override
 			public void onProgress(Object job, final int progress, final int total, final String msg) {
 				if (mHandler != null) {
 		            mHandler.post(new Runnable() {
@@ -137,7 +133,6 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				}
 			}
 
-			@Override
 			public void cancel() {
 				fParent.doCancel();
 				mHandler = null;

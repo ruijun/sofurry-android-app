@@ -123,7 +123,6 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 		        
 		        ((TextView) infoview.findViewById(R.id.AuthorName)).setText(fTitle);
 		        ((ImageView) infoview.findViewById(R.id.btnBack)).setOnClickListener(new OnClickListener() {
-					@Override
 					public void onClick(View v) {
 						finish();						}
 				});

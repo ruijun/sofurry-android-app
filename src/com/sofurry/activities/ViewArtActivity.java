@@ -766,7 +766,6 @@ public class ViewArtActivity
         if (submissions_list instanceof NetworkList)
         	((NetworkList) submissions_list).setStatusListener(new IJobStatusCallback() {
 				
-				@Override
 				public void onSuccess(Object job) {
 					RefreshPage(0);
 					RefreshPage(1);
@@ -774,16 +773,13 @@ public class ViewArtActivity
 //					LoadThumbnails(); // moved to SFSubmissionList
 				}
 				
-				@Override
 				public void onStart(Object job) {
 					showToast("Loading page...");
 				}
 				
-				@Override
 				public void onProgress(Object job, int progress, int total, String msg) {
 				}
 				
-				@Override
 				public void onError(Object job, String msg) {
 					showToast("Error load page: "+msg);
 				}
