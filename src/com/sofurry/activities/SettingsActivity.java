@@ -48,13 +48,21 @@ public class SettingsActivity
         // validate thumb cleanup period value
         getPreferenceScreen().findPreference(AppConstants.PREFERENCE_THUMB_CLEAN_PERIOD).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
-				try {
-					Integer.parseInt(newValue.toString());
-					return true;
-				}catch(NumberFormatException nfe) {
-					Toast.makeText(SettingsActivity.this, "ERROR: '"+newValue+"' is an invalid number", Toast.LENGTH_SHORT).show();
-					return false;
-				}
+				return checkNumber(newValue);
+			}
+		});
+
+        // validate image cleanup period value
+        getPreferenceScreen().findPreference(AppConstants.PREFERENCE_IMAGE_CLEAN_PERIOD).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				return checkNumber(newValue);
+			}
+		});
+
+        // validate preload items value
+        getPreferenceScreen().findPreference(AppConstants.PREFERENCE_PRELOAD_MAX).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				return checkNumber(newValue);
 			}
 		});
         
@@ -84,8 +92,75 @@ public class SettingsActivity
 				}
 			}
 		});/**/
+
+        // clean thumb now
+        getPreferenceScreen().findPreference(AppConstants.PREFERENCE_CLEAN_THUMB_NOW).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+	        	Utils.showYesNoDialog(SettingsActivity.this, "Clear thumb cache", 
+						"Do you wish to clear ALL thumbnails cache now?", 
+						new DialogInterface.OnClickListener() { // yes
+							public void onClick(DialogInterface dialog, int which) {
+								// start cleanup in async thread
+								(new AsyncTask<Integer, Integer, Integer>() {
+									@Override
+									protected Integer doInBackground(Integer... params) {
+										try {
+											FileStorage.cleanup(FileStorage.getPath(ImageStorage.THUMB_PATH));
+											FileStorage.cleanup(FileStorage.getPath(ImageStorage.AVATAR_PATH));
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+										return null;
+									}
+								}).execute();
+							}
+						}, 
+						null // no
+						);
+				return false;
+			}
+		});
+
+        // clean img cache now
+        getPreferenceScreen().findPreference(AppConstants.PREFERENCE_CLEAN_IMAGE_NOW).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+	        	Utils.showYesNoDialog(SettingsActivity.this, "Clear image cache", 
+						"Do you wish to clear ALL images cache now?", 
+						new DialogInterface.OnClickListener() { // yes
+							public void onClick(DialogInterface dialog, int which) {
+								// start cleanup in async thread
+								(new AsyncTask<Integer, Integer, Integer>() {
+									@Override
+									protected Integer doInBackground(Integer... params) {
+										try {
+											FileStorage.cleanup(FileStorage.getPath(ImageStorage.SUBMISSION_IMAGE_PATH));
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+										return null;
+									}
+								}).execute();
+							}
+						}, 
+						null // no
+						);
+				return false;
+			}
+		});
+
     }
 
+    
+    public boolean checkNumber(Object newValue) {
+		if (Utils.isNumber(newValue))
+			return true;
+		else {
+			Toast.makeText(SettingsActivity.this, "ERROR: '"+newValue+"' is an invalid number", Toast.LENGTH_SHORT).show();
+			return false;
+		}
+    }
     /**
      * Method description
      *

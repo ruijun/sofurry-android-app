@@ -6,9 +6,13 @@ import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.helpers.ProgressBarHelper;
 import com.sofurry.mobileapi.downloaders.ThumbnailDownloader;
+import com.sofurry.mobileapi.downloadmanager.DownloadManager;
+import com.sofurry.mobileapi.downloadmanager.HTTPFileDownloadTask;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
+import com.sofurry.storage.ImageStorage;
 import com.sofurry.storage.NetworkListStorage;
+import com.sofurry.util.Utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,6 +21,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Adapter;
@@ -260,7 +265,6 @@ public abstract class AbstractBrowseActivity extends Activity {
 				
 				public void onSuccess(Object job) {
 					refreshDataView();
-//					LoadThumbnails(); // done by underlying NetworkList
 					onLoadFinish();
 				}
 				
@@ -275,10 +279,76 @@ public abstract class AbstractBrowseActivity extends Activity {
 				
 				public void onError(Object job, String msg) {
 					onLoadError(msg);
-//					hideProgressDialog();
 				}
 			});
 		}
+	}
+	
+	private DownloadManager dlmanager = new DownloadManager(4); //TODO
+	private int dlindex = -1;
+	
+	private void feedLoader() {
+		Submission s = null;
+		do {
+			s = fList.get(dlindex, false);
+			if (s == null)
+				break;
+			if (! s.isSubmissionFileExists())
+				dlmanager.Download(new HTTPFileDownloadTask(
+						s.getFullURL(), ImageStorage.getSubmissionImagePath(s.getCacheName()),
+						null, 15, false, true, null, "text", 3));
+			
+			dlindex++;
+		} while (s != null);
+	}
+
+	public void PreloadItems(final int numItems) {
+		if (fList == null)
+			return;
+
+		if (dlindex <0) {
+
+			// feed downloader with already loaded items
+			dlindex = 0;
+			feedLoader();
+			
+			fList.setStatusListener(new IJobStatusCallback() {
+				public void onSuccess(Object job) {
+					refreshDataView();
+					onLoadFinish();
+					setListCallback(); // reset callback to default
+					
+					feedLoader(); // feed rest of items
+					setListCallback(); // restore callback
+					dlindex = -1; // unlock new preloads
+				}
+				
+				public void onStart(Object job) {
+					onLoadStart();
+				}
+				
+				// Called by SFSubmissionList on thumb loading progress
+				public void onProgress(Object job, int progress, int total, String msg) {
+					if (job instanceof NetworkList) { // progress from load page, skip thumb progress
+						Log.d("[Preload]", "Item "+progress+" of "+total+"done");
+						feedLoader();	// feed downloader on page loaded
+					}
+					refreshDataView();
+				}
+				
+				public void onError(Object job, String msg) {
+					onLoadError(msg);
+					feedLoader();
+					setListCallback();
+					dlindex = -1;
+				}
+			});
+		}
+		
+
+		if (fList.sizeLoaded() < numItems)
+			fList.PreloadItems(numItems);
+		
 	}
 	
 	public void onLoadStart() {
@@ -343,6 +413,10 @@ public abstract class AbstractBrowseActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, AppConstants.MENU_SETTINGS, 10, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
 
+        SubMenu sub = menu.addSubMenu(0,0,20,"More").setIcon(android.R.drawable.ic_menu_more);
+//        sub.add(0, AppConstants.MENU_CLEANTHUMB, 10, "Clean thumnails");
+        sub.add(0, AppConstants.MENU_PRELOAD, 10, "Cache all");
+//        sub.add(0, AppConstants.MENU_DOWNLOAD_ALL, 10, "Download all");
         return super.onCreateOptionsMenu(menu);
 	}
 
@@ -352,6 +426,12 @@ public abstract class AbstractBrowseActivity extends Activity {
 			case AppConstants.MENU_SETTINGS:
 				Intent intent = new Intent(this, SettingsActivity.class);
 				startActivity(intent);
+				return true;
+				
+			case AppConstants.MENU_PRELOAD:
+				Integer i = Integer.parseInt(Utils.getPreferences(this).getString(AppConstants.PREFERENCE_PRELOAD_MAX, "200"));
+				if (i != null)
+					PreloadItems(i);
 				return true;
 				
             default:

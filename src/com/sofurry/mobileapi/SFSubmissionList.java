@@ -26,6 +26,7 @@ public class SFSubmissionList extends NetworkList<Submission> {
 
 	private int currentPage = -1;
 	private int totalPages = -1;
+	private boolean fFinalPage = false;
 	
 	private ViewSource fSource = ViewSource.all;
 	private String fExtra = null;
@@ -79,9 +80,14 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	
 	
 	@Override
+	protected void doPageLoaded(int numItems) {
+		super.doPageLoaded(numItems);
+		LoadThumbnails();
+	}
+
+	@Override
 	protected void doSuccessNotify(Object job) {
 		super.doSuccessNotify(job);
-		LoadThumbnails();
 	}
 
 	/**
@@ -93,7 +99,7 @@ public class SFSubmissionList extends NetworkList<Submission> {
 		thumbLoader = new ThumbnailDownloader() {
 			@Override
 			protected void onProgressUpdate(Integer... values) {
-				doProgressNotify(SFSubmissionList.this, values[0], AppConstants.ENTRIESPERPAGE_GALLERY, "");
+				doProgressNotify(this, values[0], sizeLoaded(), "");
 			}
 
 			@Override

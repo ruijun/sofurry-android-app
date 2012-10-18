@@ -61,35 +61,67 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		private class AsyncPageLoader extends Thread implements IJobStatusCallback, ICanCancel {
 			public volatile Handler mHandler = null;
 			private NetworkList<T> fParent = null;
+			private int itemsRequested = -1;
+			private boolean isCancelled = false;
 			
 			public AsyncPageLoader(NetworkList<T> aParent) {
+				this(aParent, -1);
+			}
+			
+			public AsyncPageLoader(NetworkList<T> aParent, int itemsRequested) {
 				super("NetList: Page Loader");
 				Log.d("[NetList]", "--------------------------=== Create loader");
 				this.fParent = aParent; // do fParent become a working copy of parent thread object when worker thread starts?
 				this.mHandler = new Handler();
+				this.itemsRequested = itemsRequested;
 			}
 
+			public void setItemsRequested(int numItems) {
+				synchronized (this) {
+					itemsRequested = numItems;
+				}
+			}
+			
 			@Override
 			public void run() {
-				Log.d("[NetList]", "=== Start thread");
+				Log.d("[NetList]", "=== Start Loader");
 				fAsyncLoader = fParent.fAsyncLoader;
 
 				try {
-//					isWorkerThread = true;
-//					fLoading = true;
 					// should we set fParent.fLoadingStatusListener = this ? and fix runnables to refer parent thread fLoadingStatusListener variable?
 					
 					onStart(this);
-					fParent.doLoadNextPage(this); // should we pass fParent here to check cancelLoadFlag between different threads?
-					onSuccess(this);
+					do {
+						fParent.doLoadNextPage(this); 
+						
+						onPageLoaded(itemsRequested);
+
+						// page loaded. Should we continue loading more pages?
+						synchronized (this) { // Synchronize with this instance of loader while finishing load
+							// block change itemsRquested and check fAsyncLoader 
+							// while handle current value and set fAsyncLoader
+							if ( 	(isFinalPage()) ||
+									(isCancelled) || 
+									(itemsRequested <= 0) || // no multiple pages requested
+									(sizeLoaded() >= itemsRequested) ) { // done loading requested amount of items
+										onSuccess(this);
+										fParent.fAsyncLoader = null;
+										fAsyncLoader = null;
+										Log.d("[NetList]", "=== End Loader success");
+										return;
+									}
+						}
+					} while (! isCancelled); // retry if finish conditions don't met and not cancelled
+
 				} catch (Exception e) {
-					onError(fParent, e.getMessage());
+					synchronized (this) { // synchronise with this instance of loader while finishing load
+						onError(fParent, e.getMessage());
+						fParent.fAsyncLoader = null;
+						fAsyncLoader = null;
+						Log.d("[NetList]", "=== End Loader with error");
+					}
 				}
 				
-//				fLoading = false;
-				fParent.fAsyncLoader = null;
-				fAsyncLoader = null;
-				Log.d("[NetList]", "=== End thread");
 			}
 
 			// post callback to parent thread
@@ -98,6 +130,16 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		            mHandler.post(new Runnable() {
 		                public void run() { // should we use fParent here or just refer to parent object variable?
 		                	fParent.doStartNotify(fParent);
+		                }
+		            });
+				}
+			}
+
+			public void onPageLoaded(final int numItems) {
+				if (mHandler != null) {
+		            mHandler.post(new Runnable() {
+		                public void run() {
+		                	fParent.doPageLoaded(numItems);
 		                }
 		            });
 				}
@@ -140,6 +182,14 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 
 		} // end of class AsyncPageLoader
 
+		/**
+		 * action when page load finished
+		 * @param numItems - total requested num items to load ( <=0 - load one page)
+		 */
+		protected void doPageLoaded(int numItems) {
+			doProgressNotify(this, sizeLoaded(), numItems, "");
+		}
+		
 		/**
 		 * allow descendants to override load status actions
 		 * @param job
@@ -191,7 +241,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * @param index
 		 * @param object
 		 */
-		private void doadd(int index, T object) {
+/*		private void doadd(int index, T object) {
 			super.add(index, object);
 		}
 		
@@ -217,7 +267,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * @param object
 		 * @return
 		 */
-		private boolean doadd(T object) {
+/*		private boolean doadd(T object) {
 			return super.add(object);
 		}
 
@@ -243,7 +293,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * @param collection
 		 * @return
 		 */
-		private boolean doaddAll(Collection<? extends T> collection) {
+/*		private boolean doaddAll(Collection<? extends T> collection) {
 			return super.addAll(collection);
 		}
 
@@ -270,7 +320,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * @param collection
 		 * @return
 		 */
-		private boolean doaddAll(int location, Collection<? extends T> collection) {
+/*		private boolean doaddAll(int location, Collection<? extends T> collection) {
 			return super.addAll(location, collection);
 		}
 
@@ -290,7 +340,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
           		return doaddAll(location, collection);
 			}
 		}
-
+/**/
 	
 		@Override
 		public T get(int index) {
@@ -306,7 +356,6 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 			if (aIndex < super.size()) {
 				if (super.size() - aIndex - 1 < preloadCount) {
 					if ( (!isLoading()) && allowLoad ) {
-						// "    fLoading="+fLoading+
 						Log.d("[NetList]", ">>>>> NextPage request (preload): index="+aIndex+"   fAsyncLoader: "+(fAsyncLoader == null));
 						AsyncLoadNextPage();
 					}
@@ -352,7 +401,13 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 */
 		public Boolean isLoading() {
 //			return (fLoading) && (fAsyncLoader != null) && (fAsyncLoader.isAlive());
-			return (fAsyncLoader != null);
+			
+			if (fAsyncLoader != null) {
+				synchronized (fAsyncLoader) {
+					return (fAsyncLoader != null); // should we synchronize(fAsyncLoader) this? 
+				}
+			} else
+				return false;
 		}
 		
 		/**
@@ -378,8 +433,15 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * Load items page in worker thread
 		 */
 		private void AsyncLoadNextPage() {
+			AsyncLoadNextPage(-1);
+		}
+		
+		/**
+		 * Load items page in worker thread until list contain less than numItems or EOF
+		 */
+		private void AsyncLoadNextPage(int numItems) {
 			if  ( (! isLoading()) && (! isFinalPage()) ) {
-				fAsyncLoader = new AsyncPageLoader(this);
+				fAsyncLoader = new AsyncPageLoader(this, numItems);
 				fAsyncLoader.start();
 			}
 		}
@@ -403,7 +465,8 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		/**
 		 * perform cancel load page request. Called inside worker thread.
 		 */
-		protected abstract void doCancel(); 
+		protected void doCancel() {
+		}
 
 		// ID of this list for ListsStorage
 		private long fListId = System.currentTimeMillis();
@@ -414,8 +477,26 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		
 		
 		private IJobStatusCallback fLoadingStatusListener = null;
-
-		public void setStatusListener(IJobStatusCallback ALoadStatusListener) {
-			fLoadingStatusListener = ALoadStatusListener;
+		
+		public synchronized void setStatusListener(IJobStatusCallback ALoadStatusListener) {  // don't do this simultaneously with storing/restoring callback methods
+				fLoadingStatusListener = ALoadStatusListener;
+		}
+		
+		public synchronized void PreloadItems(int numItems) { // dont start until we finish set callback
+			if (fAsyncLoader != null){
+				synchronized (fAsyncLoader) { 
+					//  if asyncLoader checking/finishing thread wait before isLoading() check
+					// if we changing numItems then async loader should wait to start checks
+					if (isLoading()) {
+						// set numItems so AsyncLoader will continue
+						if (fAsyncLoader != null)
+							fAsyncLoader.setItemsRequested(numItems);
+					} else {
+						// start new loader
+						AsyncLoadNextPage(numItems);
+					}
+				};
+			} else
+				AsyncLoadNextPage(numItems);
 		}
 }

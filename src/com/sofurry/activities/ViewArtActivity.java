@@ -93,6 +93,8 @@ public class ViewArtActivity
 		private AsyncImageLoader imageLoader = null;
 		private boolean mustLoadImage = false;
 		
+		private boolean retryingImageLoad = false;
+		
 		private Context context = null;
 		
 		public PageHolder(Context c) {
@@ -183,7 +185,8 @@ public class ViewArtActivity
         	HQIndicator.setTextColor(Color.parseColor("#2C2C2C"));
 			HQIndicator.setVisibility(View.VISIBLE);
         	
-        	
+			retryingImageLoad = false;
+			
         	// use only cached HQ images (do not download) until click if preference set
 //            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             boolean allowDL = ! Utils.getPreferences(context).getBoolean(AppConstants.PREFERENCE_IMAGE_CLICK_TO_LOAD, true); 
@@ -303,6 +306,18 @@ public class ViewArtActivity
 				else
 				if (mustLoadImage) // bitmap load was requested while AsyncLoad was already started
 					startImageLoader(true, false); // download should be allowed on first stage. retry bmp load. do not retry download.
+				else
+				if (submission.isSubmissionFileExists()) {
+					if (! retryingImageLoad) {
+						retryingImageLoad = true;
+						// unload images to free mem
+						pages.get(0).unloadPic();
+						pages.get(1).unloadPic();
+						pages.get(2).unloadPic();
+						startImageLoader(true, false); // retry load from file
+					} else
+						showToast("Error load image from file");
+				}
 					
 				return;
 			}

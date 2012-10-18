@@ -321,8 +321,14 @@ public class MainMenuActivity
 					try {
 				        SharedPreferences prefs        = PreferenceManager.getDefaultSharedPreferences(MainMenuActivity.this);
 				        int days = Integer.parseInt(prefs.getString(AppConstants.PREFERENCE_THUMB_CLEAN_PERIOD, "3"));
-				        if (days >= 0)
+				        if (days >= 0) {
 				        	FileStorage.cleanold(FileStorage.getPath(ImageStorage.THUMB_PATH)+"/", days);
+				        	FileStorage.cleanold(FileStorage.getPath(ImageStorage.AVATAR_PATH)+"/", days);
+				        }
+				        days = Integer.parseInt(prefs.getString(AppConstants.PREFERENCE_IMAGE_CLEAN_PERIOD, "1"));
+				        if (days >= 0) {
+				        	FileStorage.cleanold(FileStorage.getPath(ImageStorage.SUBMISSION_IMAGE_PATH)+"/", days);
+				        }
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

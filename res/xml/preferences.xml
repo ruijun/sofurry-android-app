@@ -19,7 +19,7 @@
 			android:inputType="textPassword" />
 	</PreferenceCategory>
 	<PreferenceCategory
-		android:title="Misc Settings"
+		android:title="PM Settings"
 	>
 		<CheckBoxPreference
 			android:key="pmEnableChecks"
@@ -57,34 +57,39 @@
 		    android:defaultValue="true" 
 		    android:key="delete_incomplete_files" 
 		    android:title="Delete incomplete downloaded files"/>
+		
+		
 	</PreferenceCategory>
+	
+	<PreferenceCategory android:title="Submission Browser">
+	    <CheckBoxPreference android:summaryOff="Use original thumbnails" android:defaultValue="true" android:key="use_custom_thumbs" android:title="Use custom thumbnails" android:summaryOn="Use custom thumbnails" />
+	    <CheckBoxPreference android:defaultValue="true" android:key="imgCheckSaved" android:title="Show if image already saved in library" android:summaryOn="Will show saved status" android:summaryOff="Will NOT show saved status" />
+	    <com.sofurry.SeekBarPreference android:dialogMessage="Art gallery thimbnail size" android:key="art_gallery_thumbnail_size" android:summary="Art gallery thimbnail size" android:text=" minutes" sofurry:min="64" sofurry:defaultValue="130" sofurry:max="255" android:title="Thumbnail size" />
+	    <EditTextPreference android:title="Maximum items to preload" android:defaultValue="200" android:key="preload_max_items" android:summary='Number of items for "Preload items" feature' />
+	</PreferenceCategory>
+	
 	<PreferenceCategory android:title="Submission Viewer">
 	    <CheckBoxPreference android:summaryOn="Load library images" android:summaryOff="Download image" android:summary="Try use library image before download" android:title="Show images from library" android:key="imgLoadFromLib" android:defaultValue="true" />
 	    <ListPreference android:key="useHDImg" android:entries="@array/useHD_titles" android:entryValues="@array/useHD_values" android:title="Use HD images" android:dialogTitle="Choose when to use HD images" android:summary="Controls when to download HD images" android:defaultValue="0"></ListPreference>
 		<CheckBoxPreference android:summaryOn="Manual load HQ image" android:title="Click to load HQ image" android:summaryOff="Auto load HQ image" android:key="load_hd_on_click" android:defaultValue="true" />
-		<CheckBoxPreference android:defaultValue="true" android:key="imgCheckSaved" android:title="Show if image already saved in library" android:summaryOn="Will show saved status" android:summaryOff="Will NOT show saved status" />
+		
 		
 		<PreferenceScreen android:title="Side menu settings">
 		    <ListPreference android:title="Side menu position" android:key="imgMenuPosition" android:entries="@array/imgMenuPosition_titles" android:summary="position of always visible fast buttons bar" android:dialogTitle="Choose menu bar position" android:defaultValue="1" android:entryValues="@array/imgMenuPosition_values"></ListPreference>
-		    <PreferenceCategory android:title="Buttons"><CheckBoxPreference android:key="art_menu_back" android:title="Back button" android:defaultValue="true" /><CheckBoxPreference android:key="art_menu_save" android:title="Save button" android:defaultValue="true" /><CheckBoxPreference android:key="art_menu_watch" android:title="Watch button" android:defaultValue="true"/><CheckBoxPreference android:defaultValue="true" android:key="art_menu_fav" android:title="Fav button" /><CheckBoxPreference android:key="art_menu_more" android:title="More art button" android:defaultValue="true" />
-		    
-</PreferenceCategory>
-			
-			
-			
-			
+		    <PreferenceCategory android:title="Buttons">
+		        <CheckBoxPreference android:key="art_menu_back" android:title="Back button" android:defaultValue="true" />
+		        <CheckBoxPreference android:key="art_menu_save" android:title="Save button" android:defaultValue="true" />
+		        <CheckBoxPreference android:key="art_menu_watch" android:title="Watch button" android:defaultValue="true"/>
+		        <CheckBoxPreference android:defaultValue="true" android:key="art_menu_fav" android:title="Fav button" />
+		        <CheckBoxPreference android:key="art_menu_more" android:title="More art button" android:defaultValue="true" />
+			</PreferenceCategory>
 		</PreferenceScreen>
 	</PreferenceCategory>
-	<PreferenceCategory android:title="Thumbnails">
-	    <CheckBoxPreference android:summaryOff="Use original thumbnails" android:defaultValue="true" android:key="use_custom_thumbs" android:title="Use custom thumbnails" android:summaryOn="Use custom thumbnails" />
+	<PreferenceCategory android:title="Cache">
 	    <EditTextPreference android:key="thumb_cleanup_period" android:title="Delete thumbnails older than ... days (0=all, -1 = disabled)" android:defaultValue="3" />
-		<com.sofurry.SeekBarPreference 
-		    android:dialogMessage="Art gallery thimbnail size" 
-		    android:key="art_gallery_thumbnail_size" 
-		    android:summary="Art gallery thimbnail size" 
-		    android:text=" minutes" sofurry:min="64" 
-		    sofurry:defaultValue="130" 
-		    sofurry:max="255" 
-		    android:title="Thumbnail size" />
+	    <EditTextPreference android:key="image_cleanup_period" android:title="Delete image cache older than ... days (0=all, -1 = disabled)" android:defaultValue="1" />
+	    <Preference android:title="Clean thumbnails NOW" android:key="thumb_clean_now"/>
+	    <Preference android:title="Clean image cache NOW" android:key="img_clean_now"/>
+	    		
 	</PreferenceCategory>
 </PreferenceScreen>
