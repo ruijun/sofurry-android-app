@@ -10,8 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.preference.PreferenceManager;
-
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IHasThumbnail;
 import com.sofurry.mobileapi.ApiFactory;
