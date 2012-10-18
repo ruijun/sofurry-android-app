@@ -17,4 +17,6 @@
 	<string name="app_name_rater">SoFurry | Rating</string>
 	<string name="app_name_tageditor">SoFurry | TagEditor</string>
 	<string name="app_name_sendpm">SoFurry | Send PM</string>
+	<string name="loginlabel">Log in</string>
+	<string name="username">SoFurry Username</string>
 </resources>

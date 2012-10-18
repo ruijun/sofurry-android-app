@@ -43,9 +43,6 @@ import com.sofurry.util.Utils;
  */
 public class MainMenuActivity
         extends ActivityWithRequests {
-    private Button  buttonChat_;
-    private Button  buttonForums_;
-    private Button  buttonLogbook_;
     private Button  buttonPMs_;
 //    private boolean mustReloadAuthInfo_ = true;
     private int     messageCount_       = -1;
@@ -137,15 +134,12 @@ public class MainMenuActivity
     	try {
 			if (! AuthenticationHandler.useAuthentication(this)) {
 				buttonPMs_.setEnabled(false);
-			    buttonChat_.setEnabled(false);
 			} else {
 			    buttonPMs_.setEnabled(true);
-			    buttonChat_.setEnabled(true);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			buttonPMs_.setEnabled(false);
-		    buttonChat_.setEnabled(false);
 		}
     }
 
@@ -285,14 +279,18 @@ public class MainMenuActivity
         setContentView(R.layout.mainmenu_with_profile);
 
         // Find the buttons we'll be using
+        Object buttonChat_ = findViewById(R.id.chat);
         buttonPMs_     = (Button) findViewById(R.id.pms);
-        buttonChat_    = (Button) findViewById(R.id.chat);
-        buttonLogbook_ = (Button) findViewById(R.id.logbook);
-        buttonForums_  = (Button) findViewById(R.id.forums);
+        Object buttonLogbook_ = findViewById(R.id.logbook);
+        Object buttonForums_  = findViewById(R.id.forums);
 
         // Disable forums and logbook buttons for now
-        buttonForums_.setEnabled(false);
-        buttonLogbook_.setEnabled(false);
+        if (buttonChat_ != null)
+        	((Button)buttonChat_).setEnabled(false);
+        if (buttonForums_ != null)
+        	((Button)buttonForums_).setEnabled(false);
+        if (buttonLogbook_ != null)
+        	((Button)buttonLogbook_).setEnabled(false);
 
         // Disable buttons as need be
         checkButtonDisabledState();
@@ -424,22 +422,4 @@ public class MainMenuActivity
         buttonPMs_.setText("PMs (" + messageCount_ + ")");
     }
 
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @return
-//     */
-//    protected AjaxRequest getCheckParameters() {
-//        AjaxRequest req = new AjaxRequest();
-//
-//        // Set request parameters
-//        req.addParameter("f", "unreadpmcount");
-//
-//        // Set request ID
-//        req.setRequestID(AppConstants.REQUEST_ID_FETCHDATA);
-//
-//        // Return result
-//        return req;
-//    }
 }
