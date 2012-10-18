@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,7 +26,6 @@ import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.core.AuthenticationHandler;
 import com.sofurry.mobileapi.core.Request;
-import com.sofurry.mobileapi.downloaders.ContentDownloader;
 import com.sofurry.requests.AndroidRequestWrapper;
 import com.sofurry.requests.DataCall;
 import com.sofurry.storage.FileStorage;
@@ -134,12 +132,15 @@ public class MainMenuActivity
     	try {
 			if (! AuthenticationHandler.useAuthentication(this)) {
 				buttonPMs_.setEnabled(false);
+//		        setButtonEnabled(R.id.chat, false);
 			} else {
 			    buttonPMs_.setEnabled(true);
+//		        setButtonEnabled(R.id.chat, true);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			buttonPMs_.setEnabled(false);
+//	        setButtonEnabled(R.id.chat, false);
 		}
     }
 
@@ -279,18 +280,12 @@ public class MainMenuActivity
         setContentView(R.layout.mainmenu_with_profile);
 
         // Find the buttons we'll be using
-        Object buttonChat_ = findViewById(R.id.chat);
         buttonPMs_     = (Button) findViewById(R.id.pms);
-        Object buttonLogbook_ = findViewById(R.id.logbook);
-        Object buttonForums_  = findViewById(R.id.forums);
 
-        // Disable forums and logbook buttons for now
-        if (buttonChat_ != null)
-        	((Button)buttonChat_).setEnabled(false);
-        if (buttonForums_ != null)
-        	((Button)buttonForums_).setEnabled(false);
-        if (buttonLogbook_ != null)
-        	((Button)buttonLogbook_).setEnabled(false);
+        // disable currently unused buttons
+        setButtonEnabled(R.id.chat, false);
+        setButtonEnabled(R.id.logbook, false);
+        setButtonEnabled(R.id.forums, false);
 
         // Disable buttons as need be
         checkButtonDisabledState();
@@ -422,4 +417,9 @@ public class MainMenuActivity
         buttonPMs_.setText("PMs (" + messageCount_ + ")");
     }
 
+    public void setButtonEnabled(int id, boolean enabled) {
+        View v  = findViewById(id);
+        if (v instanceof Button)
+        	((Button) v).setEnabled(enabled);
+    }
 }
