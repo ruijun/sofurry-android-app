@@ -67,7 +67,7 @@
 			android:layout_weight="1"
 			android:layout_marginTop="20dip"
 			android:text="Chat"
-			android:drawableTop="@drawable/menuchat" />
+			android:drawableTop="@drawable/menuchat" android:visibility="invisible"/>
 		<Button
 			android:id="@+id/forums"
 			android:onClick="buttonClick"
@@ -77,7 +77,7 @@
 			android:layout_weight="1"
 			android:layout_marginTop="20dip"
 			android:text="Forums"
-			android:drawableTop="@drawable/menuforums" />
+			android:drawableTop="@drawable/menuforums" android:visibility="invisible"/>
 		<Button
 			android:id="@+id/logbook"
 			android:onClick="buttonClick"
@@ -87,7 +87,7 @@
 			android:layout_weight="1"
 			android:layout_marginTop="20dip"
 			android:text="Notes"
-			android:drawableTop="@drawable/menumessages" />
+			android:drawableTop="@drawable/menumessages" android:visibility="invisible"/>
 		<Button
 			android:id="@+id/pms"
 			android:onClick="buttonClick"
@@ -97,7 +97,7 @@
 			android:layout_weight="1"
 			android:layout_marginTop="20dip"
 			android:text="PMs"
-			android:drawableTop="@drawable/menumessages" />
+			android:drawableTop="@drawable/menumessages" android:visibility="invisible"/>
 	</LinearLayout>
 	<LinearLayout
 		android:orientation="horizontal"
@@ -105,13 +105,11 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 	>
-		<Button
-			android:layout_height="wrap_content"
-			android:id="@+id/settings"
-			android:onClick="buttonClick"
-			android:layout_marginTop="20dip"
-			android:text="Settings"
-			android:layout_width="fill_parent"
-			android:layout_weight="1" />
+		<TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/loginLabel" android:text="@string/loginlabel"></TextView>
 	</LinearLayout>
+	<EditText android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/mainUsername" android:hint="Username">
+	</EditText>
+	<EditText android:layout_width="fill_parent" android:layout_height="wrap_content" android:inputType="textPassword" android:id="@+id/mainPassword" android:hint="Password"></EditText>
+	<Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/mainLoginButton" android:text="@string/loginlabel"></Button>
+	<Button android:onClick="buttonClick" android:layout_marginTop="20dip" android:id="@+id/settings" android:text="Settings" android:layout_width="fill_parent" android:layout_height="wrap_content"></Button>
 </LinearLayout>
