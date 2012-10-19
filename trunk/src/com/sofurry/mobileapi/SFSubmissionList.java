@@ -92,7 +92,7 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	}
 
 	// ====================== THUMB DOWNLOAD ======================
-	private DownloadManager thumbLoader = new DownloadManager(4);
+	private DownloadManager thumbLoader = new DownloadManager(5);
 	private int thumbIndex = 0;
 
 	/**

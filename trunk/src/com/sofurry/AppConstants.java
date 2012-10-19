@@ -151,6 +151,7 @@ public class AppConstants {
     public static final int MENU_WATCH                     = 4206;
     public static final int MENU_CLEANTHUMB                = 5001;
     public static final int MENU_PRELOAD                   = 5002;
+    public static final int MENU_OPEN_BROWSER              = 5003;
 
     /**
      * Notification ID for Private Messages
