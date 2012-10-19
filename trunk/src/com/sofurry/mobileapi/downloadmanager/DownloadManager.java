@@ -1,10 +1,8 @@
 package com.sofurry.mobileapi.downloadmanager;
 
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import com.sofurry.util.CancellingThreadFactory;
 
 /**
  * Manage list of downloads. Support multithread downloading;
@@ -15,8 +13,9 @@ public class DownloadManager {
 
 	public DownloadManager(int numThreads) {
 		super();
-		// a bit of hack as newFixedThreadPool gives no warranty to return ThreadPoolExecutor not just ExecutorService
-		pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads, new CancellingThreadFactory());
+		pool = new ThreadPoolExecutor(numThreads, numThreads,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>());
 	}
 	
 	public void setNumThreads(int numThreads) {

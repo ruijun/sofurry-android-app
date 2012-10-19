@@ -130,7 +130,14 @@ public class Submission implements Serializable, IHasThumbnail {
 		}
 	}
 
-/*	public void storeIcon() throws Exception {
+	public String getThumbnailPath() {
+		if (type == ContentType.art)
+			return ImageStorage.getSubmissionIconPath(getId());
+		else
+			return ImageStorage.getUserIconPath(getAuthorID());
+	}
+
+	/*	public void storeIcon() throws Exception {
 		if (type == SUBMISSION_TYPE.ARTWORK) {
 			ImageStorage.saveSubmissionIcon(getId(), thumbnail);
 		} else {
