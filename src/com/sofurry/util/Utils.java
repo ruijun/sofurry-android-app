@@ -9,17 +9,20 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
+import android.text.ClipboardManager;
 import android.util.TypedValue;
 import android.widget.Toast;
 
 
 public class Utils {
 	private static SharedPreferences pref = null;
-	private static ConnectivityManager cm = null;
+	private static ConnectivityManager ConnectMan = null;
+	private static ClipboardManager ClipMan = null;
 	
 	public static void initUtils(Context context) {
 		pref = PreferenceManager.getDefaultSharedPreferences(context);
-		cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectMan = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		ClipMan = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
 	}
 	
 	public static SharedPreferences getPreferences() {
@@ -76,19 +79,30 @@ public class Utils {
 		}
     }
 
-	public boolean isOnline() {
+	public static boolean isOnline() {
 		return isOnline(null);
 	}
 	
-	public boolean isOnline(Context context) {
+	public static boolean isOnline(Context context) {
 		if (context != null)
 			initUtils(context);
 		
-	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
+	    NetworkInfo netInfo = ConnectMan.getActiveNetworkInfo();
 	    if (netInfo != null && netInfo.isConnectedOrConnecting()) {
 	        return true;
 	    }
 	    return false;
 	}
 
+	public static void setClipboardText(String txt) {
+		setClipboardText(null, txt);
+	}
+	
+	public static void setClipboardText(Context context, String txt) {
+		if (context != null)
+			initUtils(context);
+
+		if (ClipMan != null)
+			ClipMan.setText(txt);
+	}
 }

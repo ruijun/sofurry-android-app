@@ -1,6 +1,7 @@
 package com.sofurry.base.classes;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +19,7 @@ import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.requests.AndroidRequestWrapper;
 import com.sofurry.requests.DataCall;
+import com.sofurry.util.Utils;
 
 /**
  * @author Rangarig
@@ -38,6 +40,7 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 		favsmenu.add(0,AppConstants.MENU_ADDFAV ,0,"Add Fav").setIcon(android.R.drawable.ic_menu_add);
 		favsmenu.add(0,AppConstants.MENU_REMFAV ,0,"Remove Fav").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		favsmenu.add(0,AppConstants.MENU_RATE   ,0,"Rate").setIcon(android.R.drawable.btn_star_big_off);
+		favsmenu.add(0,AppConstants.MENU_OPEN_BROWSER ,0,"Open in Browser");
 		SubMenu usermenu = menu.addSubMenu(0, 0, 20, "Author").setIcon(android.R.drawable.ic_menu_more);
 		usermenu.add(0, AppConstants.MENU_WATCH   ,0,"Watch").setIcon(android.R.drawable.ic_menu_search);
 		usermenu.add(0, AppConstants.MENU_UNWATCH   ,0,"Unwatch").setIcon(android.R.drawable.ic_menu_delete);
@@ -72,6 +75,11 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 			return true;
 		case AppConstants.MENU_USERSMUSIK:
 			morefromuser(ListMusicActivity.class,AppConstants.ACTIVITY_MUSICLIST);
+			return true;
+		case AppConstants.MENU_OPEN_BROWSER:
+//			Utils.setClipboardText(this, ApiFactory.getSubmissionViewPageURL(pageID));
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ApiFactory.getSubmissionViewPageURL(pageID)));
+			startActivity(browserIntent);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

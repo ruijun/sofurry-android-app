@@ -245,6 +245,10 @@ public final class ApiFactory {
 		return RESOURCE_URL + "/avatar?user="+id;
 	}
 	
+	public static String getSubmissionViewPageURL(int id) {
+		return "http://www.sofurry.com/view/"+id;
+	}
+	
 	/**
 	 * Load user icon. Contains synchronous web download
 	 * @param userID
