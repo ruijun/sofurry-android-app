@@ -12,12 +12,15 @@ import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
 import com.sofurry.storage.ImageStorage;
 import com.sofurry.storage.NetworkListStorage;
+import com.sofurry.util.NotificationHelper;
 import com.sofurry.util.Utils;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,9 +58,46 @@ public abstract class AbstractBrowseActivity extends Activity {
 	protected abstract AdapterView getDataView();
 	
 	/**
+	 * Lock excess refreshDataView calls
+	 */
+	private boolean refreshLock = false;
+	private boolean refreshRequested = false;
+	private Handler refreshLockHandler = new Handler() {
+        public void handleMessage(Message m) {
+        	refreshLock = false;
+        	if (refreshRequested)
+        		refreshDataView();
+        }
+    };
+
+	/**
 	 * Refresh display to show changes in list
 	 */
 	protected synchronized void refreshDataView() {
+		// block excess refresh calls.
+		// this done as delayed message as we should not loose refresh requests.
+		// We just join all excess requests in to one delayed call 
+		if (refreshLock) {
+			refreshRequested = true;
+			return;
+		}
+		
+		refreshLock = true;
+		refreshRequested = false;
+		
+        Message m = new Message();
+        refreshLockHandler.sendMessageDelayed(m, 2000);
+        
+        doRefreshDataView();
+	}
+
+	/**
+	 * do actual job on refresh display changes in list
+	 * Descendants should override this method instead of refreshDataView
+	 */
+    protected synchronized void doRefreshDataView() {
+        
+        // perform refresh
 		if ((myAdapter != null) && (myAdapter instanceof BaseAdapter))
 			((BaseAdapter) myAdapter).notifyDataSetChanged();
 
@@ -66,7 +106,6 @@ public abstract class AbstractBrowseActivity extends Activity {
 				((AbsListView) fDataView).invalidateViews();
 			else
 				fDataView.invalidate(); // used instead of invalidateViews
-			
 		}
 	}
 
@@ -129,7 +168,7 @@ public abstract class AbstractBrowseActivity extends Activity {
 			setList(createBrowseList());
 
 		if (fDataView != null) {
-			// TODO set forward preload count to fList
+			// TODO set forward preload count to fList (set number of items till end of list that trigger next page load)
 
 			fDataView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				public void onItemClick(AdapterView parentView, View childView, int position, long id) {
@@ -284,7 +323,8 @@ public abstract class AbstractBrowseActivity extends Activity {
 		}
 	}
 	
-	private DownloadManager dlmanager = new DownloadManager(4); //TODO
+	private DownloadManager dlmanager = new DownloadManager(4); //TODO number of threads setting
+//	private NotificationHelper notification = new NotificationHelper(this); 
 	private int dlindex = -1;
 	
 	private void feedLoader() {

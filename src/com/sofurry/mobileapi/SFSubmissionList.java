@@ -12,8 +12,11 @@ import com.sofurry.mobileapi.ApiFactory.ParseBrowseResult;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.mobileapi.downloaders.ThumbnailDownloader;
+import com.sofurry.mobileapi.downloadmanager.DownloadManager;
+import com.sofurry.mobileapi.downloadmanager.HTTPFileDownloadTask;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
+import com.sofurry.storage.ImageStorage;
 
 /**
  * Implementation of SoFurry Submission List
@@ -31,8 +34,6 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	private ViewSource fSource = ViewSource.all;
 	private String fExtra = null;
 	private ContentType fContentType = ContentType.all;
-
-	private ThumbnailDownloader thumbLoader = null;
 
 	/**
 	 * 
@@ -90,9 +91,42 @@ public class SFSubmissionList extends NetworkList<Submission> {
 		super.doSuccessNotify(job);
 	}
 
+	// ====================== THUMB DOWNLOAD ======================
+	private DownloadManager thumbLoader = new DownloadManager(4);
+	private int thumbIndex = 0;
+
 	/**
 	 * Start or restart thumbnails loading 
 	 */
+	protected void LoadThumbnails() {
+		Submission s = null;
+		while ( (s = get(thumbIndex, false)) != null) {
+			if (! s.checkThumbnail())
+				thumbLoader.Download(new HTTPFileDownloadTask(
+						s.getThumbURL(), s.getThumbnailPath(),
+						new IJobStatusCallback() {
+							
+							@Override
+							public void onSuccess(Object job) {
+								doProgressNotify(job, 0, 0, "");
+							}
+							
+							public void onStart(Object job) {
+							}
+							
+							public void onProgress(Object job, int progress, int total, String msg) {
+							}
+							
+							public void onError(Object job, String msg) {
+							}
+						}, 
+						10, false, true, null, "text", s.getThumbAttempts()));
+			thumbIndex++;
+		}
+	}
+	
+/*	private ThumbnailDownloader thumbLoader = null;
+
 	protected void LoadThumbnails() {
 		StopLoadThumbnails();
 		
@@ -114,15 +148,16 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	/**
 	 * Stop loading thumbnails
 	 */
-	protected void StopLoadThumbnails() {
+/*	protected void StopLoadThumbnails() {
 		if (thumbLoader != null)
 			if (thumbLoader.cancel(false))
 				thumbLoader = null;
 	}
-
+/**/
+	
 	@Override
 	public void finalize() throws Throwable {
-		StopLoadThumbnails();
+//		StopLoadThumbnails();
 		super.finalize();
 	}
 	
