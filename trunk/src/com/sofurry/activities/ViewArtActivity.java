@@ -782,7 +782,7 @@ public class ViewArtActivity
 
         switch (id) {
         	case R.id.ArtistGalleryButton:
-                morefromuser(GalleryArtActivity.class,AppConstants.ACTIVITY_GALLERYART);
+                morefromuser(AppConstants.ACTIVITY_GALLERYART);
         		break;
 
         	case R.id.SaveBtn:
@@ -824,6 +824,10 @@ public class ViewArtActivity
 
     @Override
     public void finish() {
+    	FixedViewFlipper imageFlipper = (FixedViewFlipper) findViewById(R.id.viewFlipper1);
+    	if (imageFlipper != null)
+    		imageFlipper.setOnTouchListener(null);
+    	
     	if (submissions_list instanceof NetworkList)
         	((NetworkList) submissions_list).setStatusListener(null);
     	
@@ -1082,9 +1086,14 @@ public class ViewArtActivity
 	}
 
 	public void getViewPosition(PointF offset) {
-    	View centerview = pages.get(curpageId).myview;
-    	offset.x = centerview.getLeft();
-    	offset.y = centerview.getTop();
+		try {
+	    	View centerview = pages.get(curpageId).myview;
+	    	offset.x = centerview.getLeft();
+	    	offset.y = centerview.getTop();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 	}
 
 	private void midPoint(PointF point, MotionEvent event) {

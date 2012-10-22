@@ -1,4 +1,4 @@
-package com.sofurry.base.classes;
+package com.sofurry.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,17 +23,16 @@ import android.widget.TextView;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
-import com.sofurry.activities.TagEditorActivity;
-import com.sofurry.activities.ViewArtActivity;
-import com.sofurry.activities.ViewJournalActivity;
-import com.sofurry.activities.ViewMusicActivity;
-import com.sofurry.activities.ViewStoryActivity;
 import com.sofurry.adapters.SubmissionGalleryAdapter;
 import com.sofurry.adapters.SubmissionListAdapter;
+import com.sofurry.base.classes.AbstractBrowseActivity;
+import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.SFSubmissionList;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
+import com.sofurry.mobileapi.downloadmanager.DownloadManager;
+import com.sofurry.mobileapi.downloadmanager.HTTPFileDownloadTask;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
 import com.sofurry.storage.ImageStorage;
@@ -44,7 +43,7 @@ import com.sofurry.util.Utils;
  * @author Night_Gryphon
  *
  */
-public class SFBrowseActivity extends AbstractBrowseActivity {
+public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submission> {
 
 	protected ContentType fContentType = ContentType.all;
 	protected ViewSource fContentFilter = ViewSource.all;
@@ -232,12 +231,23 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 //		viewSourceMenu.add(0, AppConstants.MENU_FILTER_WATCHLIST_COMBINED, 0, "Watches + Groups");
 		//menu.add(0, AppConstants.MENU_FILTER_KEYWORDS, 0, "Keywords");
 
-		return result;
+        SubMenu sub = menu.addSubMenu(0,0,20,"More").setIcon(android.R.drawable.ic_menu_more);
+        sub.add(0, AppConstants.MENU_LOAD_THUMB, 10, "Load missing thumnails");
+        sub.add(0, AppConstants.MENU_PRELOAD, 10, "Cache all");
+//      sub.add(0, AppConstants.MENU_DOWNLOAD_ALL, 10, "Download all");
+
+        return result;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case AppConstants.MENU_PRELOAD:
+			Integer i = Integer.parseInt(Utils.getPreferences(this).getString(AppConstants.PREFERENCE_PRELOAD_MAX, "200"));
+			if (i != null)
+				PreloadItems(i);
+			return true;
+			
 		case AppConstants.MENU_FILTER_KEYWORDS:
 			Intent intent = new Intent(this, TagEditorActivity.class);
 			startActivityForResult(intent, AppConstants.ACTIVITY_TAGS);
@@ -283,6 +293,10 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 			setList(createBrowseList());
 			return true;
 
+		case AppConstants.MENU_LOAD_THUMB:
+			((SFSubmissionList) fList).RefreshThumbnails();
+			return true;
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -352,6 +366,85 @@ public class SFBrowseActivity extends AbstractBrowseActivity {
 		}
 		super.onDataViewItemClick(aItemIndex);
 	}
+
+	// ========================= PRELOAD =======================
+	private DownloadManager dlmanager = new DownloadManager(4); //TODO number of threads setting
+//	private NotificationHelper notification = new NotificationHelper(this); 
+	private int dlindex = -1;
+
+	/**
+	 * Pass download tasks to preload to dl manager for items from startItemIndex till the end of loaded list
+	 * @param dlManager - manager to get download tasks
+	 * @param startItemIndex - item to start processing from
+	 * @return - index of item to start processing from in next feedLoader call
+	 */
+	protected int feedPreloader(DownloadManager dlManager, int startItemIndex) {
+		Submission s = null;
+		int i = startItemIndex;
+		do {
+			s = fList.get(i, false);
+			if (s == null)
+				break;
+			if (! s.isSubmissionFileExists())
+				dlManager.Download(new HTTPFileDownloadTask(
+						s.getFullURL(), ImageStorage.getSubmissionImagePath(s.getCacheName()),
+						null, 15, false, true, null, "text", 3));
+			
+			i++;
+		} while (s != null);
+		return i; 
+	}
+	
+	public void PreloadItems(final int numItems) {
+		if (fList == null)
+			return;
+
+		dlmanager.setNumThreads(Utils.getPreferences(this).getInt(AppConstants.PREFERENCE_PRELOAD_THREADS, 4));
+		
+		if (dlindex <0) {
+
+			// feed downloader with already loaded items
+			dlindex = feedPreloader(dlmanager, 0);
+			
+			fList.setStatusListener(new IJobStatusCallback() {
+				public void onSuccess(Object job) {
+					refreshDataView();
+					onLoadFinish();
+					setListCallback(); // reset callback to default
+					
+					dlindex = feedPreloader(dlmanager, dlindex); // feed rest of items
+					setListCallback(); // restore callback
+					dlindex = -1; // unlock new preloads
+				}
+				
+				public void onStart(Object job) {
+					onLoadStart();
+				}
+				
+				// Called by SFSubmissionList on thumb loading progress
+				public void onProgress(Object job, int progress, int total, String msg) {
+					if (job instanceof NetworkList) { // progress from load page, skip thumb progress
+						Log.d("[Preload]", "Item "+progress+" of "+total+"done");
+						dlindex = feedPreloader(dlmanager, dlindex); // feed downloader on page loaded
+					}
+					refreshDataView();
+				}
+				
+				public void onError(Object job, String msg) {
+					onLoadError(msg);
+					dlindex = feedPreloader(dlmanager, dlindex); // feed rest of items
+					setListCallback();
+					dlindex = -1;
+				}
+			});
+		}
+		
+
+		if (fList.sizeLoaded() < numItems)
+			fList.PreloadItems(numItems);
+		
+	}
+	
 
 	
 }
