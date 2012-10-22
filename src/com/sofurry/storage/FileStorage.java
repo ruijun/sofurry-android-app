@@ -174,6 +174,17 @@ public class FileStorage {
     	}
     }
 	
+    public static void copyFile(String src, String dst) throws Exception {
+    	File in = new File(src);
+    	if (! in.exists())
+    		throw new Exception("Source file not found");
+    	
+    	File out = new File(dst);
+        ensureDirectory(out.getParent());
+    	
+        copyFile(in, out);
+    }
+    
 	/**
 	 * Deletes all contained files in indicated path (absolute path)
 	 * @param path

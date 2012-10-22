@@ -17,6 +17,7 @@ import com.sofurry.mobileapi.downloadmanager.HTTPFileDownloadTask;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
 import com.sofurry.storage.ImageStorage;
+import com.sofurry.util.Utils;
 
 /**
  * Implementation of SoFurry Submission List
@@ -100,6 +101,7 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	 */
 	protected void LoadThumbnails() {
 		Submission s = null;
+		thumbLoader.setNumThreads(Utils.getPreferences().getInt(AppConstants.PREFERENCE_THUMB_THREADS, 5));
 		while ( (s = get(thumbIndex, false)) != null) {
 			if (! s.checkThumbnail())
 				thumbLoader.Download(new HTTPFileDownloadTask(

@@ -62,10 +62,16 @@
 	</PreferenceCategory>
 	
 	<PreferenceCategory android:title="Submission Browser">
-	    <CheckBoxPreference android:summaryOff="Use original thumbnails" android:defaultValue="true" android:key="use_custom_thumbs" android:title="Use custom thumbnails" android:summaryOn="Use custom thumbnails" />
 	    <CheckBoxPreference android:defaultValue="true" android:key="imgCheckSaved" android:title="Show if image already saved in library" android:summaryOn="Will show saved status" android:summaryOff="Will NOT show saved status" />
-	    <com.sofurry.SeekBarPreference android:dialogMessage="Art gallery thimbnail size" android:key="art_gallery_thumbnail_size" android:summary="Art gallery thimbnail size" android:text=" minutes" sofurry:min="64" sofurry:defaultValue="130" sofurry:max="255" android:title="Thumbnail size" />
-	    <EditTextPreference android:title="Maximum items to preload" android:defaultValue="200" android:key="preload_max_items" android:summary='Number of items for "Preload items" feature' />
+	    <PreferenceScreen android:title="Thumbnail settings">
+	        <CheckBoxPreference android:summaryOff="Use original thumbnails" android:defaultValue="true" android:key="use_custom_thumbs" android:title="Use custom thumbnails" android:summaryOn="Use custom thumbnails" />
+	    	<com.sofurry.SeekBarPreference android:dialogMessage="Art gallery thimbnail size" android:key="art_gallery_thumbnail_size" android:summary="Art gallery thimbnail size" android:text=" minutes" sofurry:min="64" sofurry:defaultValue="130" sofurry:max="255" android:title="Thumbnail size" />
+	    	<com.sofurry.SpinnerPreference android:key="thumbnail_threads_count" sofurry:min="1" android:defaultValue="5" sofurry:max="10" android:title="Thumbnail download threads count" />
+	    </PreferenceScreen>
+	    <PreferenceScreen android:title="'Preload' settings">
+			<EditTextPreference android:title="Maximum items to preload" android:defaultValue="200" android:key="preload_max_items" android:summary='Number of items for "Preload items" feature' />
+	        <com.sofurry.SpinnerPreference android:key="preload_threads_count" sofurry:min="1" android:defaultValue="4" sofurry:max="10" android:title="Preload download threads count" />
+	    </PreferenceScreen>
 	</PreferenceCategory>
 	
 	<PreferenceCategory android:title="Submission Viewer">
