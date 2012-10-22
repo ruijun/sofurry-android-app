@@ -346,6 +346,8 @@ public abstract class AbstractBrowseActivity extends Activity {
 		if (fList == null)
 			return;
 
+		dlmanager.setNumThreads(Utils.getPreferences(this).getInt(AppConstants.PREFERENCE_PRELOAD_THREADS, 4));
+		
 		if (dlindex <0) {
 
 			// feed downloader with already loaded items

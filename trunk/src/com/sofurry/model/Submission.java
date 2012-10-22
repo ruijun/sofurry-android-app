@@ -194,8 +194,17 @@ public class Submission implements Serializable, IHasThumbnail {
      * @throws Exception 
      */
     public String getSaveName(Context context) throws Exception {
+    	return getSaveName(context, null);
+    }
+    
+    /**
+     * Build absolute file name to save 
+     * @throws Exception 
+     */
+    public String getSaveName(Context context, String suffix) throws Exception {
         // Image filename template (Issue 38) by NGryph
         // load template from preferences
+    	if (suffix == null) // dont return cache for suffix name
     	if (SavedNameCache.length() > 0) {
     		return SavedNameCache;
     	}
@@ -209,7 +218,7 @@ public class Submission implements Serializable, IHasThumbnail {
 //        String targetPath = fileNameTmpl + '.' + filename.substring(filename.lastIndexOf('.') + 1);
 //        String targetPath = fileNameTmpl + HttpRequest.extractExtension(getSaveFilename());
         
-        String targetPath = fileNameTmpl + FileExt;
+        String targetPath = fileNameTmpl + ((suffix == null)?"":suffix) + FileExt;
 
         /*
          *  sanitizeFileName removes '/' character so separately sanitize every unsecure data field that comes from
@@ -234,7 +243,8 @@ public class Submission implements Serializable, IHasThumbnail {
         // let's treat that getUserStoragePath provide root dir for image lib when filename is empty
        	targetPath = FileStorage.getUserStoragePath("Images", "") + targetPath;
 
-       	SavedNameCache = targetPath;
+    	if (suffix == null)
+    		SavedNameCache = targetPath; // do not cache name with suffix
        	return targetPath;
     }
 
@@ -334,7 +344,7 @@ public class Submission implements Serializable, IHasThumbnail {
 				setType(ContentType.all);
 		}
 		
-		switch (type) {
+		switch (getType()) {
 			case art: {
 		        if (datasource.getString("thumb").contains("/video.png")) {
 		        	FileExt = ".swf";

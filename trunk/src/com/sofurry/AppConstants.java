@@ -51,12 +51,14 @@ public class AppConstants {
     public static final String PREFERENCE_SALT                      = "salt";
     public static final String PREFERENCE_USERNAME                  = "username";
     public static final String PREFERENCE_THUMB_SIZE                = "art_gallery_thumbnail_size";
+    public static final String PREFERENCE_THUMB_THREADS             = "thumbnail_threads_count";
     public static final String PREFERENCE_THUMB_CLEAN_PERIOD        = "thumb_cleanup_period";
     public static final String PREFERENCE_IMAGE_CLEAN_PERIOD        = "image_cleanup_period";
     public static final String PREFERENCE_IMAGE_CLICK_TO_LOAD       = "load_hd_on_click";
     public static final String PREFERENCE_USE_CUSTOM_THUMBS         = "use_custom_thumbs";
     public static final String PREFERENCE_DELETE_INCOMPLETE			= "delete_incomplete_files";
     public static final String PREFERENCE_PRELOAD_MAX				= "preload_max_items";
+    public static final String PREFERENCE_PRELOAD_THREADS			= "preload_threads_count";
     public static final String PREFERENCE_CLEAN_THUMB_NOW			= "thumb_clean_now";
     public static final String PREFERENCE_CLEAN_IMAGE_NOW			= "img_clean_now";
     

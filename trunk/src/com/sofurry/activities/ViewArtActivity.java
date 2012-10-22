@@ -2,6 +2,7 @@ package com.sofurry.activities;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
@@ -13,6 +14,7 @@ import android.graphics.RectF;
 
 import android.net.Uri;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -421,9 +423,79 @@ public class ViewArtActivity
 	     * Saves the file to the images folder
 	     */
 	    public void save() {
+	    	//TODO should move this to submission?
 	    	if (submission == null)
 	    		return;
+
+	        try {
+	            // source file in cache
+	            File f = new File(ImageStorage.getSubmissionImagePath(submission.getCacheName()));
+
+	            // target file in user images library
+	            String targetPath = submission.getSaveName(context);
+	            File tf = new File(targetPath);
+	            
+	            if (! f.exists()) {
+	            	if (! tf.exists())
+	            		Utils.showYesNoDialog(ViewArtActivity.this, "Save thumb?", 
+							"File was not downloaded properly. Save thumbnail?", 
+							new DialogInterface.OnClickListener() { // yes
+								public void onClick(DialogInterface dialog, int which) {
+									try {
+										String targetPath = submission.getSaveName(ViewArtActivity.this, "_tn");
+										FileStorage.copyFile(	submission.getThumbnailPath(), 
+																targetPath);
+							            showToast("File saved to:\n" + targetPath);
+									} catch (Exception e) {
+							            onError(e);
+									}
+								}
+							}, 
+							null // no
+						);
+	                throw new Exception("File has not downloaded properly yet. File does not exist.");
+	            }
+
+	            if (tf.exists()) {
+		        	Utils.showYesNoDialog(ViewArtActivity.this, "Overwrite?", 
+							"File already saved. Overwrite?", 
+							new DialogInterface.OnClickListener() { // yes
+								public void onClick(DialogInterface dialog, int which) {
+									try {
+										String targetPath = submission.getSaveName(ViewArtActivity.this);
+										FileStorage.copyFile(	ImageStorage.getSubmissionImagePath(submission.getCacheName()),
+																targetPath);
+							            showToast("File saved to:\n" + targetPath);
+									} catch (Exception e) {
+							            onError(e);
+									}
+								}
+							}, 
+							null // no
+							);
+		        	return;
+	            }
+	            
+	            FileStorage.ensureDirectory(tf.getParent());
+	            
+	            // save file to user image library
+	            FileStorage.copyFile(f, tf);
+	            showToast("File saved to:\n" + targetPath);
+	            
+	            // display saved indicator
+	            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(AppConstants.PREFERENCE_IMAGE_CHECK_SAVED, true)) {
+	               	savedIndicator.setVisibility(View.VISIBLE);
+	            }
+	        } catch (Exception e) {
+	            onError(e);
+	        }
 	    	
+	    }
+	    
+/*	    public void dosave() {
+	    	if (submission == null)
+	    		return;
+
 	        try {
 	            // source file in cache
 	            File f = new File(ImageStorage.getSubmissionImagePath(submission.getCacheName()));
@@ -448,8 +520,8 @@ public class ViewArtActivity
 	        } catch (Exception e) {
 	            onError(e);
 	        }
-	    }
-	}
+	    }/**/
+	} 
 	
 	// ---------------------------------------------------------
 	private LayoutInflater mInflater = null;
@@ -520,7 +592,7 @@ public class ViewArtActivity
     	Intent intent = new Intent();
 
     	intent.setAction(android.content.Intent.ACTION_VIEW);
-    	if (s.FileExt.equals(".swf")) {
+    	if (s.isVideo()) {
         	intent.setDataAndType(Uri.fromFile(f), "video/*");
     	} else {
         	intent.setDataAndType(Uri.fromFile(f), "image/*");

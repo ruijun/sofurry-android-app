@@ -5,6 +5,7 @@ package com.sofurry.activities;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import android.os.AsyncTask;
@@ -42,6 +43,12 @@ public class SettingsActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+/*        Editor e= PreferenceManager.getDefaultSharedPreferences(this).edit();
+        e.remove(AppConstants.PREFERENCE_PRELOAD_MAX);
+        e.commit();/**/
+        
+        
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         addPreferencesFromResource(R.xml.preferences);
 
