@@ -151,7 +151,7 @@ public class AppConstants {
     public static final int MENU_USERSMUSIK                = 4212;
     public static final int MENU_USERSSTORIES              = 4210;
     public static final int MENU_WATCH                     = 4206;
-    public static final int MENU_CLEANTHUMB                = 5001;
+    public static final int MENU_LOAD_THUMB                = 5001;
     public static final int MENU_PRELOAD                   = 5002;
     public static final int MENU_OPEN_BROWSER              = 5003;
 

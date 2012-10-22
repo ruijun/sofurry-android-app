@@ -5,18 +5,12 @@ import com.sofurry.activities.SettingsActivity;
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.helpers.ProgressBarHelper;
-import com.sofurry.mobileapi.downloaders.ThumbnailDownloader;
 import com.sofurry.mobileapi.downloadmanager.DownloadManager;
-import com.sofurry.mobileapi.downloadmanager.HTTPFileDownloadTask;
 import com.sofurry.model.NetworkList;
-import com.sofurry.model.Submission;
-import com.sofurry.storage.ImageStorage;
 import com.sofurry.storage.NetworkListStorage;
-import com.sofurry.util.NotificationHelper;
 import com.sofurry.util.Utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,7 +24,6 @@ import android.widget.AbsListView;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.Toast;
 
 /**
@@ -39,11 +32,11 @@ import android.widget.Toast;
  * 
  * @author Night_Gryphon
  */
-public abstract class AbstractBrowseActivity extends Activity {
+public abstract class AbstractBrowseActivity<T> extends Activity {
 	/**
 	 * primary data list that will be presented to user
 	 */
-	protected NetworkList<Submission> fList = null;
+	protected NetworkList<T> fList = null;
 	
 	/**
 	 * UI element to present NetworkList items to user
@@ -135,7 +128,7 @@ public abstract class AbstractBrowseActivity extends Activity {
 	 * Create NetworkList that used in this activity
 	 * @return
 	 */
-	protected abstract NetworkList<Submission> createBrowseList();
+	protected abstract NetworkList<T> createBrowseList();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -268,7 +261,7 @@ public abstract class AbstractBrowseActivity extends Activity {
 	 * Plug in NetworkList to browse in this activity and call refreshDataView
 	 * @param aList
 	 */
-	public void setList(NetworkList<Submission> aList) {
+	public void setList(NetworkList<T> aList) {
 		//detach current list and unplug adapter
 		if (fList != null) {
 			try {
@@ -323,75 +316,7 @@ public abstract class AbstractBrowseActivity extends Activity {
 		}
 	}
 	
-	private DownloadManager dlmanager = new DownloadManager(4); //TODO number of threads setting
-//	private NotificationHelper notification = new NotificationHelper(this); 
-	private int dlindex = -1;
 	
-	private void feedLoader() {
-		Submission s = null;
-		do {
-			s = fList.get(dlindex, false);
-			if (s == null)
-				break;
-			if (! s.isSubmissionFileExists())
-				dlmanager.Download(new HTTPFileDownloadTask(
-						s.getFullURL(), ImageStorage.getSubmissionImagePath(s.getCacheName()),
-						null, 15, false, true, null, "text", 3));
-			
-			dlindex++;
-		} while (s != null);
-	}
-
-	public void PreloadItems(final int numItems) {
-		if (fList == null)
-			return;
-
-		dlmanager.setNumThreads(Utils.getPreferences(this).getInt(AppConstants.PREFERENCE_PRELOAD_THREADS, 4));
-		
-		if (dlindex <0) {
-
-			// feed downloader with already loaded items
-			dlindex = 0;
-			feedLoader();
-			
-			fList.setStatusListener(new IJobStatusCallback() {
-				public void onSuccess(Object job) {
-					refreshDataView();
-					onLoadFinish();
-					setListCallback(); // reset callback to default
-					
-					feedLoader(); // feed rest of items
-					setListCallback(); // restore callback
-					dlindex = -1; // unlock new preloads
-				}
-				
-				public void onStart(Object job) {
-					onLoadStart();
-				}
-				
-				// Called by SFSubmissionList on thumb loading progress
-				public void onProgress(Object job, int progress, int total, String msg) {
-					if (job instanceof NetworkList) { // progress from load page, skip thumb progress
-						Log.d("[Preload]", "Item "+progress+" of "+total+"done");
-						feedLoader();	// feed downloader on page loaded
-					}
-					refreshDataView();
-				}
-				
-				public void onError(Object job, String msg) {
-					onLoadError(msg);
-					feedLoader();
-					setListCallback();
-					dlindex = -1;
-				}
-			});
-		}
-		
-
-		if (fList.sizeLoaded() < numItems)
-			fList.PreloadItems(numItems);
-		
-	}
 	
 	public void onLoadStart() {
 		showProgressDialog("Loading page...", ! fList.isFirstPage());
@@ -455,10 +380,6 @@ public abstract class AbstractBrowseActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, AppConstants.MENU_SETTINGS, 10, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
 
-        SubMenu sub = menu.addSubMenu(0,0,20,"More").setIcon(android.R.drawable.ic_menu_more);
-//        sub.add(0, AppConstants.MENU_CLEANTHUMB, 10, "Clean thumnails");
-        sub.add(0, AppConstants.MENU_PRELOAD, 10, "Cache all");
-//        sub.add(0, AppConstants.MENU_DOWNLOAD_ALL, 10, "Download all");
         return super.onCreateOptionsMenu(menu);
 	}
 
@@ -468,12 +389,6 @@ public abstract class AbstractBrowseActivity extends Activity {
 			case AppConstants.MENU_SETTINGS:
 				Intent intent = new Intent(this, SettingsActivity.class);
 				startActivity(intent);
-				return true;
-				
-			case AppConstants.MENU_PRELOAD:
-				Integer i = Integer.parseInt(Utils.getPreferences(this).getString(AppConstants.PREFERENCE_PRELOAD_MAX, "200"));
-				if (i != null)
-					PreloadItems(i);
 				return true;
 				
             default:

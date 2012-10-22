@@ -46,7 +46,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".base.classes.SFBrowseActivity">
+        <activity android:name=".activities.SFBrowseSubmissionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.GALLERY" />
                 <category android:name="android.intent.category.DEFAULT" />

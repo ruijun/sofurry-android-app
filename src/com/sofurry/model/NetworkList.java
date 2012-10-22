@@ -360,7 +360,12 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 						AsyncLoadNextPage();
 					}
 				}
-				return super.get(aIndex);
+				
+				try {
+					return super.get(aIndex);
+				} catch (Exception e) {
+					return null;
+				}
 			} else if ( (!isLoading()) && allowLoad ) {
 				Log.d("[NetList]", ">>>>> NextPage request (no item): index="+aIndex+"   fAsyncLoader: "+(fAsyncLoader == null));
 				AsyncLoadNextPage();

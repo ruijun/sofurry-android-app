@@ -5,6 +5,9 @@ package com.sofurry.mobileapi;
 
 import org.json.JSONObject;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import com.sofurry.AppConstants;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
@@ -101,7 +104,11 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	 */
 	protected void LoadThumbnails() {
 		Submission s = null;
-		thumbLoader.setNumThreads(Utils.getPreferences().getInt(AppConstants.PREFERENCE_THUMB_THREADS, 5));
+		
+		SharedPreferences prefs =  Utils.getPreferences();
+		if (prefs != null)
+			thumbLoader.setNumThreads(prefs.getInt(AppConstants.PREFERENCE_THUMB_THREADS, 5));
+		
 		while ( (s = get(thumbIndex, false)) != null) {
 			if (! s.checkThumbnail())
 				thumbLoader.Download(new HTTPFileDownloadTask(
@@ -125,6 +132,11 @@ public class SFSubmissionList extends NetworkList<Submission> {
 						10, false, true, null, "text", s.getThumbAttempts()));
 			thumbIndex++;
 		}
+	}
+	
+	public void RefreshThumbnails() {
+		thumbIndex = 0;
+		LoadThumbnails();
 	}
 	
 /*	private ThumbnailDownloader thumbLoader = null;

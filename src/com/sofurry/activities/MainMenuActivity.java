@@ -21,7 +21,6 @@ import android.widget.TextView;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.base.classes.ActivityWithRequests;
-import com.sofurry.base.classes.SFBrowseActivity;
 import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.core.AuthenticationHandler;
@@ -75,28 +74,28 @@ public class MainMenuActivity
                 break;
 
             case R.id.stories:
-                intent     = new Intent(this, SFBrowseActivity.class);
+                intent     = new Intent(this, SFBrowseSubmissionActivity.class);
                 intent.putExtra("ContentType", ContentType.stories);
                 activityId = AppConstants.ACTIVITY_STORIESLIST;
 
                 break;
 
             case R.id.art:
-                intent     = new Intent(this, SFBrowseActivity.class);
+                intent     = new Intent(this, SFBrowseSubmissionActivity.class);
                 intent.putExtra("ContentType", ContentType.art);
                 activityId = AppConstants.ACTIVITY_GALLERYART;
 
                 break;
 
             case R.id.music:
-                intent     = new Intent(this, SFBrowseActivity.class);
+                intent     = new Intent(this, SFBrowseSubmissionActivity.class);
                 intent.putExtra("ContentType", ContentType.music);
                 activityId = AppConstants.ACTIVITY_MUSICLIST;
 
                 break;
 
             case R.id.journals:
-                intent     = new Intent(this, SFBrowseActivity.class);
+                intent     = new Intent(this, SFBrowseSubmissionActivity.class);
                 intent.putExtra("ContentType", ContentType.journals);
                 activityId = AppConstants.ACTIVITY_JOURNALSLIST;
 

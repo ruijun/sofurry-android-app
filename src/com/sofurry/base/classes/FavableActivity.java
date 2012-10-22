@@ -8,18 +8,14 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 
 import com.sofurry.AppConstants;
-import com.sofurry.activities.GalleryArtActivity;
-import com.sofurry.activities.ListMusicActivity;
-import com.sofurry.activities.ListStoriesActivity;
 import com.sofurry.activities.RateActivity;
-import com.sofurry.activities.SettingsActivity;
+import com.sofurry.activities.SFBrowseSubmissionActivity;
 import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.requests.AndroidRequestWrapper;
 import com.sofurry.requests.DataCall;
-import com.sofurry.util.Utils;
 
 /**
  * @author Rangarig
@@ -68,13 +64,13 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 			unwatch();
 			return true;
 		case AppConstants.MENU_USERSSTORIES:
-			morefromuser(ListStoriesActivity.class,AppConstants.ACTIVITY_STORIESLIST);
+			morefromuser(AppConstants.ACTIVITY_STORIESLIST);
 			return true;
 		case AppConstants.MENU_USERSART:
-			morefromuser(GalleryArtActivity.class,AppConstants.ACTIVITY_GALLERYART);
+			morefromuser(AppConstants.ACTIVITY_GALLERYART);
 			return true;
 		case AppConstants.MENU_USERSMUSIK:
-			morefromuser(ListMusicActivity.class,AppConstants.ACTIVITY_MUSICLIST);
+			morefromuser(AppConstants.ACTIVITY_MUSICLIST);
 			return true;
 		case AppConstants.MENU_OPEN_BROWSER:
 //			Utils.setClipboardText(this, ApiFactory.getSubmissionViewPageURL(pageID));
@@ -163,12 +159,12 @@ public abstract class FavableActivity extends SubmissionViewActivity {
 	/**
 	 * Shows more work by the specific user
 	 */
-	public void morefromuser(Class<?> activity, int ActivityID) {
+	public void morefromuser(int ActivityID) {
 /*		Intent intent = new Intent(this, activity);
 		intent.putExtra("viewSource", ViewSource.user.name());
 		intent.putExtra("viewSearch", "" + authorId  );
 /**/
-		Intent intent = new Intent(this, SFBrowseActivity.class);
+		Intent intent = new Intent(this, SFBrowseSubmissionActivity.class);
 		intent.putExtra("AuthorId", authorId  );
 		
 		switch (ActivityID) {
