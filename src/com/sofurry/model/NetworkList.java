@@ -23,16 +23,23 @@ import android.util.Log;
  */
 public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel, IAddObjectCallback<T> {
 		
-		/**
-	 * 
-	 */
 //	private static final long serialVersionUID = 1L;
+	
+		private int defaultSize = Integer.MAX_VALUE;
+		private boolean getSizeTriggerFirstLoad = false;
 
 		public NetworkList() {
 			super();
 			NetworkListStorage.store(this);
 		}
 
+		public NetworkList(int defaultSize, boolean getSizeTriggerFirstLoad) {
+			this();
+			
+			this.defaultSize = defaultSize;
+			this.getSizeTriggerFirstLoad = getSizeTriggerFirstLoad;
+		}
+		
 		@Override
 		public void finalize() throws Throwable {
 //			if (! isWorkerThread) // do not remove id from storage when worker thread die
@@ -388,8 +395,11 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 			// TODO non actual value is bad when pass list through serializible as it looks serializible does not support 'null' list items
 			if (isFinalPage() && ( ! isLoading() ) )  // is all possible item pages done loading?
 				return super.size(); // no more items to load, return number of items we already have in list
-			else
-				return Integer.MAX_VALUE; // there may be infinite items left to load
+			else {
+				if ( (getSizeTriggerFirstLoad) && (isFirstPage()) && (! isLoading()) )
+					AsyncLoadNextPage();
+				return (sizeLoaded() > defaultSize)? sizeLoaded() : defaultSize; // there may be infinite items left to load
+			}
 		}
 
 		/**
@@ -437,14 +447,14 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		/**
 		 * Load items page in worker thread
 		 */
-		private void AsyncLoadNextPage() {
+		protected void AsyncLoadNextPage() {
 			AsyncLoadNextPage(-1);
 		}
 		
 		/**
 		 * Load items page in worker thread until list contain less than numItems or EOF
 		 */
-		private void AsyncLoadNextPage(int numItems) {
+		protected void AsyncLoadNextPage(int numItems) {
 			if  ( (! isLoading()) && (! isFinalPage()) ) {
 				fAsyncLoader = new AsyncPageLoader(this, numItems);
 				fAsyncLoader.start();

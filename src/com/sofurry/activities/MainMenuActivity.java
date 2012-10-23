@@ -60,7 +60,8 @@ public class MainMenuActivity
 
         switch (id) {
             case R.id.pms:
-                intent     = new Intent(this, ListPMActivity.class);
+//                intent     = new Intent(this, ListPMActivity.class);
+                intent     = new Intent(this, SFBrowsePMActivity.class);
                 activityId = AppConstants.ACTIVITY_PMLIST;
 
                 break;
