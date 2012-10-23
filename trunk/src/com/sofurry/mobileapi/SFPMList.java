@@ -12,6 +12,11 @@ public class SFPMList extends NetworkList<PrivateMessage> {
 	private int currentPage = -1;
 	private Boolean lastpage = false;
 	
+	
+	public SFPMList() {
+		super(0, true);
+	}
+
 	@Override
 	protected void doLoadNextPage(IJobStatusCallback StatusCallback) throws Exception {
 			if (isFinalPage()) return; // don't fetch after last page

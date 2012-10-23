@@ -14,7 +14,7 @@ import android.util.Log;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.sofurry.AppConstants;
 import com.sofurry.R;
-import com.sofurry.activities.ListPMActivity;
+import com.sofurry.activities.SFBrowsePMActivity;
 import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.core.AuthenticationHandler;
 import com.sofurry.mobileapi.core.Request;
@@ -86,7 +86,8 @@ public class PmNotificationService extends WakefulIntentService {
                                     System.currentTimeMillis());
 
             // Create the Intent and wrap it in a PendingIntent
-            intent = new Intent(this, ListPMActivity.class);
+//            intent = new Intent(this, ListPMActivity.class);
+            intent = new Intent(this, SFBrowsePMActivity.class);
 
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

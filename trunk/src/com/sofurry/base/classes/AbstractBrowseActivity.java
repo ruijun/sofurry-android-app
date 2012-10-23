@@ -296,7 +296,7 @@ public abstract class AbstractBrowseActivity<T> extends Activity {
 			fList.setStatusListener(new IJobStatusCallback() {
 				
 				public void onSuccess(Object job) {
-					refreshDataView();
+					doRefreshDataView(); // force refresh when page loaded
 					onLoadFinish();
 				}
 				
@@ -354,7 +354,7 @@ public abstract class AbstractBrowseActivity<T> extends Activity {
 			fDataView.setAdapter(myAdapter);
 			fDataView.setSelection(0);
 			
-			refreshDataView();
+			doRefreshDataView(); // force refresh, do not trigger lock to allow fList to refresh immidiately on load
 		}
 	}
 	

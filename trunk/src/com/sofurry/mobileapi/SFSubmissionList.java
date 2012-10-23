@@ -43,7 +43,7 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	 * 
 	 */
 	public SFSubmissionList(ViewSource source, String extra, ContentType contentType) {
-		super();
+		super(0, true);
 		fSource = source;
 		fExtra = extra;
 		fContentType = contentType;
@@ -74,7 +74,12 @@ public class SFSubmissionList extends NetworkList<Submission> {
 		if (totalPages > 0) 
 			return totalPages * AppConstants.ENTRIESPERPAGE_GALLERY;
 		
-		return sizeLoaded() + AppConstants.ENTRIESPERPAGE_GALLERY;
+		if (sizeLoaded() > 0)
+			return sizeLoaded() + AppConstants.ENTRIESPERPAGE_GALLERY;
+		else {
+			AsyncLoadNextPage();
+			return 0;
+		}
 	}
 
 	@Override
