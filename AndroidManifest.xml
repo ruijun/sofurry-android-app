@@ -38,49 +38,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.GalleryArtActivity"
-                  android:label="@string/app_name_listgallery">
-            <intent-filter>
-                <action android:name="android.intent.action.GALLERYART" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <activity android:name=".activities.SFBrowseSubmissionActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.GALLERY" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
 
-        <activity android:name=".activities.ListJournalsActivity"
-                  android:label="@string/app_name_listjournals">
-            <intent-filter>
-                <action android:name="android.intent.action.LISTJOURNALS" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".activities.ListMusicActivity"
-                  android:label="@string/app_name_listmusic">
-            <intent-filter>
-                <action android:name="android.intent.action.LISTMUSIC" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".activities.ListPMActivity"
+        <activity android:name=".activities.SFBrowsePMActivity"
                   android:label="@string/app_name_listpm">
             <intent-filter>
                 <action android:name="android.intent.action.LISTPM" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".activities.ListStoriesActivity"
-                  android:label="@string/app_name_liststories">
-            <intent-filter>
-                <action android:name="android.intent.action.LISTSTORIES" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

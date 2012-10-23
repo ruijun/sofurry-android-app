@@ -1406,16 +1406,18 @@ public class ViewArtActivity
 		} else
 			pages.get(curpageId).startImageLoader(true, true);/**/
 
-		boolean fieloaded = ( pages.get(curpageId).imageLoaded ) || // short check
-				 			( pages.get(curpageId).submission.isSubmissionFileExists() ); // hard check
-		
-		if (fieloaded) {
-				if (pages.get(curpageId).imageLoader != null)
+		PageHolder p = pages.get(curpageId);
+		if (p != null) {
+			boolean fieloaded = ( p.imageLoaded ) || // short check
+		 			( p.submission.isSubmissionFileExists() ); // hard check
+
+			if (fieloaded) {
+				if (p.imageLoader != null)
 		            showToast("Warning: download in progress");
-		  		doHdView(pages.get(curpageId).submission);
-		} else
-			pages.get(curpageId).startImageLoader(true, true); // will handle running downloads correctly
-		/**/
+		  		doHdView(p.submission);
+			} else
+				p.startImageLoader(true, true); // will handle running downloads correctly
+		}
 	}
 	
 	private void showToast(String msg) {
