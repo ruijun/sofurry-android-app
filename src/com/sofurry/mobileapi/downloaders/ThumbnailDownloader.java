@@ -33,7 +33,7 @@ public abstract class ThumbnailDownloader extends
 			while ( (! isCancelled()) && tryAgain) {
 				tryAgain = false;
 				itemId = 0;
-				s = arg0[0].get(itemId, false);
+				s = arg0[0].get(itemId, false, false);
 
 				while ((! isCancelled()) && (s != null)) {
 					if (s.getThumbAttempts() > 3) 
@@ -55,7 +55,7 @@ public abstract class ThumbnailDownloader extends
 					pubProgress(itemId);
 
 					itemId++;
-					s = arg0[0].get(itemId, false);
+					s = arg0[0].get(itemId, false, false);
 					
 					if (isCancelled()) {
 						Log.d("[ThumbDl]", "--- Cancelled");

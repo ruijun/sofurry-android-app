@@ -62,7 +62,7 @@ public class SFBrowsePMActivity extends AbstractBrowseActivity<PrivateMessage> {
 
 	@Override
 	protected void onDataViewItemClick(int aItemIndex) {
-        PrivateMessage pm = fList.get(aItemIndex, false);
+        PrivateMessage pm = fList.get(aItemIndex); // , false ????
         Log.i(AppConstants.TAG_STRING, "ListPM: Viewing PM ID: " + pm.getId());
         Intent intent = new Intent(this, ViewPMActivity.class);
         intent.putExtra("PMID", pm.getId());

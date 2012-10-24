@@ -224,7 +224,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * @param msg
 		 */
 		protected void doErrorNotify(Object job, final String msg) {
-	      	  fFirstPage = false; // we are done loading a page so next page will not be not first
+//	      	  fFirstPage = false; // we are done loading a page so next page will not be not first
 	      	  if (fLoadingStatusListener != null) {
 	      		  fLoadingStatusListener.onError(job, msg);
 	      	  }
@@ -351,7 +351,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 	
 		@Override
 		public T get(int index) {
-			return get(index, true);
+			return get(index, true, true);
 		}
 
 		/**
@@ -359,7 +359,7 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		 * @param ASubmissionIndex
 		 * @return
 		 */
-		public T get(int aIndex, boolean allowLoad)  {
+		public T get(int aIndex, boolean allowLoad, boolean useCache)  {
 			if (aIndex < super.size()) {
 				if (super.size() - aIndex - 1 < preloadCount) {
 					if ( (!isLoading()) && allowLoad ) {
@@ -373,9 +373,21 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 				} catch (Exception e) {
 					return null;
 				}
-			} else if ( (!isLoading()) && allowLoad ) {
-				Log.d("[NetList]", ">>>>> NextPage request (no item): index="+aIndex+"   fAsyncLoader: "+(fAsyncLoader == null));
-				AsyncLoadNextPage();
+			} else {
+				// start load next page
+				if ( (!isLoading()) && allowLoad ) {
+					Log.d("[NetList]", ">>>>> NextPage request (no item): index="+aIndex+"   fAsyncLoader: "+(fAsyncLoader == null));
+					AsyncLoadNextPage();
+				}
+					
+				// look in cache
+				if ( 	(useCache) &&
+						(Cache != null) && // have cache provided 
+						(aIndex < Cache.size()) && // have an item in cache
+						( (! isFinalPage()) || (isLoading()) ) // list load is not finished
+					) {
+					return Cache.get(aIndex);
+				}
 			}
 			
 			return null;
@@ -383,7 +395,10 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 
 		@Override
 		public boolean isEmpty() {
-			return ( isFinalPage() && (!isLoading()) && super.isEmpty()); // can be incorrect if isFinalPage is not overrided
+			return ( 	isFinalPage() && (!isLoading()) && 
+						super.isEmpty() && 
+						( (Cache == null) || (Cache.size() == 0) )
+					); // can be incorrect if isFinalPage is not overrided
 		}
 
 		/**
@@ -398,7 +413,11 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 			else {
 				if ( (getSizeTriggerFirstLoad) && (isFirstPage()) && (! isLoading()) )
 					AsyncLoadNextPage();
-				return (sizeLoaded() > defaultSize)? sizeLoaded() : defaultSize; // there may be infinite items left to load
+//				return (sizeLoaded() > defaultSize)? sizeLoaded() : defaultSize; // there may be infinite items left to load
+				if (Cache != null)
+					return Math.max( Math.max(sizeLoaded(), defaultSize), Cache.size());
+				else
+					return Math.max(sizeLoaded(), defaultSize);
 			}
 		}
 
@@ -409,6 +428,16 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 		public int sizeLoaded() {
 			return super.size();
 		}
+		
+/*		private int sizeLoaded(boolean useCache) {
+			if (	(useCache) &&
+					(Cache != null) && // have cache
+					( (! isFinalPage()) || (isLoading())) // load not finished
+				)
+				return Math.max( super.size(), Cache.size()); // use cache
+			else
+				return super.size();
+		}/**/
 		
 		/**
 		 * Return if next page loading in progress
@@ -514,4 +543,8 @@ public abstract class NetworkList<T> extends ArrayList<T> implements ICanCancel,
 			} else
 				AsyncLoadNextPage(numItems);
 		}
+		
+		// =================== CACHE ===========
+		public ArrayList<T> Cache = null;
+		
 }

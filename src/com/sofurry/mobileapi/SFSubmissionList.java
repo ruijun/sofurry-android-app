@@ -63,22 +63,23 @@ public class SFSubmissionList extends NetworkList<Submission> {
 
 	@Override
 	public Boolean isFinalPage() {
-		return (totalPages > 0) && (currentPage >= totalPages-1);
+		return (totalPages >= 0) && (currentPage >= totalPages-1);
 	}
 
 	@Override
 	public int size() { // TODO return sizeLoaded if there was error in last page request
-		if (isFinalPage() && (! isLoading()))
+		if ( (isFinalPage()) && (! isLoading()) ) // all loaded
 			return sizeLoaded();
 		
-		if (totalPages > 0) 
+		if (totalPages >= 0) // we know number of pages
 			return totalPages * AppConstants.ENTRIESPERPAGE_GALLERY;
 		
+		int csize = (Cache == null) ? 0 : Cache.size();
 		if (sizeLoaded() > 0)
-			return sizeLoaded() + AppConstants.ENTRIESPERPAGE_GALLERY;
+			return Math.max( sizeLoaded() + AppConstants.ENTRIESPERPAGE_GALLERY, csize);
 		else {
 			AsyncLoadNextPage();
-			return 0;
+			return csize;
 		}
 	}
 
@@ -114,7 +115,7 @@ public class SFSubmissionList extends NetworkList<Submission> {
 		if (prefs != null)
 			thumbLoader.setNumThreads(prefs.getInt(AppConstants.PREFERENCE_THUMB_THREADS, 5));
 		
-		while ( (s = get(thumbIndex, false)) != null) {
+		while ( (s = get(thumbIndex, false, false)) != null) {
 			if (! s.checkThumbnail())
 				thumbLoader.Download(new HTTPFileDownloadTask(
 						s.getThumbURL(), s.getThumbnailPath(),
