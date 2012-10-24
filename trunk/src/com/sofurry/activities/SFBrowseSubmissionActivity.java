@@ -1,5 +1,10 @@
 package com.sofurry.activities;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -35,6 +40,7 @@ import com.sofurry.mobileapi.downloadmanager.DownloadManager;
 import com.sofurry.mobileapi.downloadmanager.HTTPFileDownloadTask;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
+import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
 import com.sofurry.util.Utils;
 
@@ -321,7 +327,6 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 			Submission s = fList.get(aItemIndex);
 			Intent i = null;
 			
-				
 			switch (s.getType()) {
 			case art:
 				Log.i(AppConstants.TAG_STRING, "SFGallery: Viewing art ID: " + s.getId());
@@ -382,7 +387,7 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 		Submission s = null;
 		int i = startItemIndex;
 		do {
-			s = fList.get(i, false);
+			s = fList.get(i, false, false);
 			if (s == null)
 				break;
 			if (! s.isSubmissionFileExists())
