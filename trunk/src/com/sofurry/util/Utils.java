@@ -1,6 +1,7 @@
 package com.sofurry.util;
 
 import com.sofurry.activities.SettingsActivity;
+import com.sofurry.adapters.SFBrowseCache;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,11 +19,15 @@ public class Utils {
 	private static SharedPreferences pref = null;
 	private static ConnectivityManager ConnectMan = null;
 	private static ClipboardManager ClipMan = null;
+	private static SFBrowseCache fBrowseCache = null;
 	
 	public static void initUtils(Context context) {
 		pref = PreferenceManager.getDefaultSharedPreferences(context);
 		ConnectMan = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		ClipMan = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+		
+		if (fBrowseCache == null)
+			fBrowseCache = new SFBrowseCache(context);
 	}
 	
 	public static SharedPreferences getPreferences() {
@@ -104,5 +109,16 @@ public class Utils {
 
 		if (ClipMan != null)
 			ClipMan.setText(txt);
+	}
+	
+	public static SFBrowseCache BrowseCache() {
+		return BrowseCache(null);
+	}
+	
+	public static SFBrowseCache BrowseCache(Context context) {
+		if (context != null)
+			initUtils(context);
+
+		return fBrowseCache;
 	}
 }
