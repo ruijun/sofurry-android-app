@@ -3,23 +3,24 @@
  */
 package com.sofurry.mobileapi;
 
+import java.util.ArrayList;
+
 import org.json.JSONObject;
 
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.os.AsyncTask;
 
 import com.sofurry.AppConstants;
+import com.sofurry.adapters.SFBrowseCache;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ParseBrowseResult;
 import com.sofurry.mobileapi.ApiFactory.ViewSource;
 import com.sofurry.mobileapi.core.Request;
-import com.sofurry.mobileapi.downloaders.ThumbnailDownloader;
 import com.sofurry.mobileapi.downloadmanager.DownloadManager;
 import com.sofurry.mobileapi.downloadmanager.HTTPFileDownloadTask;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
-import com.sofurry.storage.ImageStorage;
 import com.sofurry.util.Utils;
 
 /**
@@ -39,6 +40,7 @@ public class SFSubmissionList extends NetworkList<Submission> {
 	private String fExtra = null;
 	private ContentType fContentType = ContentType.all;
 
+	private AsyncTask<Object, Integer, Integer> updateCacheTask = null;
 	/**
 	 * 
 	 */
@@ -47,6 +49,24 @@ public class SFSubmissionList extends NetworkList<Submission> {
 		fSource = source;
 		fExtra = extra;
 		fContentType = contentType;
+		
+		// run cache load in separate thread as it freeze UI thread
+		(new AsyncTask<Object, Integer, ArrayList<Submission>>() {
+
+			@Override
+			protected ArrayList<Submission> doInBackground(Object... params) {
+				Thread.currentThread().setName("Read cache "+((String) params[2]));
+				return Utils.BrowseCache().getCache((ViewSource) params[0], (ContentType) params[1], (String) params[2]);
+			}
+
+			@Override
+			protected void onPostExecute(ArrayList<Submission> result) {
+				Cache = result;
+				// notify cache done
+				SFSubmissionList.super.doSuccessNotify(this); // call parent onSuccess as we don't want to update cache
+			}
+		}).execute(source, contentType, extra);
+//		Cache = Utils.BrowseCache().getCache(source, contentType, extra);
 	}
 
 	@Override
@@ -98,6 +118,27 @@ public class SFSubmissionList extends NetworkList<Submission> {
 
 	@Override
 	protected void doSuccessNotify(Object job) {
+		// TODO queue re-update if updates was lost
+		if (updateCacheTask == null) { // yes, we can miss a latest updates here but unlocking UI worth it
+			updateCacheTask = new AsyncTask<Object, Integer, Integer>(){
+
+				@Override
+				protected Integer doInBackground(Object... params) {
+					Thread.currentThread().setName("Save cache "+((String) params[2]));
+					Utils.BrowseCache().putCache( (ViewSource) params[0], (ContentType) params[1], (String) params[2], (ArrayList<Submission>) params[3]);
+					Thread.currentThread().setName("Save cache [done]");
+					return null;
+				}
+
+				@Override
+				protected void onPostExecute(Integer result) {
+					updateCacheTask = null;
+				}
+				
+			};
+			updateCacheTask.execute(fSource, fContentType, fExtra, this);
+		}
+		
 		super.doSuccessNotify(job);
 	}
 

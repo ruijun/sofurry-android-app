@@ -14,7 +14,6 @@ import android.graphics.RectF;
 
 import android.net.Uri;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -46,7 +45,6 @@ import com.sofurry.R;
 import com.sofurry.base.classes.FavableActivity;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.mobileapi.downloaders.AsyncImageLoader;
-import com.sofurry.mobileapi.downloaders.ThumbnailDownloader;
 import com.sofurry.model.NetworkList;
 import com.sofurry.model.Submission;
 import com.sofurry.storage.FileStorage;
@@ -59,8 +57,6 @@ import java.util.ArrayList;
 
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.BounceInterpolator;
-
 import java.lang.Math;
 
 

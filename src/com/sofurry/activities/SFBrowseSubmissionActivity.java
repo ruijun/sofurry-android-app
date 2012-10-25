@@ -55,7 +55,7 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 	protected ViewSource fContentFilter = ViewSource.all;
 	protected String fExtra = "";
 	protected String fTitle = null;
-	protected int fAuthorId = -1;
+//	protected int fAuthorId = -1;
 	
 	private AsyncTask<Integer, Integer, Bitmap> iconLoader = null;
 	
@@ -68,7 +68,7 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 			fContentFilter = (ViewSource) savedInstanceState.getSerializable("ContentFilter");
 			fExtra = savedInstanceState.getString("Extra");
 			fTitle = savedInstanceState.getString("activityTitle");
-			fAuthorId = savedInstanceState.getInt("AuthorId", -1);
+//			fAuthorId = savedInstanceState.getInt("AuthorId", -1);
 		} else {
 		    Bundle extras = getIntent().getExtras();
 		    if (extras != null) {
@@ -76,9 +76,12 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 				fContentFilter = (ViewSource) extras.getSerializable("ContentFilter");
 				fExtra = extras.getString("Extra");
 				fTitle = extras.getString("activityTitle");
-				fAuthorId = extras.getInt("AuthorId", -1);
+//				fAuthorId = extras.getInt("AuthorId", -1);
 		    }
 		}
+		
+//		if (fAuthorId < 0)
+//			fAuthorId = ApiFactory.myUserProfile.userID;
 		
 		if (fContentType == null)
 			fContentType = ContentType.all;
@@ -132,7 +135,14 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 						finish();						}
 				});
 		        
-		        if (fAuthorId >= 0) {
+		        // for ViewSource.user extra MUST contain user id
+		        Integer iExtra = -1;
+		        try {
+			        iExtra = Integer.parseInt(fExtra);
+				} catch (Exception e) {
+				}
+		        
+		        if (iExtra >= 0) {
 		        	iconLoader = new AsyncTask<Integer, Integer, Bitmap>() {
 
 						@Override
@@ -154,7 +164,7 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 					    }
 					};
 		        
-					iconLoader.execute(new Integer(fAuthorId));
+					iconLoader.execute(new Integer(iExtra));
 		        }
 			}
 		}
@@ -171,7 +181,7 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 		outState.putSerializable("ContentFilter", fContentFilter);
 		outState.putString("Extra", fExtra);
 		outState.putString("activityTitle", fTitle);
-		outState.putInt("AuthorId", fAuthorId);
+//		outState.putInt("AuthorId", fAuthorId);
 	}
 
 	@Override
@@ -269,21 +279,24 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 		case AppConstants.MENU_FILTER_FEATURED:
 			setTitle("Featured");
 			fContentFilter = ViewSource.featured;
-			fExtra = ""+ApiFactory.myUserProfile.userID;
+			if ( ! Utils.isNumber(fExtra))
+				fExtra = ""+ApiFactory.myUserProfile.userID;
 			setList(createBrowseList());
 			return true;
 
 		case AppConstants.MENU_FILTER_FAVORITES:
 			setTitle("Favorites");
 			fContentFilter = ViewSource.favorites;
-			fExtra = ""+ApiFactory.myUserProfile.userID;
+			if ( ! Utils.isNumber(fExtra))
+				fExtra = ""+ApiFactory.myUserProfile.userID;
 			setList(createBrowseList());
 			return true;
 
 		case AppConstants.MENU_FILTER_WATCHLIST:
 			setTitle("Watchlist");
 			fContentFilter = ViewSource.watchlist;
-			fExtra = ""+ApiFactory.myUserProfile.userID;
+			if ( ! Utils.isNumber(fExtra))
+				fExtra = ""+ApiFactory.myUserProfile.userID;
 			setList(createBrowseList());
 			return true;
 		/*
@@ -295,7 +308,8 @@ public class SFBrowseSubmissionActivity extends AbstractBrowseActivity<Submissio
 		case AppConstants.MENU_FILTER_WATCHLIST_COMBINED:
 			setTitle("Combined");
 			fContentFilter = ViewSource.combinedwatch;
-			fExtra = ""+ApiFactory.myUserProfile.userID;
+			if ( ! Utils.isNumber(fExtra))
+				fExtra = ""+ApiFactory.myUserProfile.userID;
 			setList(createBrowseList());
 			return true;
 
