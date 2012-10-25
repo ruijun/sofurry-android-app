@@ -63,7 +63,8 @@ public class SFSubmissionList extends NetworkList<Submission> {
 			protected void onPostExecute(ArrayList<Submission> result) {
 				Cache = result;
 				// notify cache done
-				SFSubmissionList.super.doSuccessNotify(this); // call parent onSuccess as we don't want to update cache
+				if (Cache != null)
+					SFSubmissionList.super.doSuccessNotify(this); // call parent onSuccess as we don't want to update cache
 			}
 		}).execute(source, contentType, extra);
 //		Cache = Utils.BrowseCache().getCache(source, contentType, extra);
@@ -125,7 +126,7 @@ public class SFSubmissionList extends NetworkList<Submission> {
 				@Override
 				protected Integer doInBackground(Object... params) {
 					Thread.currentThread().setName("Save cache "+((String) params[2]));
-					Utils.BrowseCache().putCache( (ViewSource) params[0], (ContentType) params[1], (String) params[2], (ArrayList<Submission>) params[3]);
+					Utils.BrowseCache().putCache( (ViewSource) params[0], (ContentType) params[1], (String) params[2], (ArrayList<Submission>) params[3], (ArrayList<Submission>) params[4]);
 					Thread.currentThread().setName("Save cache [done]");
 					return null;
 				}
@@ -136,7 +137,7 @@ public class SFSubmissionList extends NetworkList<Submission> {
 				}
 				
 			};
-			updateCacheTask.execute(fSource, fContentType, fExtra, this);
+			updateCacheTask.execute(fSource, fContentType, fExtra, this, Cache);
 		}
 		
 		super.doSuccessNotify(job);
