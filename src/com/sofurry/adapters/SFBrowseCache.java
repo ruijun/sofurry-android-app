@@ -98,7 +98,7 @@ public class SFBrowseCache {
 		return list;
 	}
 
-	public void putCache(ViewSource viewSource, ContentType contentType, String extra, ArrayList<Submission> list) {
+	public void putCache(ViewSource viewSource, ContentType contentType, String extra, ArrayList<Submission> list, ArrayList<Submission> cachelist) {
 		if (list == null)
 			return;
 		
@@ -122,6 +122,22 @@ public class SFBrowseCache {
 					i++;
 				}
 			}
+			
+			if (cachelist != null)
+				if (cachelist instanceof NetworkList) {
+					Submission s = ((NetworkList<Submission>) cachelist).get(i, false, false);
+					while ( s != null) {
+						os.writeObject(s);
+						i++;
+						s = ((NetworkList<Submission>) cachelist).get(i, false, false);
+					}
+					
+				} else {
+					while (i < cachelist.size()) {
+						os.writeObject(cachelist.get(i));
+						i++;
+					}
+				}
 			
 			Cursor cursor = db.rawQuery("SELECT id FROM sfbrowsecache WHERE ViewSource=? AND ContentType=? AND Extra=?",
 					new String[] {""+viewSource.value, ""+contentType.value, ""+extra});
