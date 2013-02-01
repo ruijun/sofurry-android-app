@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical" android:gravity="center_horizontal" android:layout_height="fill_parent" android:layout_width="fill_parent" android:id="@+id/layout_main">
+<RelativeLayout android:layout_weight="0.0" android:layout_height="wrap_content" android:id="@+id/relativeLayout1" android:layout_width="fill_parent">
+    <com.sofurry.FixedViewFlipper android:layout_width="fill_parent" android:id="@+id/viewFlipper1" android:layout_height="fill_parent">
+    </com.sofurry.FixedViewFlipper>
+    <LinearLayout android:weightSum="1" android:gravity="center_vertical|center_horizontal" android:layout_width="wrap_content" android:orientation="vertical" android:layout_height="fill_parent" android:id="@+id/menuLayout" android:layout_alignParentLeft="false" android:layout_alignParentRight="true" android:layout_alignParentBottom="false">
+
+        <Button android:shadowRadius="1" android:shadowColor="#FFFFFF" android:background="@android:color/transparent" android:padding="5px" android:layout_height="wrap_content" android:shadowDy="1" android:drawableTop="@android:drawable/ic_menu_revert" android:id="@+id/BackBtn" android:shadowDx="1" android:layout_width="wrap_content" android:onClick="menuButtonClick" android:tag="art_menu_back"></Button>
+        <Button android:shadowRadius="1" android:shadowColor="#FFFFFF" android:background="@android:color/transparent" android:padding="5px" android:layout_height="wrap_content" android:shadowDy="1" android:drawableTop="@android:drawable/ic_menu_save" android:id="@+id/SaveBtn" android:shadowDx="1" android:layout_width="wrap_content" android:onClick="menuButtonClick" android:tag="art_menu_save"></Button>
+
+        <Button
+            android:id="@+id/WatchBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:drawableTop="@android:drawable/ic_menu_view"
+            android:onClick="menuButtonClick"
+            android:padding="5px"
+            android:tag="art_menu_watch" />
+
+        <Button
+            android:id="@+id/FavBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:drawableTop="@android:drawable/btn_star_big_off"
+            android:onClick="menuButtonClick"
+            android:padding="5px"
+            android:tag="art_menu_fav" />
+
+        <Button android:background="@android:color/transparent" android:padding="5px" android:layout_height="wrap_content" android:id="@+id/ArtistGalleryButton" android:layout_width="wrap_content" android:drawableTop="@android:drawable/ic_menu_gallery" android:onClick="menuButtonClick" android:tag="art_menu_more"></Button>
+    </LinearLayout>
+</RelativeLayout>
+
+</LinearLayout>

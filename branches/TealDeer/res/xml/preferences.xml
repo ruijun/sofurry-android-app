@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:sofurry="http://schemas.android.com/apk/res/com.sofurry"
+>
+	<PreferenceCategory
+		android:title="Account Information"
+	>
+		<EditTextPreference
+			android:key="username"
+			android:title="Username"
+			android:summary="SoFurry username"
+			android:dialogTitle="Enter your SoFurry username" />
+		<EditTextPreference
+			android:key="password"
+			android:title="Password"
+			android:summary="SoFurry password"
+			android:dialogTitle="Enter your SoFurry password"
+			android:inputType="textPassword" />
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="PM Settings"
+	>
+		<CheckBoxPreference
+			android:key="pmEnableChecks"
+			android:title="PM Background Checks"
+			android:defaultValue="true"
+			android:summaryOn="Will check for PMs in the background, even if the app isn't currently running."
+			android:summaryOff="Will NOT check for PMs, and thus won't show notifications." />
+		<ListPreference
+			android:key="pmCheckInterval"
+			android:title="PM Check Interval"
+			android:defaultValue="900000"
+			android:dependency="pmEnableChecks"
+			android:summary="How often the background service should check for PMs"
+			android:dialogTitle="Choose Interval. Smaller values will drain the battery faster."
+			android:entries="@array/interval_titles"
+			android:entryValues="@array/interval_values" />
+		
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="Image Library"
+	>
+		<EditTextPreference
+			android:key="imgFileNameTemplate"
+			android:dialogTitle="Image file name template"
+			android:title="Image file name template"
+			android:summary="Supports: %AUTHOR%, %NAME%, %DATE%, and %LEVEL%"
+			android:defaultValue="%AUTHOR% - %NAME%" />
+		<CheckBoxPreference
+			android:key="imgFileNameTemplateUseAdultForExtreme"
+			android:title="Do not use 'extreme'"
+			android:summary="Use only 'clean' and 'adult' for level"
+			android:defaultValue="false" />
+		
+		<CheckBoxPreference 
+		    android:defaultValue="true" 
+		    android:key="delete_incomplete_files" 
+		    android:title="Delete incomplete downloaded files"/>
+		
+		
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:title="Submission Browser">
+	    <CheckBoxPreference android:defaultValue="true" android:key="imgCheckSaved" android:title="Show if image already saved in library" android:summaryOn="Will show saved status" android:summaryOff="Will NOT show saved status" />
+	    <PreferenceScreen android:title="Thumbnail settings">
+	        <CheckBoxPreference android:summaryOff="Use original thumbnails" android:defaultValue="true" android:key="use_custom_thumbs" android:title="Use custom thumbnails" android:summaryOn="Use custom thumbnails" />
+	    	<com.sofurry.SeekBarPreference android:dialogMessage="Art gallery thimbnail size" android:key="art_gallery_thumbnail_size" android:summary="Art gallery thimbnail size" android:text=" minutes" sofurry:min="64" sofurry:defaultValue="130" sofurry:max="255" android:title="Thumbnail size" />
+	    	<com.sofurry.SpinnerPreference android:key="thumbnail_threads_count" sofurry:min="1" android:defaultValue="5" sofurry:max="10" android:title="Thumbnail download threads count" />
+	    </PreferenceScreen>
+	    <PreferenceScreen android:title="'Preload' settings">
+			<EditTextPreference android:title="Maximum items to preload" android:defaultValue="200" android:key="preload_max_items" android:summary='Number of items for "Preload items" feature' />
+	        <com.sofurry.SpinnerPreference android:key="preload_threads_count" sofurry:min="1" android:defaultValue="4" sofurry:max="10" android:title="Preload download threads count" />
+	    </PreferenceScreen>
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:title="Submission Viewer">
+	    <CheckBoxPreference android:summaryOn="Load library images" android:summaryOff="Download image" android:summary="Try use library image before download" android:title="Show images from library" android:key="imgLoadFromLib" android:defaultValue="true" />
+	    <ListPreference android:key="useHDImg" android:entries="@array/useHD_titles" android:entryValues="@array/useHD_values" android:title="Use HD images" android:dialogTitle="Choose when to use HD images" android:summary="Controls when to download HD images" android:defaultValue="0"></ListPreference>
+		<CheckBoxPreference android:summaryOn="Manual load HQ image" android:title="Click to load HQ image" android:summaryOff="Auto load HQ image" android:key="load_hd_on_click" android:defaultValue="true" />
+		
+		
+		<PreferenceScreen android:title="Side menu settings">
+		    <ListPreference android:title="Side menu position" android:key="imgMenuPosition" android:entries="@array/imgMenuPosition_titles" android:summary="position of always visible fast buttons bar" android:dialogTitle="Choose menu bar position" android:defaultValue="1" android:entryValues="@array/imgMenuPosition_values"></ListPreference>
+		    <PreferenceCategory android:title="Buttons">
+		        <CheckBoxPreference android:key="art_menu_back" android:title="Back button" android:defaultValue="true" />
+		        <CheckBoxPreference android:key="art_menu_save" android:title="Save button" android:defaultValue="true" />
+		        <CheckBoxPreference android:key="art_menu_watch" android:title="Watch button" android:defaultValue="true"/>
+		        <CheckBoxPreference android:defaultValue="true" android:key="art_menu_fav" android:title="Fav button" />
+		        <CheckBoxPreference android:key="art_menu_more" android:title="More art button" android:defaultValue="true" />
+			</PreferenceCategory>
+		</PreferenceScreen>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="Cache">
+	    <EditTextPreference android:key="thumb_cleanup_period" android:title="Delete thumbnails older than ... days (0=all, -1 = disabled)" android:defaultValue="3" />
+	    <EditTextPreference android:key="image_cleanup_period" android:title="Delete image cache older than ... days (0=all, -1 = disabled)" android:defaultValue="1" />
+	    <Preference android:title="Clean thumbnails NOW" android:key="thumb_clean_now"/>
+	    <Preference android:title="Clean image cache NOW" android:key="img_clean_now"/>
+	    		
+	</PreferenceCategory>
+</PreferenceScreen>

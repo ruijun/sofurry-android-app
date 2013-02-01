@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="SpinnerPreference">
+        <attr name="min" />
+        <attr name="max" />
+        <attr name="android:defaultValue" />
+        <attr name="currentValue" />
+    </declare-styleable>
+</resources>
