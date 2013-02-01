@@ -48,6 +48,7 @@ public final class ApiFactory {
      */
     public static final String API_URL = "http://chat.sofurry.com";
     public static final String API2_URL = "http://api2.sofurry.com";
+    public static final String CHAT_API_URL = "http://sfchat.sofurry.com";
 //    public static final String API2_URL = "http://ie1edcb55.dev.sofurry.net";
 
     /**

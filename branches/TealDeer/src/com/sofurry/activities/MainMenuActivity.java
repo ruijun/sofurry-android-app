@@ -283,7 +283,6 @@ public class MainMenuActivity
         buttonPMs_     = (Button) findViewById(R.id.pms);
 
         // disable currently unused buttons
-        setButtonEnabled(R.id.chat, false);
         setButtonEnabled(R.id.logbook, false);
         setButtonEnabled(R.id.forums, false);
 
