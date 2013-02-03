@@ -328,7 +328,7 @@ public class MainMenuActivity
 					return null;
 				}
 			};
-			cleaner.execute(null);
+			cleaner.execute((Integer[])null);
         }
     }
 
