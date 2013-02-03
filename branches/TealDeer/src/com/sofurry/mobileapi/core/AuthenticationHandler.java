@@ -174,13 +174,6 @@ public class AuthenticationHandler {
         return true;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param context
-     * @throws Exception 
-     */
     public static void savePreferences(final Context context) throws Exception {
     	if (mustReloadAuth) {
     		// we did not load latest auth preferences so should not save non actual info
@@ -208,14 +201,6 @@ public class AuthenticationHandler {
 		}
     }
 
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @param activity
-//     * @param newUsername
-//     * @param newPassword
-//     */
 //    public static void updateAuthenticationInformation(Activity activity, String newUsername, String newPassword) {
 //        username = newUsername;
 //        password = newPassword;
@@ -259,52 +244,24 @@ public class AuthenticationHandler {
         }
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
+
 /*    public static String getPassword() {
         return password;
     }
-
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
+*/
+    
     public static String getUsername() {
         return username;
     }
 
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @param newPadding
-//     */
 //    public static void setCurrentAuthenticationPadding(String newPadding) {
 //        authenticationPadding = newPadding;
 //    }
 //
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @param newSalt
-//     */
 //    public static void setCurrentAuthenticationSalt(String newSalt) {
 //        salt = newSalt;
 //    }
 //
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @param newSequence
-//     */
 //    public static void setCurrentAuthenticationSequence(long newSequence) {
 //        currentAuthenticationSequence = newSequence;
 //    }

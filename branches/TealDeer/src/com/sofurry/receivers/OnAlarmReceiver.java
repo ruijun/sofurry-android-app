@@ -14,19 +14,8 @@ import com.sofurry.services.PmNotificationService;
 
 //~--- classes ----------------------------------------------------------------
 
-/**
- * Class description
- *
- */
 public class OnAlarmReceiver
         extends BroadcastReceiver {
-    /**
-     * Method description
-     *
-     *
-     * @param context
-     * @param intent
-     */
     @Override
     public void onReceive(Context context, Intent intent) {
     	Log.i(AppConstants.TAG_STRING, "Triggering alarm");

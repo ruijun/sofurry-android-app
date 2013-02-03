@@ -89,12 +89,6 @@ public class ProgressBarHelper {
 
     //~--- get methods --------------------------------------------------------
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
     public boolean isShowing() {
         if ((pd != null) && pd.isShowing()) {
             return true;

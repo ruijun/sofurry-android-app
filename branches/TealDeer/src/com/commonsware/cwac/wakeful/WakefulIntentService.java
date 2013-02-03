@@ -29,10 +29,6 @@ import android.os.PowerManager;
 
 //~--- classes ----------------------------------------------------------------
 
-/**
- * Class description
- *
- */
 abstract public class WakefulIntentService
         extends IntentService {
     private static final String LOCK_NAME_STATIC =
@@ -42,32 +38,14 @@ abstract public class WakefulIntentService
 
     //~--- constructors -------------------------------------------------------
 
-    /**
-     * Constructs ...
-     *
-     *
-     * @param name
-     */
     public WakefulIntentService(String name) {
         super(name);
     }
 
     //~--- methods ------------------------------------------------------------
 
-    /**
-     * Method description
-     *
-     *
-     * @param intent
-     */
     abstract protected void doWakefulWork(Intent intent);
-
-    /**
-     * Method description
-     *
-     *
-     * @param intent
-     */
+    
     @Override
     final protected void onHandleIntent(Intent intent) {
         try {
@@ -77,13 +55,6 @@ abstract public class WakefulIntentService
         }
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param intent
-     * @param startId
-     */
     @Override
     public void onStart(Intent intent, int startId) {
         if (!getLock(this).isHeld()) {    // fail-safe for crash restart
@@ -93,24 +64,10 @@ abstract public class WakefulIntentService
         super.onStart(intent, startId);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param ctxt
-     * @param clsService
-     */
     public static void sendWakefulWork(Context ctxt, Class clsService) {
         sendWakefulWork(ctxt, new Intent(ctxt, clsService));
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param ctxt
-     * @param i
-     */
     public static void sendWakefulWork(Context ctxt, Intent i) {
         if (PackageManager.PERMISSION_DENIED
                 == ctxt.getPackageManager().checkPermission(

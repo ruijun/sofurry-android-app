@@ -246,29 +246,12 @@ public class FileStorage {
 		}
 		return sb.toString();
 	}
-
-    /**
-     * Method description
-     *
-     *
-     * @param fileName
-     *
-     * @return
-     */
+	
     public static String sanitizeFileName(String fileName) {
         // Remove non-permitted characters
         return sanitizeFileName(fileName, false);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param fileName
-     * @param blockDots
-     *
-     * @return
-     */
     public static String sanitizeFileName(String fileName, boolean blockDots) {
         if (blockDots) {
             return fileName.replaceAll("[$\\/?%*:.|<>\"]", "_").trim();

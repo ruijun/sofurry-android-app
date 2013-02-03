@@ -25,19 +25,10 @@ import com.sofurry.util.Utils;
 
 //~--- classes ----------------------------------------------------------------
 
-/**
- * Class description
- *
- */
 public class SettingsActivity
         extends PreferenceActivity
         implements OnSharedPreferenceChangeListener {
-    /**
-     * Method description
-     *
-     *
-     * @param savedInstanceState
-     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,10 +157,7 @@ public class SettingsActivity
 			return false;
 		}
     }
-    /**
-     * Method description
-     *
-     */
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -178,10 +166,6 @@ public class SettingsActivity
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
 
-    /**
-     * Method description
-     *
-     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -190,13 +174,6 @@ public class SettingsActivity
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param sharedPreferences
-     * @param key
-     */
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if ((key.equals(AppConstants.PREFERENCE_PM_CHECK_INTERVAL))
                 || (key.equals(AppConstants.PREFERENCE_PM_ENABLE_CHECKS))) {

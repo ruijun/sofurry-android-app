@@ -34,21 +34,11 @@ public abstract class SubmissionViewActivity
      */
     public abstract void createExtraMenuOptions(Menu menu);
 
-    /**
-     * Method description
-     *
-     */
     @Override
     public void finish() {
         super.finish();
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param savedInstanceState
-     */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -101,28 +91,12 @@ public abstract class SubmissionViewActivity
         return result;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     * @param e
-     */
     @Override
     public void onError(Exception e) {
         pbh.hideProgressDialog();
         super.onError(e);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param keyCode
-     * @param event
-     *
-     * @return
-     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && (event.getRepeatCount() == 0)) {
@@ -132,14 +106,6 @@ public abstract class SubmissionViewActivity
         return super.onKeyDown(keyCode, event);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param item
-     *
-     * @return
-     */
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 			case AppConstants.MENU_SETTINGS:
