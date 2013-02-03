@@ -60,7 +60,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
     		return -1;
     }
 
-    // viewholder to store links to intrface elements
+    // viewholder to store links to interface elements
     private class ViewHolder {
         public ImageView image = null;
         public ImageView saved_indicator = null;
