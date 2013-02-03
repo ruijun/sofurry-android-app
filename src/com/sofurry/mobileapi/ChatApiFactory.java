@@ -3,11 +3,7 @@ package com.sofurry.mobileapi;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.sofurry.mobileapi.core.Request;
-import com.sofurry.mobileapi.core.Request.HttpMode;
-import com.sofurry.requests.DataCall;
 
 /**
  * @author Rangarig

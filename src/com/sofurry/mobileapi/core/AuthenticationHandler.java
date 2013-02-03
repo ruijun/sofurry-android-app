@@ -1,11 +1,7 @@
 package com.sofurry.mobileapi.core;
 
-import android.app.Activity;
-
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import android.preference.PreferenceManager;
 
 import android.util.Log;
 
