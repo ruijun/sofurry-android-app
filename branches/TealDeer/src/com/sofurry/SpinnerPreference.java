@@ -20,7 +20,7 @@ public class SpinnerPreference extends Preference implements OnClickListener {
 	private int max = 99;
 	private int min = 0;
 
-	//конструктор, вытаскивает спецальные атрибуты настройки
+	//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ, РІС‹С‚Р°СЃРєРёРІР°РµС‚ СЃРїРµС†Р°Р»СЊРЅС‹Рµ Р°С‚СЂРёР±СѓС‚С‹ РЅР°СЃС‚СЂРѕР№РєРё
 	 public SpinnerPreference(Context context, AttributeSet attrs) {
 		 super(context, attrs);
 		 max = attrs.getAttributeIntValue("http://schemas.android.com/apk/res/com.sofurry", "max", Integer.MAX_VALUE);
@@ -30,7 +30,7 @@ public class SpinnerPreference extends Preference implements OnClickListener {
 //		 currentValue = getSharedPreferences().getInt(getKey(), defaultValue);
 	 }
 
-	//Переопределяем процедуру создания View для этой настройки
+	//РџРµСЂРµРѕРїСЂРµРґРµР»СЏРµРј РїСЂРѕС†РµРґСѓСЂСѓ СЃРѕР·РґР°РЅРёСЏ View РґР»СЏ СЌС‚РѕР№ РЅР°СЃС‚СЂРѕР№РєРё
 	 @Override
 	 protected View onCreateView(ViewGroup parent) {
 		 RelativeLayout layout = (RelativeLayout) LayoutInflater.from(getContext())
@@ -49,7 +49,7 @@ public class SpinnerPreference extends Preference implements OnClickListener {
 	 	return layout;
 	 }
 
-	//Сохранение значения настройки
+	//РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РЅР°СЃС‚СЂРѕР№РєРё
 	 private void updatePreference(int newValue) {
 		 SharedPreferences.Editor editor = getEditor();
 		 editor.putInt(getKey(), newValue);
