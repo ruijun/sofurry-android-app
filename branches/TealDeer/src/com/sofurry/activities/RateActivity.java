@@ -2,9 +2,6 @@ package com.sofurry.activities;
 
 import com.sofurry.AppConstants;
 import com.sofurry.R;
-import com.sofurry.R.id;
-import com.sofurry.R.layout;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

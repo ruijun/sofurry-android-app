@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.sofurry.AppConstants;
 import com.sofurry.model.Submission;
-import com.sofurry.storage.FileStorage;
 import com.sofurry.storage.ImageStorage;
 
 // Load or Download image asyncronously then call onImageLoad

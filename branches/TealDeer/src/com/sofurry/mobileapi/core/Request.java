@@ -11,7 +11,6 @@ import org.json.JSONObject;
 
 import com.sofurry.mobileapi.SFConstants;
 
-import android.content.SyncResult;
 import android.util.Log;
 
 /**

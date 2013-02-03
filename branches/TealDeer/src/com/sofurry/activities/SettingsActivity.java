@@ -3,9 +3,7 @@ package com.sofurry.activities;
 //~--- imports ----------------------------------------------------------------
 
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import android.os.AsyncTask;

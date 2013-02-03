@@ -1,6 +1,5 @@
 package com.sofurry.util;
 
-import com.sofurry.activities.SettingsActivity;
 import com.sofurry.adapters.SFBrowseCache;
 
 import android.app.AlertDialog;
@@ -12,7 +11,6 @@ import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.util.TypedValue;
-import android.widget.Toast;
 
 
 public class Utils {

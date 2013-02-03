@@ -6,10 +6,6 @@ import android.os.Message;
 import com.sofurry.base.interfaces.ICanHandleFeedback;
 import com.sofurry.base.interfaces.IRequestHandler;
 import com.sofurry.helpers.RefreshRequest;
-import com.sofurry.mobileapi.core.CallBack;
-import com.sofurry.util.ProgressSignal;
-
-import org.json.JSONObject;
 
 /**
  * @author Rangarig
