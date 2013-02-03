@@ -182,7 +182,7 @@ public class ImageStorage {
 	}
 	
 	/**
-	 * Löscht alle in dem Ordner enthaltenen Dateien
+	 * LÃ¶scht alle in dem Ordner enthaltenen Dateien
 	 * @throws Exception
 	 */
 	public static void cleanupImages() throws Exception {

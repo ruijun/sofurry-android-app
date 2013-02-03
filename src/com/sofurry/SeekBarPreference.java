@@ -21,7 +21,7 @@ public class SeekBarPreference extends Preference implements
 	 private int max;
 	 private int min = 0;
 
-	//конструктор, вытаскивает спецальные атрибуты настройки
+	//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ, РІС‹С‚Р°СЃРєРёРІР°РµС‚ СЃРїРµС†Р°Р»СЊРЅС‹Рµ Р°С‚СЂРёР±СѓС‚С‹ РЅР°СЃС‚СЂРѕР№РєРё
 	 public SeekBarPreference(Context context, AttributeSet attrs) {
 	 super(context, attrs);
 	 max = attrs.getAttributeIntValue("http://schemas.android.com/apk/res/com.sofurry", "max", 99);
@@ -31,7 +31,7 @@ public class SeekBarPreference extends Preference implements
 //	 currentValue = getSharedPreferences().getInt(getKey(), defaultValue);
 	 }
 
-	//Переопределяем процедуру создания View для этой настройки
+	//РџРµСЂРµРѕРїСЂРµРґРµР»СЏРµРј РїСЂРѕС†РµРґСѓСЂСѓ СЃРѕР·РґР°РЅРёСЏ View РґР»СЏ СЌС‚РѕР№ РЅР°СЃС‚СЂРѕР№РєРё
 	 @Override
 	 protected View onCreateView(ViewGroup parent) {
 
@@ -52,7 +52,7 @@ public class SeekBarPreference extends Preference implements
 	return layout;
 	 }
 
-	//Функция, вызываемая каждый раз при перемещении ползунка
+	//Р¤СѓРЅРєС†РёСЏ, РІС‹Р·С‹РІР°РµРјР°СЏ РєР°Р¶РґС‹Р№ СЂР°Р· РїСЂРё РїРµСЂРµРјРµС‰РµРЅРёРё РїРѕР»Р·СѓРЅРєР°
 	 public void onProgressChanged(SeekBar seekBar, int progress,
 	 boolean fromUser) {
 	 valueTextView.setText( (min + progress)+"");
@@ -62,14 +62,14 @@ public class SeekBarPreference extends Preference implements
 	public void onStartTrackingTouch(SeekBar seekBar) {
 	 }
 
-	//Функция, вызываемая после окончания движения пользователем
+	//Р¤СѓРЅРєС†РёСЏ, РІС‹Р·С‹РІР°РµРјР°СЏ РїРѕСЃР»Рµ РѕРєРѕРЅС‡Р°РЅРёСЏ РґРІРёР¶РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј
 	 public void onStopTrackingTouch(SeekBar seekBar) {
 	 currentValue = min + seekBar.getProgress();
 	 updatePreference(currentValue);
 	 notifyChanged();
 	 }
 
-	//Сохранение значения настройки
+	//РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РЅР°СЃС‚СЂРѕР№РєРё
 	 private void updatePreference(int newValue) {
 	 SharedPreferences.Editor editor = getEditor();
 	 editor.putInt(getKey(), newValue);
