@@ -22,9 +22,6 @@ import com.sofurry.requests.DataCall;
 
 
 /**
- * Class description
- *
- *
  * @author         SoFurry
  */
 public class SendPMActivity extends ActivityWithRequests {
@@ -36,14 +33,6 @@ public class SendPMActivity extends ActivityWithRequests {
     private TextView             messageText_;
     private TextView             subject_;
 
-
-
-    /**
-     * Method description
-     *
-     *
-     * @param v
-     */
     public void buttonClick(View v) {
         if (v.getId() == R.id.send) {
             if (sendTo_.getText().length() > 0) {
@@ -59,12 +48,6 @@ public class SendPMActivity extends ActivityWithRequests {
         }
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param savedInstanceState
-     */
     public void onCreate(Bundle savedInstanceState) {
         Cursor cursor;
 

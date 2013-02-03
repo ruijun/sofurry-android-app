@@ -13,29 +13,11 @@ import com.sofurry.AppConstants;
 import com.sofurry.R;
 import com.sofurry.receivers.OnAlarmReceiver;
 
-
-/**
- * Class description
- *
- */
 public class BootVersionChecker {
-    /**
-     * Method description
-     *
-     *
-     * @param context
-     */
     public static void scheduleAlarm(Context context) {
         BootVersionChecker.scheduleAlarm(context, false);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param context
-     * @param onlyIfNotLaunched
-     */
     public static void scheduleAlarm(Context context, boolean onlyIfNotLaunched) {
         BootVersionChecker bvc           = new BootVersionChecker();
         AlarmManager       manager       = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -72,14 +54,6 @@ public class BootVersionChecker {
         }
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param context
-     *
-     * @return
-     */
     public int getVersionCode(Context context) {
         int versionCode = 0;
 
@@ -93,14 +67,6 @@ public class BootVersionChecker {
         return versionCode;
     }
 
-    /**
-     * Method description
-     *
-     *
-     *
-     * @param context
-     * @return
-     */
     public boolean hasLaunched(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -113,12 +79,6 @@ public class BootVersionChecker {
         return true;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param context
-     */
     public void setHasLaunched(Context context) {
         SharedPreferences        prefs  = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();

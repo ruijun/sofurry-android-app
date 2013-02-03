@@ -122,15 +122,6 @@ public class RequestHandler implements IRequestHandler {
     /*
      *  (non-Javadoc)
      * @see com.sofurry.requests.CanHandleFeedback#onProgress(int, com.sofurry.requests.ProgressSignal)
-     */
-
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @param id
-//     * @param prg
-//     */
 //    public void onProgress(int id, ProgressSignal prg) {
 //        try {
 //            feedback.onProgress(id, prg);
@@ -175,13 +166,6 @@ public class RequestHandler implements IRequestHandler {
         requesthandler.sendMessage(msg);
     }
 
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @param id
-//     * @param obj
-//     */
 //    public void postMessageInline(int id, Object obj) {
 //        try {
 //            if (obj == null) {
@@ -226,11 +210,6 @@ public class RequestHandler implements IRequestHandler {
      *  (non-Javadoc)
      * @see com.sofurry.requests.CanHandleFeedback#refresh()
      */
-
-    /**
-     * Method description
-     *
-     */
     public void refresh() {
         try {
             feedback.refresh();
@@ -244,13 +223,6 @@ public class RequestHandler implements IRequestHandler {
      * @see com.sofurry.requests.IRequestHandler#getRequestHandler()
      * Returns the request handler for this session
      */
-
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
     public Handler getRequestHandler() {
         return requesthandler;
     }
@@ -261,23 +233,10 @@ public class RequestHandler implements IRequestHandler {
      *
      * Is called by running threads to see if they should terminate
      */
-
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
     public boolean isKilled() {
         return killed;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param feedback
-     */
     public void setFeedbackReceive(ICanHandleFeedback feedback) {
         this.feedback = feedback;
     }

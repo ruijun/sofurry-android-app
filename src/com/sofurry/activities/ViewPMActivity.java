@@ -50,13 +50,6 @@ public class ViewPMActivity
     private WebView       webview_;
     private int           pmId_;
 
-
-    /**
-     * Method description
-     *
-     *
-     * @param v
-     */
     public void buttonClick(View v) {
     	try {
             if (v.getId() == R.id.reply) {
@@ -76,14 +69,6 @@ public class ViewPMActivity
 		}
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param contents
-     *
-     * @return
-     */
     protected String formatContents(String contents, String fromUserName, String subject, String date) {
         StringBuilder contentBuilder;
 
@@ -110,12 +95,6 @@ public class ViewPMActivity
         return contentBuilder.toString();
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param savedInstanceState
-     */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewpm);
