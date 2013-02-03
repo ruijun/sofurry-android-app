@@ -61,7 +61,7 @@ public class ViewPMActivity
 
                 Request req = ApiFactory.createSendPM(fromUserName_,Integer.parseInt(fromUserId_),subject_.getText().toString(),messageText,pmId_);
         		AndroidRequestWrapper arw = new AndroidRequestWrapper(requesthandler, req);
-        		arw.exec(new DataCall() { public void call() { handlePMContent((JSONObject)arg1);	} });
+        		arw.exec(new DataCall() { public void call() { handleSendData((JSONObject)arg1);	} });
                 
             }
 		} catch (Exception e) {
