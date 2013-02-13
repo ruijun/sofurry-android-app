@@ -47,12 +47,6 @@ public class MainMenuActivity
     
     private AsyncTask<Integer, Integer, Integer> cleaner = null;
 
-    /**
-     * Method description
-     *
-     *
-     * @param v
-     */
     public void buttonClick(View v) {
         int    activityId = -1;
         int    id         = v.getId();
@@ -217,14 +211,6 @@ public class MainMenuActivity
 		}
     }
     
-    /**
-     * Method description
-     *
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param intent
-     */
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
@@ -252,12 +238,6 @@ public class MainMenuActivity
         }
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param savedInstanceState
-     */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -283,7 +263,6 @@ public class MainMenuActivity
         buttonPMs_     = (Button) findViewById(R.id.pms);
 
         // disable currently unused buttons
-        setButtonEnabled(R.id.chat, false);
         setButtonEnabled(R.id.logbook, false);
         setButtonEnabled(R.id.forums, false);
 
@@ -329,7 +308,7 @@ public class MainMenuActivity
 					return null;
 				}
 			};
-			cleaner.execute(null);
+			cleaner.execute((Integer[])null);
         }
     }
 
@@ -353,10 +332,6 @@ public class MainMenuActivity
 		}
     }
 
-    /**
-     * Method description
-     *
-     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -378,12 +353,6 @@ public class MainMenuActivity
         checkButtonDisabledState();
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param outState
-     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -393,18 +362,10 @@ public class MainMenuActivity
         storeObject("cleaner", cleaner);
     }
 
-    /**
-     * Method description
-     *
-     */
     protected void setupAlarmIfNeeded() {
         BootVersionChecker.scheduleAlarm(getApplicationContext(), true);
     }
 
-    /**
-     * Method description
-     *
-     */
     protected void updateButtons() {
         // Alter the PM button based on the number of messages
         if (messageCount_ > 0) {

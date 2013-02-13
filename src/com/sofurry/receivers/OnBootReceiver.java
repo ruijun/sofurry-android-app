@@ -11,18 +11,8 @@ import android.content.Intent;
 
 //~--- classes ----------------------------------------------------------------
 
-/**
- * Class description
- */
 public class OnBootReceiver
         extends BroadcastReceiver {
-    /**
-     * Method description
-     *
-     *
-     * @param context
-     * @param intent
-     */
     @Override
     public void onReceive(Context context, Intent intent) {
         Context newContext = context.getApplicationContext();

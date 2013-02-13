@@ -44,12 +44,6 @@ public abstract class ActivityWithRequests
     protected String errorTitle_;
     protected long   uniquestoragekey = System.nanoTime();
 
-
-
-    /**
-     * Method description
-     *
-     */
     public void cancel() {
         requesthandler.killThreads();
         finish();
@@ -64,10 +58,6 @@ public abstract class ActivityWithRequests
 
     // Goes back to the story list
 
-    /**
-     * Method description
-     *
-     */
     protected void closeList() {
         Bundle bundle  = new Bundle();
         Intent mIntent = new Intent();
@@ -77,12 +67,6 @@ public abstract class ActivityWithRequests
         finish();
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param savedInstanceState
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
@@ -106,14 +90,6 @@ public abstract class ActivityWithRequests
         super.onCreate(savedInstanceState);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     *
-     * @return
-     */
     @Override
     protected Dialog onCreateDialog(int id) {
         Dialog dialog = null;
@@ -127,54 +103,22 @@ public abstract class ActivityWithRequests
         return dialog;
     }
 
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @param id
-//     * @param obj
-//     *
-//     * @throws Exception
-//     */
 //    public void onData(int id, JSONObject obj) throws Exception {
 //        pbh.hideProgressDialog();
 //
 //        throw new Exception("JSONObject received, but no handler implemented.");
 //    }
 
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     * @param e
-     */
     public void onError(Exception e) {
         pbh.hideProgressDialog();
         ErrorHandler.showError(this, e);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     * @param obj
-     *
-     * @throws Exception
-     */
     public void onOther(int id, Object obj) throws Exception {
         throw new Exception("Unexpected object type "
                             + obj.getClass().getName() + " received.");
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     * @param dialog
-     */
     @Override
     protected void onPrepareDialog(int id, Dialog dialog) {
         switch (id) {
@@ -184,36 +128,15 @@ public abstract class ActivityWithRequests
         }
     }
 
-//    /**
-//     * Method description
-//     *
-//     *
-//     * @param id
-//     * @param prg
-//     *
-//     * @throws Exception
-//     */
 //    public void onProgress(int id, ProgressSignal prg) throws Exception {
 //        pbh.setProgress(prg);
 //    }
 
-    /**
-     * Method description
-     *
-     *
-     * @param savedInstanceState
-     */
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param outState
-     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putLong("unique", uniquestoragekey);
@@ -221,12 +144,6 @@ public abstract class ActivityWithRequests
         super.onSaveInstanceState(outState);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @throws Exception
-     */
     public void refresh() throws Exception {
         // Intentionally left blank
     }

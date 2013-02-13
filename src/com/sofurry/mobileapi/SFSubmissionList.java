@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
 import com.sofurry.AppConstants;
-import com.sofurry.adapters.SFBrowseCache;
 import com.sofurry.base.interfaces.IJobStatusCallback;
 import com.sofurry.mobileapi.ApiFactory.ContentType;
 import com.sofurry.mobileapi.ApiFactory.ParseBrowseResult;

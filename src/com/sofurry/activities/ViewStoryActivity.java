@@ -28,23 +28,11 @@ public class ViewStoryActivity extends FavableActivity {
     private String  content;
     private WebView webview;
 
-    /**
-     * Method description
-     *
-     *
-     * @param menu
-     */
     @Override
     public void createExtraMenuOptions(Menu menu) {
         super.createExtraMenuOptions(menu);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param savedInstanceState
-     */
     public void onCreate(Bundle savedInstanceState) {
         boolean mustFetch = true;
 
@@ -93,12 +81,6 @@ public class ViewStoryActivity extends FavableActivity {
 		}
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param outState
-     */
     protected void onSaveInstanceState(Bundle outState) {
         if (!pbh.isShowing()) {
             storeObject("content", content);
@@ -107,10 +89,6 @@ public class ViewStoryActivity extends FavableActivity {
         super.onSaveInstanceState(outState);
     }
 
-    /**
-     * Method description
-     *
-     */
     @Override
     public void save() {
         try {

@@ -69,7 +69,7 @@ public class ProgressBarHelper {
         pd.setCancelable(true);
         setCancelListener();
 
-        // Will allow the application to react to cancel reqeusts
+        // Will allow the application to react to cancel requests
         pd.show();
 
         // Read more: http://www.brighthub.com/mobile/google-android/articles/43168.aspx#ixzz10FQ3en3x
@@ -89,12 +89,6 @@ public class ProgressBarHelper {
 
     //~--- get methods --------------------------------------------------------
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
     public boolean isShowing() {
         if ((pd != null) && pd.isShowing()) {
             return true;
