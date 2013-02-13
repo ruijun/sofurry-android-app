@@ -5,12 +5,15 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 >
-
+
+
+
     <TextView
         android:id="@+id/user_profile_nickname"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" android:layout_gravity="center_vertical|center_horizontal" android:visibility="gone" android:gravity="center_horizontal" android:textSize="10pt" android:text="name"/>
-
+
+
     <ImageView
         android:id="@+id/user_profile_avatar"
         android:layout_width="wrap_content"

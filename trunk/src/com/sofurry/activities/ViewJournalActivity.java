@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
-import org.json.JSONObject;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,11 +12,7 @@ import android.widget.Toast;
 
 import com.sofurry.base.classes.SubmissionViewActivity;
 import com.sofurry.mobileapi.ApiFactory;
-import com.sofurry.mobileapi.core.Request;
-import com.sofurry.mobileapi.downloaders.AsyncFileDownloader;
 import com.sofurry.mobileapi.downloaders.ContentDownloader;
-import com.sofurry.requests.AndroidRequestWrapper;
-import com.sofurry.requests.DataCall;
 import com.sofurry.storage.FileStorage;
 
 /**

@@ -3,11 +3,7 @@ package com.sofurry.mobileapi;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.sofurry.mobileapi.core.Request;
-import com.sofurry.mobileapi.core.Request.HttpMode;
-import com.sofurry.requests.DataCall;
 
 /**
  * @author Rangarig
@@ -19,7 +15,8 @@ import com.sofurry.requests.DataCall;
  */
 public class ChatApiFactory {
 
-	public static final String CHAT_API_URL = ApiFactory.API2_URL; 
+	public static final String CHAT_API_URL = ApiFactory.CHAT_API_URL; 
+	private static final String FORMAT = "?format=json";
 	
 	/**
 	 * Currently logged in user joins the specified chatroom
@@ -29,7 +26,7 @@ public class ChatApiFactory {
 	 */
 	public static Request createJoin(int room) {
 		Request req = new Request();
-		req.setURL(CHAT_API_URL + "/chat/feed/join");
+		req.setURL(CHAT_API_URL + "/chat/feed/join" + FORMAT);
 		req.setParameter("format", "json"); // Currently not Supported
 		req.setParameter("room", ""+ room);
 		req.setParameter("character", "-1"); // Currently not supported
@@ -48,7 +45,7 @@ public class ChatApiFactory {
 				return toprocess;
 			}
 		};
-		req.setURL(CHAT_API_URL + "/chat/feed/part");
+		req.setURL(CHAT_API_URL + "/chat/feed/part" + FORMAT);
 		req.setParameter("format", "json"); // Currently not Supported
 		req.setParameter("room", ""+ room);
 		req.setParameter("character", "-1"); // Currently not supported
@@ -63,7 +60,7 @@ public class ChatApiFactory {
 	 */
 	public static Request createRoomList() {
 		Request req = new Request();
-		req.setURL(CHAT_API_URL + "/chat/api/roomlist");
+		req.setURL(CHAT_API_URL + "/chat/api/roomlist" + FORMAT);
 		req.setParameter("format","json");
 		return req;
 	}
@@ -76,7 +73,7 @@ public class ChatApiFactory {
 	 */
 	public static Request createUserList(int roomid) {
 		Request req = new Request();
-		req.setURL(CHAT_API_URL + "/chat/feed/userlist");
+		req.setURL(CHAT_API_URL + "/chat/feed/userlist" + FORMAT);
 //		req.setMode(HttpMode.get);
 		req.setParameter("room", "" + roomid);
 		req.setParameter("format","json");
@@ -143,7 +140,7 @@ public class ChatApiFactory {
 				return newjson;
 			}
 		};
-		req.setURL(CHAT_API_URL + "/chat/feed/backlog");
+		req.setURL(CHAT_API_URL + "/chat/feed/backlog" + FORMAT);
 		req.setParameter("startID", "" + startID);
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < roomids.length; i++) {
@@ -193,7 +190,7 @@ public class ChatApiFactory {
 	 * The status to set
 	 */
 	private static void createStatus(Request req, String status) {
-		req.setURL(CHAT_API_URL + "/chat/feed/statusupdate");
+		req.setURL(CHAT_API_URL + "/chat/feed/statusupdate" + FORMAT);
 		req.setParameter("status", status);
 	}
 	
@@ -243,13 +240,13 @@ public class ChatApiFactory {
 			// Invokes the help
 			if (check.startsWith("help"))
 			{
-				req.setURL(CHAT_API_URL + "/chat/feed/help");
+				req.setURL(CHAT_API_URL + "/chat/feed/help" + FORMAT);
 				return req;
 			}
 			
 			// Allows to pose a character action
 			if (check.startsWith("me")) {
-				req.setURL(CHAT_API_URL + "/chat/feed/sendmessage");
+				req.setURL(CHAT_API_URL + "/chat/feed/sendmessage" + FORMAT);
 				req.setParameter("action", "y");
 				req.setParameter("text", text);
 				return req;
@@ -257,14 +254,14 @@ public class ChatApiFactory {
 
 			// Talks to a user in private (whisper)
 			if (check.startsWith("pm") || check.startsWith("whisper")) {
-				req.setURL(CHAT_API_URL + "/chat/feed/sendwhisper");
+				req.setURL(CHAT_API_URL + "/chat/feed/sendwhisper" + FORMAT);
 				req.setParameter("text", text);
 				return req;
 			}
 			
 			// Bans a user
 			if (check.startsWith("ban")) {
-				req.setURL(CHAT_API_URL + "/chat/feed/modban");
+				req.setURL(CHAT_API_URL + "/chat/feed/modban" + FORMAT);
 				
 				String[] param = parse(check,4,"ban username length reason");
 				req.setParameter("username", param[1]);
@@ -275,7 +272,7 @@ public class ChatApiFactory {
 			
 			// Bans a user with ageban
 			if (check.startsWith("ageban")) {
-				req.setURL(CHAT_API_URL + "/chat/feed/ageban");
+				req.setURL(CHAT_API_URL + "/chat/feed/ageban" + FORMAT);
 				
 				String[] param = parse(check,4,"ageban username length reason");
 				req.setParameter("username", param[1]);
@@ -286,7 +283,7 @@ public class ChatApiFactory {
 			
 			// Kicks a user from the chatroom
 			if (check.startsWith("kick")) {
-				req.setURL(CHAT_API_URL + "/chat/feed/kick");
+				req.setURL(CHAT_API_URL + "/chat/feed/kick" + FORMAT);
 
 				String[] param = parse(check,3,"kick username reason");
 				req.setParameter("username", param[1]);
@@ -306,7 +303,7 @@ public class ChatApiFactory {
 			
 			// Mute a user (warning, not implemented yet)
 			if (check.startsWith("mute")) {
-				req.setURL(CHAT_API_URL + "/chat/feed/mute");
+				req.setURL(CHAT_API_URL + "/chat/feed/mute" + FORMAT);
 
 				String[] param = parse(check,3,"warn username reason");
 				req.setParameter("username", param[1]);
@@ -340,14 +337,14 @@ public class ChatApiFactory {
 
 			// Allows to block a user
 			if (check.startsWith("block")) {
-				req.setURL(CHAT_API_URL + "/chat/feed/block");
+				req.setURL(CHAT_API_URL + "/chat/feed/block" + FORMAT);
 				req.setParameter("username", restOfLine(check));
 				return req;
 			}
 
 			// Allows to unblock a user
 			if (check.startsWith("unblock")) {
-				req.setURL(CHAT_API_URL + "/chat/feed/unblock");
+				req.setURL(CHAT_API_URL + "/chat/feed/unblock" + FORMAT);
 				req.setParameter("username", restOfLine(check));
 				return req;
 			}
@@ -356,7 +353,7 @@ public class ChatApiFactory {
 		}
 		
 		// no special command found, so the text is simply posted
-		req.setURL(CHAT_API_URL + "/chat/feed/sendmessage");
+		req.setURL(CHAT_API_URL + "/chat/feed/sendmessage" + FORMAT);
 		req.setParameter("text", text);
 		return req;
 	}

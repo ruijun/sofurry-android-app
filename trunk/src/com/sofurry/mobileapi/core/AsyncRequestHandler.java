@@ -2,7 +2,6 @@ package com.sofurry.mobileapi.core;
 
 import org.json.JSONObject;
 
-import android.os.Looper;
 import android.util.Log;
 
 /**

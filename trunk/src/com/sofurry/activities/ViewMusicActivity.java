@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -22,7 +21,6 @@ import com.sofurry.base.classes.FavableActivity;
 import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.core.Request;
 import com.sofurry.mobileapi.core.RequestException;
-import com.sofurry.mobileapi.downloaders.AsyncFileDownloader;
 import com.sofurry.requests.AndroidDownloadWrapper;
 import com.sofurry.requests.AndroidRequestWrapper;
 import com.sofurry.requests.DataCall;

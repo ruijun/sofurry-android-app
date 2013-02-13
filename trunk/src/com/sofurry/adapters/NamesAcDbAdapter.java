@@ -11,9 +11,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Class description
- *
- *
  * @author         SoFurry
  */
 public class NamesAcDbAdapter {
@@ -34,100 +31,47 @@ public class NamesAcDbAdapter {
     private static class DatabaseHelper
             extends SQLiteOpenHelper {
 
-        /**
-         * Constructs ...
-         *
-         *
-         * @param context
-         */
         public DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
 
         //~--- methods --------------------------------------------------------
 
-        /**
-         * Method description
-         *
-         *
-         * @param db
-         */
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE names (_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);");
         }
 
-        /**
-         * Method description
-         *
-         *
-         * @param db
-         * @param oldVersion
-         * @param newVersion
-         */
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
     }
 
 
     /**
-     * Class description
-     *
-     *
      * @author         SoFurry
      */
     public class Names {
 
-        /**
-         * Method description
-         *
-         *
-         * @param name
-         */
         public void addName(String name) {
             if (!hasName(name)) {
                 db_.execSQL("INSERT INTO names (name) VALUES (?)", new String[] { name });
             }
         }
 
-        /**
-         * Method description
-         *
-         */
         public void clearAllNames() {
             db_.execSQL("DELETE FROM names");
         }
 
-        /**
-         * Method description
-         *
-         *
-         * @param name
-         */
         public void removeName(String name) {
             db_.execSQL("DELETE FROM names WHERE name=?", new String[] { name });
         }
 
         //~--- get methods ----------------------------------------------------
 
-        /**
-         * Method description
-         *
-         *
-         * @return
-         */
         public Cursor getNames() {
             return db_.rawQuery("SELECT _id, name FROM names ORDER BY name ASC", null);
         }
 
-        /**
-         * Method description
-         *
-         *
-         * @param name
-         *
-         * @return
-         */
         public boolean hasName(String name) {
             Cursor  cursor;
             boolean found = false;
@@ -151,34 +95,16 @@ public class NamesAcDbAdapter {
 
     //~--- constructors -------------------------------------------------------
 
-    /**
-     * Constructs ...
-     *
-     *
-     * @param context
-     */
     public NamesAcDbAdapter(Context context) {
         context_ = context;
     }
 
     //~--- methods ------------------------------------------------------------
 
-    /**
-     * Method description
-     *
-     */
     public void close() {
         dbHelper_.close();
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     *
-     * @throws SQLException
-     */
     public NamesAcDbAdapter open() throws SQLException {
         dbHelper_ = new DatabaseHelper(context_);
         db_       = dbHelper_.getWritableDatabase();

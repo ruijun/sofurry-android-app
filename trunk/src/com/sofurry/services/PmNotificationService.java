@@ -19,10 +19,6 @@ import com.sofurry.mobileapi.ApiFactory;
 import com.sofurry.mobileapi.core.AuthenticationHandler;
 import com.sofurry.mobileapi.core.Request;
 
-/**
- *
- *
- */
 public class PmNotificationService extends WakefulIntentService {
     private static long lastCheck_ = 0;
     private SharedPreferences prefs;
@@ -120,12 +116,6 @@ public class PmNotificationService extends WakefulIntentService {
         prefs.edit().putLong(AppConstants.PREFERENCE_LAST_PM_CHECK_TIME, PmNotificationService.lastCheck_).commit();
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
     protected Request createRequest() {
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -136,12 +126,6 @@ public class PmNotificationService extends WakefulIntentService {
     	return ApiFactory.createUnreadPMCount(PmNotificationService.lastCheck_);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
 /*    protected boolean hasAuthInformation() {
         if ((AuthenticationHandler.getUsername() == null) || (AuthenticationHandler.getUsername().trim().length() <= 0)
                 || (AuthenticationHandler.getPassword() == null) || (AuthenticationHandler.getPassword().trim().length() <= 0)) {

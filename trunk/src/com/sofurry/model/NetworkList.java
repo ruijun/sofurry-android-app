@@ -1,8 +1,6 @@
 package com.sofurry.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
 import com.sofurry.base.interfaces.IAddObjectCallback;
 import com.sofurry.base.interfaces.ICanCancel;
 import com.sofurry.base.interfaces.IJobStatusCallback;

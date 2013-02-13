@@ -13,7 +13,6 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -61,7 +60,7 @@ public class SubmissionGalleryAdapter extends BaseAdapter {
     		return -1;
     }
 
-    // viewholder to store links to intrface elements
+    // viewholder to store links to interface elements
     private class ViewHolder {
         public ImageView image = null;
         public ImageView saved_indicator = null;

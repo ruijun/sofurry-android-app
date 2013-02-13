@@ -35,22 +35,10 @@ public class TwoLineIconViewWrapper {
     private View      base_;
 
 
-    /**
-     * Constructs ...
-     *
-     *
-     * @param base
-     */
     public TwoLineIconViewWrapper(View base) {
         base_ = base;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
     public TextView getBottomText() {
     	if (bottomText_ == null) {
     		bottomText_ = (TextView)base_.findViewById(R.id.bottomtext);
@@ -59,12 +47,6 @@ public class TwoLineIconViewWrapper {
         return bottomText_;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
     public TextView getCenterText() {
     	if (centerText_ == null) {
     		centerText_ = (TextView)base_.findViewById(R.id.centertext);
@@ -73,12 +55,6 @@ public class TwoLineIconViewWrapper {
         return centerText_;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
     public ImageView getIcon() {
     	if (icon_ == null) {
     		icon_ = (ImageView)base_.findViewById(R.id.icon);
@@ -87,12 +63,6 @@ public class TwoLineIconViewWrapper {
         return icon_;
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @return
-     */
     public TextView getTopText() {
     	if (topText_ == null) {
     		topText_ = (TextView)base_.findViewById(R.id.toptext);

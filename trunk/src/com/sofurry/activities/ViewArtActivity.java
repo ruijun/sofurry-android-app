@@ -563,12 +563,6 @@ public class ViewArtActivity
 	private Animation aRightIn = null;
 	private Animation aRightOut = null;
 
-    /**
-     * Method description
-     *
-     *
-     * @param menu
-     */
     @Override
     public void createExtraMenuOptions(Menu menu) {
         menu.add(0, AppConstants.MENU_HD, 0, "HD View").setIcon(android.R.drawable.ic_menu_gallery);
@@ -596,12 +590,6 @@ public class ViewArtActivity
     	startActivity(intent);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param savedInstanceState
-     */
     public void onCreate(Bundle savedInstanceState) {
     	PageHolder curpage = null;
 
@@ -898,27 +886,11 @@ public class ViewArtActivity
 		}
 	}
 
-
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     * @param e
-     */
     @Override
     public void onError(Exception e) {
         super.onError(e);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param item
-     *
-     * @return
-     */
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case AppConstants.MENU_HD:
@@ -935,15 +907,6 @@ public class ViewArtActivity
         }
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param id
-     * @param obj
-     *
-     * @throws Exception
-     */
     @Override
     public void onOther(int id, Object obj) throws Exception {
 //        pbh.hideProgressDialog();
@@ -951,12 +914,6 @@ public class ViewArtActivity
         super.onOther(id, obj);
     }
 
-    /**
-     * Method description
-     *
-     *
-     * @param outState
-     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         pages.get(0).store("0");
