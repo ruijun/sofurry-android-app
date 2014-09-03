@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="FilenamePreference">
+        <attr name="android:defaultValue" />
+        <attr name="filename" format="string" />
+        <attr name="folder_select" format="boolean" />
+    </declare-styleable>
+</resources>

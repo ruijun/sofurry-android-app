@@ -1361,10 +1361,10 @@ public class ViewArtActivity
 
 		PageHolder p = pages.get(curpageId);
 		if (p != null) {
-			boolean fieloaded = ( p.imageLoaded ) || // short check
+			boolean fileloaded = ( p.imageLoaded ) || // short check
 		 			( p.submission.isSubmissionFileExists() ); // hard check
 
-			if (fieloaded) {
+			if (fileloaded) {
 				if (p.imageLoader != null)
 		            showToast("Warning: download in progress");
 		  		doHdView(p.submission);
