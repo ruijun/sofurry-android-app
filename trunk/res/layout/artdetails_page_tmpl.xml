@@ -13,8 +13,8 @@
                 android:adjustViewBounds="true"
                 android:clickable="true"
                 android:scaleType="matrix" >
-</ImageView>
-
+            </ImageView>
+
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
                     android:scaleType="fitXY"
                     android:src="@android:drawable/ic_menu_save"
                     android:visibility="invisible" >
-</ImageView>
+				</ImageView>
 
                 <TextView
                     android:id="@+id/InfoText"
@@ -45,10 +45,9 @@
                     android:text=" Art Description with wrap long names"
                     android:textColor="#FFFFFFFF"
                     android:textSize="16px" >
-</TextView>
-
-            </LinearLayout>
-
+				</TextView>
+			</LinearLayout>
+			
             <TextView
                 android:id="@+id/hq_indicator"
                 android:layout_width="wrap_content"

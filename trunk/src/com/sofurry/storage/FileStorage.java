@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 import com.sofurry.AppConstants;
+import com.sofurry.util.Utils;
 
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class FileStorage {
@@ -225,9 +228,22 @@ public class FileStorage {
 	 * @param fname
 	 * The filename to be saved
 	 * @return
+	 * @throws Exception 
 	 */
+	public static String getUserStorageRoot() throws Exception {
+		SharedPreferences sp = Utils.getPreferences(null);
+	
+		if (sp == null) {
+			throw new Exception("FileStorage.getUserStorageRoot: Shared preferences not available"); 
+		} else {
+			return sp.getString("LibraryRoot", FileStorage.getExternalMediaRoot() + "/SoFurry Files")+"/";
+		}
+		
+//		return FileStorage.getExternalMediaRoot() + "/SoFurry Files/";
+	}
+	
 	public static String getUserStoragePath(String type, String fname) throws Exception {
-		return FileStorage.getExternalMediaRoot() + "/SoFurry Files/"+type+"/" + sanitize(fname);
+		return getUserStorageRoot()+type+"/" + sanitize(fname);
 	}
 	
 	/**
